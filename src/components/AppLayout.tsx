@@ -97,7 +97,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
             ) : (
               <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-3 text-sm font-medium">
-                כניסת מנהל
+                התחברות
               </Link>
             )}
           </nav>

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AppLayout from "@/components/AppLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Policy from "./pages/Policy";
 import Directory from "./pages/Directory";
@@ -13,6 +14,11 @@ import ApplicationForm from "./pages/ApplicationForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
 import LocationCard from "./pages/LocationCard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import UpdatePassword from "./pages/UpdatePassword";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,8 +38,13 @@ const App = () => (
               <Route path="/truck/:id" element={<TruckProfile />} />
               <Route path="/apply" element={<ApplicationForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/login" element={<AdminLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/update-password" element={<UpdatePassword />} />
               <Route path="/location-card" element={<LocationCard />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
