@@ -2,3 +2,6 @@ project_id = "muybtvenrzqtkswxafyq"
 
 [functions.notify-status-change]
 verify_jwt = false
+
+[functions.parse-excel]
+verify_jwt = false
