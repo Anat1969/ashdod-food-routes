@@ -115,6 +115,24 @@ export default function Directory() {
     );
   };
 
+  const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
+
+  const updateOperatorName = async (truckId: string, value: string) => {
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ operator_name: value || null } as any)
+      .eq("id", truckId);
+    if (error) {
+      toast.error("שגיאה בעדכון שם המפעיל");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) =>
+        t.id === truckId ? { ...t, operator_name: value || null } : t
+      )
+    );
+  };
+
   const filtered = trucks.filter((t) => {
     const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
