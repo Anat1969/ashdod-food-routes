@@ -213,7 +213,7 @@ export default function Directory() {
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[200px] h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm">
             <SelectValue placeholder="סטטוס" />
           </SelectTrigger>
           <SelectContent>
