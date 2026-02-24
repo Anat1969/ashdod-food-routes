@@ -1,0 +1,1 @@
+ALTER TABLE public.food_trucks ADD COLUMN operator_name text;

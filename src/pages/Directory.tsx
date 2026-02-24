@@ -115,8 +115,26 @@ export default function Directory() {
     );
   };
 
+  const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
+
+  const updateOperatorName = async (truckId: string, value: string) => {
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ operator_name: value || null } as any)
+      .eq("id", truckId);
+    if (error) {
+      toast.error("שגיאה בעדכון שם המפעיל");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) =>
+        t.id === truckId ? { ...t, operator_name: value || null } : t
+      )
+    );
+  };
+
   const filtered = trucks.filter((t) => {
-    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search);
+    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search) || ((t as any).operator_name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -164,7 +182,7 @@ export default function Directory() {
                 <TableHead className="text-right">עמדה</TableHead>
                 <TableHead className="text-right">פודטראק</TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
-                <TableHead className="text-right">מיקום עמדה</TableHead>
+                <TableHead className="text-right">שם המפעיל</TableHead>
                 <TableHead className="text-right">סטטוס</TableHead>
                 <TableHead className="text-right">תאריך הגשה</TableHead>
               </TableRow>
@@ -227,9 +245,20 @@ export default function Directory() {
                       </div>
                     </div>
                   </TableCell>
-                  {/* מיקום עמדה */}
+                  {/* שם המפעיל */}
                   <TableCell>
-                    <Checkbox checked={!!truck.location} disabled />
+                    <Input
+                      className="h-8 text-xs w-[140px]"
+                      placeholder="שם המפעיל"
+                      value={operatorEdits[truck.id] ?? (truck as any).operator_name ?? ""}
+                      onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
+                      onBlur={() => {
+                        const val = operatorEdits[truck.id];
+                        if (val !== undefined && val !== ((truck as any).operator_name ?? "")) {
+                          updateOperatorName(truck.id, val);
+                        }
+                      }}
+                    />
                   </TableCell>
                   {/* סטטוס */}
                   <TableCell>
