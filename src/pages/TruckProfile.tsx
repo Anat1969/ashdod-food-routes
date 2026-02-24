@@ -13,7 +13,7 @@ import FileUpload from "@/components/FileUpload";
 import { COMPLIANCE_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Clock, MapPin, Check, X } from "lucide-react";
+import { Clock, MapPin, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TruckProfile() {
@@ -82,6 +82,13 @@ export default function TruckProfile() {
     });
     setNewNote("");
     toast.success("הערה נוספה");
+    fetchData();
+  };
+
+  const deleteNote = async (noteId: string) => {
+    if (!isAdmin) return;
+    await supabase.from("activity_log").delete().eq("id", noteId);
+    toast.success("הערה נמחקה");
     fetchData();
   };
 
@@ -207,26 +214,49 @@ export default function TruckProfile() {
         </TabsContent>
 
         <TabsContent value="history">
+          {/* Admin notes section - visible to operators too */}
+          {history.filter(e => e.action === "note").length > 0 && (
+            <Card className="municipal-shadow mb-4 border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-lg">הערות מנהל</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {history.filter(e => e.action === "note").map((entry) => (
+                  <div key={entry.id} className="flex items-start justify-between gap-3 py-2 border-b last:border-b-0">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-primary" />
+                      <div>
+                        <p className="text-sm">{entry.note}</p>
+                        <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
+                      </div>
+                    </div>
+                    {isAdmin && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteNote(entry.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="municipal-shadow">
             <CardHeader>
               <CardTitle className="text-lg">היסטוריית שינויים</CardTitle>
             </CardHeader>
             <CardContent>
-              {history.length === 0 ? (
+              {history.filter(e => e.action !== "note").length === 0 ? (
                 <p className="text-muted-foreground text-sm">אין היסטוריה עדיין</p>
               ) : (
                 <div className="space-y-4">
-                  {history.map((entry) => (
+                  {history.filter(e => e.action !== "note").map((entry) => (
                     <div key={entry.id} className="flex gap-3 items-start border-b pb-3 last:border-b-0">
-                      <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${entry.action === "note" ? "bg-primary" : "bg-accent"}`} />
+                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-accent" />
                       <div>
-                        {entry.action === "status_change" ? (
-                          <p className="text-sm">
-                            שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status as TruckStatus] || entry.old_status : "חדש"} ← {STATUS_LABELS[entry.new_status as TruckStatus] || entry.new_status}
-                          </p>
-                        ) : (
-                          <p className="text-sm">{entry.note}</p>
-                        )}
+                        <p className="text-sm">
+                          שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status as TruckStatus] || entry.old_status : "חדש"} ← {STATUS_LABELS[entry.new_status as TruckStatus] || entry.new_status}
+                        </p>
                         <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
                       </div>
                     </div>
