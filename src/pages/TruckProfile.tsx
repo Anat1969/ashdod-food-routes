@@ -188,7 +188,11 @@ export default function TruckProfile() {
                   </label>
                 </div>
               </div>
-              <InfoRow label="שם המפעיל" value={(truck as any).operator_name} />
+              <EditableOperatorName
+                truck={truck}
+                isAdmin={isAdmin}
+                onSaved={fetchData}
+              />
               <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
             </CardContent>
           </Card>
