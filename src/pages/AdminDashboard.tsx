@@ -9,6 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { BarChart3, Clock, CheckCircle, XCircle, Search } from "lucide-react";
+import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminDashboard() {
   const { isAdmin, loading: authLoading } = useAuth();
