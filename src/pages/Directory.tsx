@@ -248,7 +248,7 @@ export default function Directory() {
                   {/* שם המפעיל */}
                   <TableCell>
                     <Input
-                      className="h-8 text-xs w-[140px]"
+                      className={`h-8 text-xs w-[140px] ${(truck as any).operator_name ? "border-green-500" : "border-destructive"}`}
                       placeholder="שם המפעיל"
                       value={operatorEdits[truck.id] ?? (truck as any).operator_name ?? ""}
                       onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
