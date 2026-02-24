@@ -100,7 +100,10 @@ Deno.serve(async (req) => {
     const resendData = await resendRes.json();
 
     if (!resendRes.ok) {
-      throw new Error(`Resend API error [${resendRes.status}]: ${JSON.stringify(resendData)}`);
+      console.warn(`Resend API warning [${resendRes.status}]: ${JSON.stringify(resendData)}`);
+      return new Response(JSON.stringify({ success: true, skipped: "email_send_failed", detail: resendData.message }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(JSON.stringify({ success: true, email_id: resendData.id }), {
