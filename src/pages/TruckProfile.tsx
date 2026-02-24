@@ -10,8 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
 import FileUpload from "@/components/FileUpload";
+import LocationCard from "@/components/LocationCard";
 import { COMPLIANCE_ITEMS } from "@/lib/types";
-import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog } from "@/lib/types";
+import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { Clock, MapPin, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +23,9 @@ export default function TruckProfile() {
   const [truck, setTruck] = useState<FoodTruck | null>(null);
   const [compliance, setCompliance] = useState<ComplianceChecklist | null>(null);
   const [history, setHistory] = useState<ActivityLog[]>([]);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [operator, setOperator] = useState<Profile | null>(null);
+  const [expertOpinion, setExpertOpinion] = useState<any>(null);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +43,19 @@ export default function TruckProfile() {
     setTruck(truckRes.data);
     setCompliance(complianceRes.data);
     setHistory(historyRes.data || []);
+
+    // Fetch related data for location card
+    if (truckRes.data?.location_id) {
+      const { data: loc } = await supabase.from("locations").select("*").eq("id", truckRes.data.location_id).single();
+      setLocation(loc);
+    }
+    if (truckRes.data?.operator_id) {
+      const { data: op } = await supabase.from("profiles").select("*").eq("id", truckRes.data.operator_id).single();
+      setOperator(op);
+    }
+    const { data: expert } = await supabase.from("expert_opinions").select("*").eq("truck_id", id).maybeSingle();
+    setExpertOpinion(expert);
+
     setLoading(false);
   };
 
@@ -125,6 +142,7 @@ export default function TruckProfile() {
           <TabsTrigger value="details">פרטי הרכב</TabsTrigger>
           <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
+          <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
@@ -263,6 +281,18 @@ export default function TruckProfile() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="location_card">
+          <LocationCard
+            truck={truck}
+            location={location}
+            operator={operator}
+            expertOpinion={expertOpinion}
+            isAdmin={isAdmin}
+            userId={user?.id}
+            onUpdate={fetchData}
+          />
         </TabsContent>
       </Tabs>
     </div>
