@@ -25,6 +25,7 @@ interface FileUploadProps {
   accept?: string;
   label: string;
   isImage?: boolean;
+  className?: string;
 }
 
 export default function FileUpload({
