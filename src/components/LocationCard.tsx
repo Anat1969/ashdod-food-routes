@@ -299,7 +299,11 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} />
-                <div className="flex gap-4 pt-2 border-t">
+                <div className="flex flex-wrap gap-4 pt-2 border-t">
+                  <div className="flex items-center gap-1">
+                    <Checkbox checked={locDesired} onCheckedChange={(v) => setLocDesired(!!v)} />
+                    <span className="text-xs">מיקום רצוי</span>
+                  </div>
                   <div className="flex items-center gap-1">
                     <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
                     <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
