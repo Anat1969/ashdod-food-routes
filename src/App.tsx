@@ -12,6 +12,7 @@ import Directory from "./pages/Directory";
 import TruckProfile from "./pages/TruckProfile";
 import ApplicationForm from "./pages/ApplicationForm";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAddTrucks from "./pages/AdminAddTrucks";
 import AdminLogin from "./pages/AdminLogin";
 import LocationCard from "./pages/LocationCard";
 import Login from "./pages/Login";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/truck/:id" element={<TruckProfile />} />
               <Route path="/apply" element={<ApplicationForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/add" element={<AdminAddTrucks />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

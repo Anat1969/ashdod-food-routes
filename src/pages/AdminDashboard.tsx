@@ -9,6 +9,7 @@ import StatusBadge from "@/components/StatusBadge";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { BarChart3, Clock, CheckCircle, XCircle, Search } from "lucide-react";
+import AdminLayout from "@/components/AdminLayout";
 
 export default function AdminDashboard() {
   const { isAdmin, loading: authLoading } = useAuth();
@@ -52,7 +53,8 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <AdminLayout>
+    <div className="container mx-auto px-4 py-8" dir="rtl">
       <h1 className="text-2xl font-bold mb-6">לוח בקרה – אדריכל העיר</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -113,6 +115,7 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
     </div>
+    </AdminLayout>
   );
 }
 
