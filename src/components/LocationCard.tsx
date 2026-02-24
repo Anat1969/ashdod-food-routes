@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, X, Zap, Droplets, CircleDot } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 import { toast } from "sonner";
 import type { FoodTruck, Location, Profile, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
