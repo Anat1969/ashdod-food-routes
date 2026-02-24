@@ -209,6 +209,7 @@ export type Database = {
           id: string
           location_id: string | null
           operator_id: string | null
+          operator_name: string | null
           status: string
           street_photo_1_url: string | null
           street_photo_2_url: string | null
@@ -229,6 +230,7 @@ export type Database = {
           id?: string
           location_id?: string | null
           operator_id?: string | null
+          operator_name?: string | null
           status?: string
           street_photo_1_url?: string | null
           street_photo_2_url?: string | null
@@ -249,6 +251,7 @@ export type Database = {
           id?: string
           location_id?: string | null
           operator_id?: string | null
+          operator_name?: string | null
           status?: string
           street_photo_1_url?: string | null
           street_photo_2_url?: string | null
