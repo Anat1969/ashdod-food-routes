@@ -320,7 +320,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         <div className="space-y-4">
           <Card className="border-sky-300 bg-white/80">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">המפעיל</CardTitle>
+              <CardTitle className="text-base">שם המפעיל</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               {isAdmin ? (
