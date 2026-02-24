@@ -205,7 +205,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               }}
               label="מיקום עירוני"
               accept="image/*"
-              className="h-full"
             />
           ) : (
             <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} className="h-full aspect-square" />
