@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import StatusBadge from "@/components/StatusBadge";
 import FileUpload from "@/components/FileUpload";
 import LocationCard from "@/components/LocationCard";
@@ -187,7 +188,11 @@ export default function TruckProfile() {
                   </label>
                 </div>
               </div>
-              <InfoRow label="שם המפעיל" value={(truck as any).operator_name} />
+              <EditableOperatorName
+                truck={truck}
+                isAdmin={isAdmin}
+                onSaved={fetchData}
+              />
               <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
             </CardContent>
           </Card>
@@ -343,6 +348,48 @@ function InfoRow({ label, value, icon }: { label: string; value: string | null |
         {icon}
         <p className="text-sm font-medium">{value || "—"}</p>
       </div>
+    </div>
+  );
+}
+
+function EditableOperatorName({ truck, isAdmin, onSaved }: { truck: FoodTruck; isAdmin: boolean; onSaved: () => void }) {
+  const [value, setValue] = useState((truck as any).operator_name ?? "");
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    setValue((truck as any).operator_name ?? "");
+    setDirty(false);
+  }, [(truck as any).operator_name]);
+
+  const save = async () => {
+    if (!dirty) return;
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ operator_name: value || null } as any)
+      .eq("id", truck.id);
+    if (error) {
+      toast.error("שגיאה בעדכון שם המפעיל");
+      return;
+    }
+    toast.success("שם המפעיל עודכן");
+    setDirty(false);
+    onSaved();
+  };
+
+  return (
+    <div>
+      <p className="text-xs text-muted-foreground mb-0.5">שם המפעיל</p>
+      {isAdmin ? (
+        <Input
+          className="h-8 text-sm"
+          placeholder="הזן שם מפעיל..."
+          value={value}
+          onChange={(e) => { setValue(e.target.value); setDirty(true); }}
+          onBlur={save}
+        />
+      ) : (
+        <p className="text-sm font-medium">{value || "—"}</p>
+      )}
     </div>
   );
 }
