@@ -43,6 +43,19 @@ export default function TruckProfile() {
     setTruck(truckRes.data);
     setCompliance(complianceRes.data);
     setHistory(historyRes.data || []);
+
+    // Fetch related data for location card
+    if (truckRes.data?.location_id) {
+      const { data: loc } = await supabase.from("locations").select("*").eq("id", truckRes.data.location_id).single();
+      setLocation(loc);
+    }
+    if (truckRes.data?.operator_id) {
+      const { data: op } = await supabase.from("profiles").select("*").eq("id", truckRes.data.operator_id).single();
+      setOperator(op);
+    }
+    const { data: expert } = await supabase.from("expert_opinions").select("*").eq("truck_id", id).maybeSingle();
+    setExpertOpinion(expert);
+
     setLoading(false);
   };
 
