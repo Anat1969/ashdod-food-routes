@@ -152,6 +152,18 @@ export default function TruckProfile() {
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="location_card">
+          <LocationCard
+            truck={truck}
+            location={location}
+            operator={operator}
+            expertOpinion={expertOpinion}
+            isAdmin={isAdmin}
+            userId={user?.id}
+            onUpdate={fetchData}
+          />
+        </TabsContent>
+
         {/* Combined: compliance on the left, documents on the right */}
         <TabsContent value="review">
           <div className="grid lg:grid-cols-2 gap-4">
@@ -276,18 +288,6 @@ export default function TruckProfile() {
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="location_card">
-          <LocationCard
-            truck={truck}
-            location={location}
-            operator={operator}
-            expertOpinion={expertOpinion}
-            isAdmin={isAdmin}
-            userId={user?.id}
-            onUpdate={fetchData}
-          />
         </TabsContent>
       </Tabs>
     </div>
