@@ -15,7 +15,7 @@ import LocationCard from "@/components/LocationCard";
 import { COMPLIANCE_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Clock, MapPin, Check, X, Trash2 } from "lucide-react";
+import { Clock, Check, X, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TruckProfile() {
