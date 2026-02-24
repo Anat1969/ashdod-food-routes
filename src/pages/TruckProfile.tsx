@@ -145,58 +145,12 @@ export default function TruckProfile() {
         <StatusBadge status={truck.status} className="text-sm" />
       </div>
 
-      <Tabs defaultValue="details" className="space-y-4">
+      <Tabs defaultValue="location_card" className="space-y-4">
         <TabsList className="w-full justify-start">
-          <TabsTrigger value="details">פרטי הרכב</TabsTrigger>
+          <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
           <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
-          <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="details">
-          <Card className="municipal-shadow">
-            <CardContent className="pt-6 grid sm:grid-cols-2 gap-4">
-              <InfoRow label="עמדה" value={truck.truck_name} />
-              <InfoRow label="סוג עמדה" value={location?.location_type} icon={<MapPin className="h-4 w-4" />} />
-              <InfoRow label="פודטראק" value={truck.vehicle_type ? "קיים" : "לא קיים"} />
-              <div>
-                <p className="text-xs text-muted-foreground mb-0.5">תשתית</p>
-                <div className="flex flex-col gap-2 mt-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox
-                      checked={!!location?.infra_electricity}
-                      disabled={!isAdmin}
-                      onCheckedChange={(v) => updateInfra("infra_electricity", !!v)}
-                    />
-                    <span className="text-sm">⚡ חשמל</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox
-                      checked={!!location?.infra_water}
-                      disabled={!isAdmin}
-                      onCheckedChange={(v) => updateInfra("infra_water", !!v)}
-                    />
-                    <span className="text-sm">💧 מים</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <Checkbox
-                      checked={!!location?.infra_sewage}
-                      disabled={!isAdmin}
-                      onCheckedChange={(v) => updateInfra("infra_sewage", !!v)}
-                    />
-                    <span className="text-sm">🔵 ביוב</span>
-                  </label>
-                </div>
-              </div>
-              <EditableOperatorName
-                truck={truck}
-                isAdmin={isAdmin}
-                onSaved={fetchData}
-              />
-              <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Combined: compliance on the left, documents on the right */}
         <TabsContent value="review">
