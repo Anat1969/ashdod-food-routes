@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Building2, FileText, List, PenLine } from "lucide-react";
+import { FileText, List, PenLine } from "lucide-react";
+import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function Index() {
   const actions = [
