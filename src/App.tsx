@@ -33,6 +33,7 @@ const App = () => (
               <Route path="/apply" element={<ApplicationForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/login" element={<AdminLogin />} />
+              <Route path="/location-card" element={<LocationCard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
