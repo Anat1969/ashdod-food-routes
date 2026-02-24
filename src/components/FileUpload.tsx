@@ -25,6 +25,7 @@ interface FileUploadProps {
   accept?: string;
   label: string;
   isImage?: boolean;
+  className?: string;
 }
 
 export default function FileUpload({
@@ -36,6 +37,7 @@ export default function FileUpload({
   accept,
   label,
   isImage = true,
+  className,
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -170,11 +172,11 @@ export default function FileUpload({
 
   return (
     <div
-      className={`space-y-2 rounded-lg border-2 border-dashed p-3 transition-colors outline-none ${
+      className={`flex flex-col rounded-lg border-2 border-dashed p-3 transition-colors outline-none ${
         dragging
           ? "border-primary bg-primary/10"
           : "border-muted-foreground/25 hover:border-muted-foreground/40"
-      }`}
+      } ${className || ""}`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
@@ -182,14 +184,14 @@ export default function FileUpload({
       onPaste={handlePaste}
       tabIndex={0}
     >
-      <p className="text-sm font-medium">{label}</p>
+      <p className="text-sm font-medium mb-2">{label}</p>
 
       {currentUrl && isImage && (
-        <div className="relative rounded-lg overflow-hidden border bg-muted">
+        <div className="relative rounded-lg overflow-hidden border bg-muted flex-1 min-h-[8rem]">
           <img
             src={currentUrl}
             alt={label}
-            className="w-full h-32 object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       )}

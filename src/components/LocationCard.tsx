@@ -164,10 +164,57 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     <div className="bg-sky-50 rounded-xl p-4 space-y-3 border border-sky-200" dir="rtl">
 
       {/* === ROW 1: Photos === */}
-      {/* Layout: הפודטראק (large rectangular ~2/3) | מיקום עירוני + מיקום סביבה stacked squares (~1/3) */}
-      <div className="grid grid-cols-3 gap-3" style={{ gridTemplateRows: "1fr 1fr" }}>
-        {/* הפודטראק - spans 2 cols and 2 rows */}
-        <div className="col-span-2 row-span-2">
+      {/* RTL: right = stacked squares, left = large rectangle */}
+      <div className="flex gap-3">
+        {/* Right side: two stacked square photos */}
+        <div className="flex flex-col gap-3 w-1/3 flex-shrink-0">
+          <div className="aspect-square">
+            {isAdmin ? (
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street1`}
+                currentUrl={truck.street_photo_1_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="מיקום עירוני"
+                accept="image/*"
+                className="h-full"
+              />
+            ) : (
+              <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} className="h-full aspect-square" />
+            )}
+          </div>
+          <div className="aspect-square">
+            {isAdmin ? (
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street2`}
+                currentUrl={truck.street_photo_2_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="מיקום סביבה"
+                accept="image/*"
+                className="h-full"
+              />
+            ) : (
+              <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
+            )}
+          </div>
+        </div>
+        {/* Left side (in RTL): large rectangular truck photo */}
+        <div className="flex-1">
           {isAdmin ? (
             <FileUpload
               bucket="truck-photos"
@@ -183,53 +230,10 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               }}
               label="הפודטראק"
               accept="image/*"
+              className="h-full"
             />
           ) : (
             <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
-          )}
-        </div>
-        {/* מיקום עירוני - top right square */}
-        <div className="aspect-square">
-          {isAdmin ? (
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/street1`}
-              currentUrl={truck.street_photo_1_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="מיקום עירוני"
-              accept="image/*"
-            />
-          ) : (
-            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} className="h-full aspect-square" />
-          )}
-        </div>
-        {/* מיקום סביבה - bottom right square */}
-        <div className="aspect-square">
-          {isAdmin ? (
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/street2`}
-              currentUrl={truck.street_photo_2_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="מיקום סביבה"
-              accept="image/*"
-            />
-          ) : (
-            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
           )}
         </div>
       </div>
