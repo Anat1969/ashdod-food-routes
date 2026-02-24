@@ -9,34 +9,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatusBadge from "@/components/StatusBadge";
+import FileUpload from "@/components/FileUpload";
 import { COMPLIANCE_ITEMS } from "@/lib/types";
-import type { FoodTruck, TruckStatus, ComplianceItem, StatusHistoryEntry, AdminNote } from "@/lib/types";
+import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { Phone, Mail, Clock, MapPin, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TruckProfile() {
   const { id } = useParams<{ id: string }>();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [truck, setTruck] = useState<FoodTruck | null>(null);
-  const [compliance, setCompliance] = useState<ComplianceItem[]>([]);
-  const [history, setHistory] = useState<StatusHistoryEntry[]>([]);
-  const [notes, setNotes] = useState<AdminNote[]>([]);
+  const [compliance, setCompliance] = useState<ComplianceChecklist | null>(null);
+  const [history, setHistory] = useState<ActivityLog[]>([]);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
     if (!id) return;
-    const [truckRes, complianceRes, historyRes, notesRes] = await Promise.all([
+    const [truckRes, complianceRes, historyRes] = await Promise.all([
       supabase.from("food_trucks").select("*").eq("id", id).single(),
-      supabase.from("compliance_checklist").select("*").eq("truck_id", id),
-      supabase.from("status_history").select("*").eq("truck_id", id).order("created_at", { ascending: false }),
-      supabase.from("admin_notes").select("*").eq("truck_id", id).order("created_at", { ascending: false }),
+      supabase.from("compliance_checklist").select("*").eq("truck_id", id).maybeSingle(),
+      supabase.from("activity_log").select("*").eq("truck_id", id).order("created_at", { ascending: false }),
     ]);
-    setTruck(truckRes.data as FoodTruck | null);
-    setCompliance((complianceRes.data as ComplianceItem[]) || []);
-    setHistory((historyRes.data as StatusHistoryEntry[]) || []);
-    setNotes((notesRes.data as AdminNote[]) || []);
+    setTruck(truckRes.data);
+    setCompliance(complianceRes.data);
+    setHistory(historyRes.data || []);
     setLoading(false);
   };
 
@@ -45,8 +43,10 @@ export default function TruckProfile() {
   const updateStatus = async (newStatus: TruckStatus) => {
     if (!truck) return;
     await supabase.from("food_trucks").update({ status: newStatus }).eq("id", truck.id);
-    await supabase.from("status_history").insert({
+    await supabase.from("activity_log").insert({
       truck_id: truck.id,
+      user_id: user?.id || null,
+      action: "status_change",
       old_status: truck.status,
       new_status: newStatus,
     });
@@ -54,18 +54,15 @@ export default function TruckProfile() {
     fetchData();
   };
 
-  const toggleCompliance = async (itemKey: string, currentPassed: boolean) => {
+  const toggleCompliance = async (field: string, currentValue: boolean | null) => {
     if (!truck || !isAdmin) return;
-    const existing = compliance.find(c => c.item_key === itemKey);
-    if (existing) {
-      await supabase.from("compliance_checklist").update({ passed: !currentPassed }).eq("id", existing.id);
+    if (compliance) {
+      await supabase.from("compliance_checklist").update({ [field]: !currentValue }).eq("id", compliance.id);
     } else {
-      const item = COMPLIANCE_ITEMS.find(i => i.key === itemKey);
       await supabase.from("compliance_checklist").insert({
         truck_id: truck.id,
-        item_key: itemKey,
-        item_label: item?.label || itemKey,
-        passed: true,
+        checked_by: user?.id || null,
+        [field]: true,
       });
     }
     fetchData();
@@ -73,9 +70,20 @@ export default function TruckProfile() {
 
   const addNote = async () => {
     if (!truck || !newNote.trim()) return;
-    await supabase.from("admin_notes").insert({ truck_id: truck.id, note: newNote.trim() });
+    await supabase.from("activity_log").insert({
+      truck_id: truck.id,
+      user_id: user?.id || null,
+      action: "note",
+      note: newNote.trim(),
+    });
     setNewNote("");
     toast.success("הערה נוספה");
+    fetchData();
+  };
+
+  const updateFileUrl = async (field: string, url: string | null) => {
+    if (!truck) return;
+    await supabase.from("food_trucks").update({ [field]: url }).eq("id", truck.id);
     fetchData();
   };
 
@@ -84,11 +92,10 @@ export default function TruckProfile() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{truck.name}</h1>
-          <p className="text-muted-foreground">{truck.operator_name}</p>
+          <h1 className="text-2xl font-bold">{truck.truck_name}</h1>
+          <p className="text-muted-foreground">{truck.vehicle_type || "—"}</p>
         </div>
         <StatusBadge status={truck.status} className="text-sm" />
       </div>
@@ -96,52 +103,89 @@ export default function TruckProfile() {
       <Tabs defaultValue="details" className="space-y-4">
         <TabsList className="w-full justify-start">
           <TabsTrigger value="details">פרטי הרכב</TabsTrigger>
-          <TabsTrigger value="location">מיקום וסביבה</TabsTrigger>
+          <TabsTrigger value="photos">תמונות ומסמכים</TabsTrigger>
           <TabsTrigger value="compliance">עמידה בהנחיות</TabsTrigger>
-          <TabsTrigger value="history">היסטוריה ומסמכים</TabsTrigger>
+          <TabsTrigger value="history">היסטוריה</TabsTrigger>
         </TabsList>
 
-        {/* Tab A - Details */}
         <TabsContent value="details">
           <Card className="municipal-shadow">
             <CardContent className="pt-6 grid sm:grid-cols-2 gap-4">
-              <InfoRow label="שם הפודטראק" value={truck.name} />
-              <InfoRow label="שם המפעיל" value={truck.operator_name} />
-              <InfoRow label="מספר זיהוי" value={truck.operator_id} />
+              <InfoRow label="שם הפודטראק" value={truck.truck_name} />
               <InfoRow label="סוג רכב" value={truck.vehicle_type} />
-              <InfoRow label="תיאור הרכב / עטיפה" value={truck.vehicle_description} />
-              <InfoRow label="סוג מזון" value={truck.cuisine} icon={<MapPin className="h-4 w-4" />} />
-              <InfoRow label="שעות פעילות" value={truck.operating_hours} icon={<Clock className="h-4 w-4" />} />
-              <InfoRow label="טלפון" value={truck.contact_phone} icon={<Phone className="h-4 w-4" />} />
-              <InfoRow label="אימייל" value={truck.contact_email} icon={<Mail className="h-4 w-4" />} />
+              <InfoRow label="קטגוריית מזון" value={truck.food_category} icon={<MapPin className="h-4 w-4" />} />
+              <InfoRow label="שעות פעילות" value={truck.hours_from && truck.hours_to ? `${truck.hours_from} - ${truck.hours_to}` : null} icon={<Clock className="h-4 w-4" />} />
+              <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Tab B - Location */}
-        <TabsContent value="location">
+        <TabsContent value="photos">
           <Card className="municipal-shadow">
-            <CardContent className="pt-6 space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <InfoRow label="כתובת" value={truck.street_address} />
-                <InfoRow label="שכונה" value={truck.neighborhood} />
-              </div>
-              {truck.latitude && truck.longitude && (
-                <div className="rounded-lg overflow-hidden border h-[300px]">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    src={`https://www.google.com/maps?q=${truck.latitude},${truck.longitude}&z=16&output=embed`}
-                  />
-                </div>
-              )}
+            <CardHeader>
+              <CardTitle className="text-lg">תמונות ומסמכים</CardTitle>
+            </CardHeader>
+            <CardContent className="grid sm:grid-cols-2 gap-6">
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street`}
+                currentUrl={(truck as any).street_photo_1_url}
+                onUploaded={(url) => updateFileUrl("street_photo_1_url", url)}
+                onDeleted={() => updateFileUrl("street_photo_1_url", null)}
+                accept="image/jpeg,image/png,image/webp"
+                label="תמונת רחוב 1"
+              />
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street`}
+                currentUrl={(truck as any).street_photo_2_url}
+                onUploaded={(url) => updateFileUrl("street_photo_2_url", url)}
+                onDeleted={() => updateFileUrl("street_photo_2_url", null)}
+                accept="image/jpeg,image/png,image/webp"
+                label="תמונת רחוב 2"
+              />
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/aerial`}
+                currentUrl={(truck as any).aerial_photo_url}
+                onUploaded={(url) => updateFileUrl("aerial_photo_url", url)}
+                onDeleted={() => updateFileUrl("aerial_photo_url", null)}
+                accept="image/jpeg,image/png,image/webp"
+                label="תמונה אווירית"
+              />
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/vehicle`}
+                currentUrl={(truck as any).vehicle_photo_url}
+                onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)}
+                onDeleted={() => updateFileUrl("vehicle_photo_url", null)}
+                accept="image/jpeg,image/png,image/webp"
+                label="תמונת הרכב"
+              />
+              <FileUpload
+                bucket="documents"
+                storagePath={`${truck.id}/license`}
+                currentUrl={(truck as any).business_license_url}
+                onUploaded={(url) => updateFileUrl("business_license_url", url)}
+                onDeleted={() => updateFileUrl("business_license_url", null)}
+                accept="application/pdf,image/jpeg,image/png"
+                label="רישיון עסק"
+                isImage={false}
+              />
+              <FileUpload
+                bucket="documents"
+                storagePath={`${truck.id}/design`}
+                currentUrl={(truck as any).design_mockup_url}
+                onUploaded={(url) => updateFileUrl("design_mockup_url", url)}
+                onDeleted={() => updateFileUrl("design_mockup_url", null)}
+                accept="application/pdf,image/jpeg,image/png"
+                label="הדמיית עיצוב"
+                isImage={false}
+              />
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Tab C - Compliance */}
         <TabsContent value="compliance">
           <Card className="municipal-shadow">
             <CardHeader>
@@ -149,17 +193,16 @@ export default function TruckProfile() {
             </CardHeader>
             <CardContent className="space-y-3">
               {COMPLIANCE_ITEMS.map((item) => {
-                const entry = compliance.find(c => c.item_key === item.key);
-                const passed = entry?.passed ?? false;
+                const value = compliance ? (compliance as any)[item.key] ?? false : false;
                 return (
                   <div key={item.key} className="flex items-center gap-3 py-2 border-b last:border-b-0">
                     {isAdmin ? (
                       <Checkbox
-                        checked={passed}
-                        onCheckedChange={() => toggleCompliance(item.key, passed)}
+                        checked={!!value}
+                        onCheckedChange={() => toggleCompliance(item.key, value)}
                       />
                     ) : (
-                      passed ? <Check className="h-5 w-5 text-success" /> : <X className="h-5 w-5 text-destructive" />
+                      value ? <Check className="h-5 w-5 text-success" /> : <X className="h-5 w-5 text-destructive" />
                     )}
                     <span className="text-sm">{item.label}</span>
                   </div>
@@ -194,34 +237,28 @@ export default function TruckProfile() {
           </Card>
         </TabsContent>
 
-        {/* Tab D - History */}
         <TabsContent value="history">
           <Card className="municipal-shadow">
             <CardHeader>
               <CardTitle className="text-lg">היסטוריית שינויים</CardTitle>
             </CardHeader>
             <CardContent>
-              {history.length === 0 && notes.length === 0 ? (
+              {history.length === 0 ? (
                 <p className="text-muted-foreground text-sm">אין היסטוריה עדיין</p>
               ) : (
                 <div className="space-y-4">
                   {history.map((entry) => (
                     <div key={entry.id} className="flex gap-3 items-start border-b pb-3 last:border-b-0">
-                      <div className="w-2 h-2 rounded-full bg-accent mt-2 flex-shrink-0" />
+                      <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${entry.action === "note" ? "bg-primary" : "bg-accent"}`} />
                       <div>
-                        <p className="text-sm">
-                          שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status] : "חדש"} ← {STATUS_LABELS[entry.new_status]}
-                        </p>
+                        {entry.action === "status_change" ? (
+                          <p className="text-sm">
+                            שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status as TruckStatus] || entry.old_status : "חדש"} ← {STATUS_LABELS[entry.new_status as TruckStatus] || entry.new_status}
+                          </p>
+                        ) : (
+                          <p className="text-sm">{entry.note}</p>
+                        )}
                         <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {notes.map((note) => (
-                    <div key={note.id} className="flex gap-3 items-start border-b pb-3 last:border-b-0">
-                      <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm">{note.note}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleDateString("he-IL")}</p>
                       </div>
                     </div>
                   ))}

@@ -19,7 +19,7 @@ export default function Directory() {
         .from("food_trucks")
         .select("*")
         .order("created_at", { ascending: false });
-      setTrucks((data as FoodTruck[]) || []);
+      setTrucks(data || []);
       setLoading(false);
     };
     fetchTrucks();
@@ -35,7 +35,7 @@ export default function Directory() {
   }, []);
 
   const filtered = trucks.filter((t) => {
-    const matchesSearch = !search || t.name.includes(search) || t.operator_name.includes(search) || (t.neighborhood || "").includes(search);
+    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -45,12 +45,11 @@ export default function Directory() {
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מאגר פודטראקים</h1>
       <p className="text-muted-foreground mb-6">רשימת הפודטראקים הרשומים בעיר אשדוד</p>
 
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="חיפוש לפי שם, מפעיל או שכונה..."
+            placeholder="חיפוש לפי שם או קטגוריה..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pr-9"
