@@ -61,7 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             ) : (
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 mr-2">
-                  כניסת מנהל
+                  התחברות
                 </Button>
               </Link>
             )}
