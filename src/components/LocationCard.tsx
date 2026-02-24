@@ -171,60 +171,69 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
   return (
     <div className="bg-sky-50 rounded-xl p-4 space-y-4 border border-sky-200" dir="rtl">
-      {/* Photos row */}
+      {/* Photos row: 2 square location photos + 1 rectangular truck photo */}
       <div className="grid grid-cols-3 gap-3">
         {isAdmin ? (
           <>
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/street1`}
-              currentUrl={truck.street_photo_1_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="מיקום עירוני"
-              accept="image/*"
-            />
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/street2`}
-              currentUrl={truck.street_photo_2_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="מיקום סביבה"
-              accept="image/*"
-            />
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/vehicle`}
-              currentUrl={truck.vehicle_photo_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="הפודטראק"
-              accept="image/*"
-            />
+            {/* Right: מיקום עירוני - square */}
+            <div className="aspect-square">
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street1`}
+                currentUrl={truck.street_photo_1_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="מיקום עירוני"
+                accept="image/*"
+              />
+            </div>
+            {/* Center: מיקום סביבה - square */}
+            <div className="aspect-square">
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/street2`}
+                currentUrl={truck.street_photo_2_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="מיקום סביבה"
+                accept="image/*"
+              />
+            </div>
+            {/* Left: הפודטראק - rectangular, spans full height */}
+            <div className="row-span-1">
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/vehicle`}
+                currentUrl={truck.vehicle_photo_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="הפודטראק"
+                accept="image/*"
+              />
+            </div>
           </>
         ) : (
           <>
-            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} />
-            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} />
+            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} square />
+            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} square />
             <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} />
           </>
         )}
@@ -387,13 +396,15 @@ function ReadOnlyRow({ label, value }: { label: string; value: string | null | u
   );
 }
 
-function PhotoSlot({ label, url }: { label: string; url: string | null }) {
+function PhotoSlot({ label, url, square }: { label: string; url: string | null; square?: boolean }) {
+  const sizeClass = square ? "aspect-square" : "w-full h-36";
   return (
     <div className="space-y-1">
+      <p className="text-xs text-center font-medium text-muted-foreground">{label}</p>
       {url ? (
-        <img src={url} alt={label} className="w-full h-36 object-cover rounded-lg border border-sky-200" />
+        <img src={url} alt={label} className={`w-full object-cover rounded-lg border border-sky-200 ${sizeClass}`} />
       ) : (
-        <div className="w-full h-36 bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground">{label} — לא הועלה</div>
+        <div className={`w-full bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground ${sizeClass}`}>{label} — לא הועלה</div>
       )}
     </div>
   );
