@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -39,68 +39,149 @@ export default function FileUpload({
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
+
+  const isAccepted = useCallback(
+    (file: File): boolean => {
+      if (!accept) return true;
+      const acceptedTypes = accept.split(",").map((t) => t.trim().toLowerCase());
+      const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+      const mime = file.type.toLowerCase();
+      return acceptedTypes.some(
+        (a) =>
+          a === ext ||
+          a === mime ||
+          (a.endsWith("/*") && mime.startsWith(a.replace("/*", "/")))
+      );
+    },
+    [accept]
+  );
+
+  const uploadFile = useCallback(
+    async (file: File) => {
+      if (!isAccepted(file)) {
+        toast.error("סוג הקובץ אינו נתמך");
+        return;
+      }
+
+      setUploading(true);
+      setProgress(10);
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${storagePath}/${fileName}`;
+
+      setProgress(30);
+
+      const { error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, { upsert: true });
+
+      if (error) {
+        toast.error("שגיאה בהעלאת הקובץ");
+        setUploading(false);
+        setProgress(0);
+        return;
+      }
+
+      setProgress(80);
+
+      const { data: urlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      setProgress(100);
+      onUploaded(urlData.publicUrl);
+      toast.success("הקובץ הועלה בהצלחה");
+
+      setTimeout(() => {
+        setUploading(false);
+        setProgress(0);
+      }, 500);
+    },
+    [bucket, storagePath, onUploaded, isAccepted]
+  );
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setUploading(true);
-    setProgress(10);
-
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `${storagePath}/${fileName}`;
-
-    setProgress(30);
-
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, { upsert: true });
-
-    if (error) {
-      toast.error("שגיאה בהעלאת הקובץ");
-      setUploading(false);
-      setProgress(0);
-      return;
-    }
-
-    setProgress(80);
-
-    const { data: urlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-
-    setProgress(100);
-    onUploaded(urlData.publicUrl);
-    toast.success("הקובץ הועלה בהצלחה");
-
-    setTimeout(() => {
-      setUploading(false);
-      setProgress(0);
-    }, 500);
-
+    await uploadFile(file);
     if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current++;
+    setDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current--;
+    if (dragCounter.current === 0) setDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current = 0;
+    setDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) await uploadFile(file);
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.kind === "file") {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          await uploadFile(file);
+          return;
+        }
+      }
+    }
   };
 
   const handleDelete = async () => {
     if (!currentUrl) return;
-
-    // Extract path from URL
     const urlParts = currentUrl.split(`/storage/v1/object/public/${bucket}/`);
     if (urlParts.length < 2) {
       onDeleted();
       return;
     }
     const path = urlParts[1];
-
     await supabase.storage.from(bucket).remove([path]);
     onDeleted();
     toast.success("הקובץ נמחק");
   };
 
   return (
-    <div className="space-y-2">
+    <div
+      className={`space-y-2 rounded-lg border-2 border-dashed p-3 transition-colors outline-none ${
+        dragging
+          ? "border-primary bg-primary/10"
+          : "border-muted-foreground/25 hover:border-muted-foreground/40"
+      }`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onPaste={handlePaste}
+      tabIndex={0}
+    >
       <p className="text-sm font-medium">{label}</p>
 
       {currentUrl && isImage && (
@@ -125,9 +206,13 @@ export default function FileUpload({
         </a>
       )}
 
-      {uploading && (
-        <Progress value={progress} className="h-2" />
+      {!currentUrl && !uploading && (
+        <p className="text-xs text-muted-foreground text-center py-2">
+          גרור קובץ לכאן, הדבק, או לחץ להעלאה
+        </p>
       )}
+
+      {uploading && <Progress value={progress} className="h-2" />}
 
       <div className="flex gap-2">
         <Button
@@ -137,7 +222,11 @@ export default function FileUpload({
           disabled={uploading}
           className="flex-1"
         >
-          {isImage ? <Image className="h-4 w-4 ml-1" /> : <Upload className="h-4 w-4 ml-1" />}
+          {isImage ? (
+            <Image className="h-4 w-4 ml-1" />
+          ) : (
+            <Upload className="h-4 w-4 ml-1" />
+          )}
           {uploading ? "מעלה..." : currentUrl ? "החלף" : "העלה"}
         </Button>
 
