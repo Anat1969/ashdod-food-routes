@@ -118,6 +118,13 @@ export default function TruckProfile() {
     fetchData();
   };
 
+  const updateInfra = async (field: string, value: boolean) => {
+    if (!location || !isAdmin) return;
+    await supabase.from("locations").update({ [field]: value }).eq("id", location.id);
+    toast.success("תשתית עודכנה");
+    fetchData();
+  };
+
   const updateFileUrl = async (field: string, url: string | null) => {
     if (!truck || !canUpload) return;
     await supabase.from("food_trucks").update({ [field]: url }).eq("id", truck.id);
