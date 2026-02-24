@@ -142,6 +142,7 @@ export default function TruckProfile() {
           <TabsTrigger value="details">פרטי הרכב</TabsTrigger>
           <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
+          <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
