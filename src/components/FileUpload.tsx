@@ -176,7 +176,7 @@ export default function FileUpload({
         dragging
           ? "border-primary bg-primary/10"
           : "border-muted-foreground/25 hover:border-muted-foreground/40"
-      }`}
+      } ${className || ""}`}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
