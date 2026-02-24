@@ -51,6 +51,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
   const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
+  const [opEmail, setOpEmail] = useState((truck as any).operator_email || "");
+  const [opAddress, setOpAddress] = useState((truck as any).operator_address || "");
 
   const [saving, setSaving] = useState(false);
 
