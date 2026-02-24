@@ -13,7 +13,7 @@ import FileUpload from "@/components/FileUpload";
 import { COMPLIANCE_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Phone, Mail, Clock, MapPin, Check, X } from "lucide-react";
+import { Clock, MapPin, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function TruckProfile() {
@@ -24,6 +24,10 @@ export default function TruckProfile() {
   const [history, setHistory] = useState<ActivityLog[]>([]);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Check if current user is the owner of this truck
+  const isOwner = truck?.operator_id === user?.id;
+  const canUpload = isOwner || isAdmin;
 
   const fetchData = async () => {
     if (!id) return;
@@ -41,7 +45,7 @@ export default function TruckProfile() {
   useEffect(() => { fetchData(); }, [id]);
 
   const updateStatus = async (newStatus: TruckStatus) => {
-    if (!truck) return;
+    if (!truck || !isAdmin) return;
     await supabase.from("food_trucks").update({ status: newStatus }).eq("id", truck.id);
     await supabase.from("activity_log").insert({
       truck_id: truck.id,
@@ -69,7 +73,7 @@ export default function TruckProfile() {
   };
 
   const addNote = async () => {
-    if (!truck || !newNote.trim()) return;
+    if (!truck || !newNote.trim() || !isAdmin) return;
     await supabase.from("activity_log").insert({
       truck_id: truck.id,
       user_id: user?.id || null,
@@ -82,7 +86,7 @@ export default function TruckProfile() {
   };
 
   const updateFileUrl = async (field: string, url: string | null) => {
-    if (!truck) return;
+    if (!truck || !canUpload) return;
     await supabase.from("food_trucks").update({ [field]: url }).eq("id", truck.id);
     fetchData();
   };
@@ -124,64 +128,28 @@ export default function TruckProfile() {
           <Card className="municipal-shadow">
             <CardHeader>
               <CardTitle className="text-lg">תמונות ומסמכים</CardTitle>
+              {!canUpload && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
             </CardHeader>
             <CardContent className="grid sm:grid-cols-2 gap-6">
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/street`}
-                currentUrl={(truck as any).street_photo_1_url}
-                onUploaded={(url) => updateFileUrl("street_photo_1_url", url)}
-                onDeleted={() => updateFileUrl("street_photo_1_url", null)}
-                accept="image/jpeg,image/png,image/webp"
-                label="תמונת רחוב 1"
-              />
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/street`}
-                currentUrl={(truck as any).street_photo_2_url}
-                onUploaded={(url) => updateFileUrl("street_photo_2_url", url)}
-                onDeleted={() => updateFileUrl("street_photo_2_url", null)}
-                accept="image/jpeg,image/png,image/webp"
-                label="תמונת רחוב 2"
-              />
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/aerial`}
-                currentUrl={(truck as any).aerial_photo_url}
-                onUploaded={(url) => updateFileUrl("aerial_photo_url", url)}
-                onDeleted={() => updateFileUrl("aerial_photo_url", null)}
-                accept="image/jpeg,image/png,image/webp"
-                label="תמונה אווירית"
-              />
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/vehicle`}
-                currentUrl={(truck as any).vehicle_photo_url}
-                onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)}
-                onDeleted={() => updateFileUrl("vehicle_photo_url", null)}
-                accept="image/jpeg,image/png,image/webp"
-                label="תמונת הרכב"
-              />
-              <FileUpload
-                bucket="documents"
-                storagePath={`${truck.id}/license`}
-                currentUrl={(truck as any).business_license_url}
-                onUploaded={(url) => updateFileUrl("business_license_url", url)}
-                onDeleted={() => updateFileUrl("business_license_url", null)}
-                accept="application/pdf,image/jpeg,image/png"
-                label="רישיון עסק"
-                isImage={false}
-              />
-              <FileUpload
-                bucket="documents"
-                storagePath={`${truck.id}/design`}
-                currentUrl={(truck as any).design_mockup_url}
-                onUploaded={(url) => updateFileUrl("design_mockup_url", url)}
-                onDeleted={() => updateFileUrl("design_mockup_url", null)}
-                accept="application/pdf,image/jpeg,image/png"
-                label="הדמיית עיצוב"
-                isImage={false}
-              />
+              {canUpload ? (
+                <>
+                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_1_url} onUploaded={(url) => updateFileUrl("street_photo_1_url", url)} onDeleted={() => updateFileUrl("street_photo_1_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 1" />
+                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_2_url} onUploaded={(url) => updateFileUrl("street_photo_2_url", url)} onDeleted={() => updateFileUrl("street_photo_2_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 2" />
+                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/aerial`} currentUrl={truck.aerial_photo_url} onUploaded={(url) => updateFileUrl("aerial_photo_url", url)} onDeleted={() => updateFileUrl("aerial_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונה אווירית" />
+                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/vehicle`} currentUrl={truck.vehicle_photo_url} onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)} onDeleted={() => updateFileUrl("vehicle_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת הרכב" />
+                  <FileUpload bucket="documents" storagePath={`${truck.id}/license`} currentUrl={truck.business_license_url} onUploaded={(url) => updateFileUrl("business_license_url", url)} onDeleted={() => updateFileUrl("business_license_url", null)} accept="application/pdf,image/jpeg,image/png" label="רישיון עסק" isImage={false} />
+                  <FileUpload bucket="documents" storagePath={`${truck.id}/design`} currentUrl={truck.design_mockup_url} onUploaded={(url) => updateFileUrl("design_mockup_url", url)} onDeleted={() => updateFileUrl("design_mockup_url", null)} accept="application/pdf,image/jpeg,image/png" label="הדמיית עיצוב" isImage={false} />
+                </>
+              ) : (
+                <>
+                  <PhotoPreview label="תמונת רחוב 1" url={truck.street_photo_1_url} />
+                  <PhotoPreview label="תמונת רחוב 2" url={truck.street_photo_2_url} />
+                  <PhotoPreview label="תמונה אווירית" url={truck.aerial_photo_url} />
+                  <PhotoPreview label="תמונת הרכב" url={truck.vehicle_photo_url} />
+                  <PhotoPreview label="רישיון עסק" url={truck.business_license_url} isImage={false} />
+                  <PhotoPreview label="הדמיית עיצוב" url={truck.design_mockup_url} isImage={false} />
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -190,6 +158,7 @@ export default function TruckProfile() {
           <Card className="municipal-shadow">
             <CardHeader>
               <CardTitle className="text-lg">רשימת עמידה בהנחיות</CardTitle>
+              {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד — עריכה זמינה למנהלים בלבד</p>}
             </CardHeader>
             <CardContent className="space-y-3">
               {COMPLIANCE_ITEMS.map((item) => {
@@ -202,7 +171,7 @@ export default function TruckProfile() {
                         onCheckedChange={() => toggleCompliance(item.key, value)}
                       />
                     ) : (
-                      value ? <Check className="h-5 w-5 text-success" /> : <X className="h-5 w-5 text-destructive" />
+                      value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
                     )}
                     <span className="text-sm">{item.label}</span>
                   </div>
@@ -280,6 +249,23 @@ function InfoRow({ label, value, icon }: { label: string; value: string | null |
         {icon}
         <p className="text-sm font-medium">{value || "—"}</p>
       </div>
+    </div>
+  );
+}
+
+function PhotoPreview({ label, url, isImage = true }: { label: string; url: string | null; isImage?: boolean }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-sm font-medium">{label}</p>
+      {url ? (
+        isImage ? (
+          <img src={url} alt={label} className="w-full h-32 object-cover rounded-lg border" />
+        ) : (
+          <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">צפה בקובץ</a>
+        )
+      ) : (
+        <p className="text-xs text-muted-foreground">לא הועלה</p>
+      )}
     </div>
   );
 }
