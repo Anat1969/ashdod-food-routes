@@ -46,14 +46,23 @@ export default function TruckProfile() {
 
   const updateStatus = async (newStatus: TruckStatus) => {
     if (!truck || !isAdmin) return;
+    const oldStatus = truck.status;
     await supabase.from("food_trucks").update({ status: newStatus }).eq("id", truck.id);
     await supabase.from("activity_log").insert({
       truck_id: truck.id,
       user_id: user?.id || null,
       action: "status_change",
-      old_status: truck.status,
+      old_status: oldStatus,
       new_status: newStatus,
     });
+
+    // Send email notification to operator
+    supabase.functions.invoke("notify-status-change", {
+      body: { truck_id: truck.id, old_status: oldStatus, new_status: newStatus },
+    }).then(({ error }) => {
+      if (error) console.error("Email notification failed:", error);
+    });
+
     toast.success("הסטטוס עודכן בהצלחה");
     fetchData();
   };

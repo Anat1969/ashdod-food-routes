@@ -1,1 +1,4 @@
 project_id = "muybtvenrzqtkswxafyq"
+
+[functions.notify-status-change]
+verify_jwt = false
