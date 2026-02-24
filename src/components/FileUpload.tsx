@@ -187,11 +187,11 @@ export default function FileUpload({
       <p className="text-sm font-medium">{label}</p>
 
       {currentUrl && isImage && (
-        <div className="relative rounded-lg overflow-hidden border bg-muted">
+        <div className="relative rounded-lg overflow-hidden border bg-muted flex-1 min-h-[8rem]">
           <img
             src={currentUrl}
             alt={label}
-            className="w-full h-32 object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       )}
