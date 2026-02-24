@@ -124,6 +124,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
     await supabase.from("food_trucks").update({
       operator_name: opName || null,
+      operator_email: opEmail || null,
+      operator_address: opAddress || null,
     } as any).eq("id", truck.id);
 
     if (operator?.id) {
