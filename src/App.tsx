@@ -12,6 +12,7 @@ import TruckProfile from "./pages/TruckProfile";
 import ApplicationForm from "./pages/ApplicationForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
+import LocationCard from "./pages/LocationCard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
