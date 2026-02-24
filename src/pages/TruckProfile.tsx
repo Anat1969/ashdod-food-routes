@@ -282,6 +282,18 @@ export default function TruckProfile() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="location_card">
+          <LocationCard
+            truck={truck}
+            location={location}
+            operator={operator}
+            expertOpinion={expertOpinion}
+            isAdmin={isAdmin}
+            userId={user?.id}
+            onUpdate={fetchData}
+          />
+        </TabsContent>
       </Tabs>
     </div>
   );
