@@ -33,7 +33,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <header className="bg-primary text-primary-foreground municipal-shadow sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <img src={ashdodLogo} alt="לוגו עיריית אשדוד" className="h-10 w-auto" />
+            <img src={ashdodLogo} alt="לוגו עיריית אשדוד" className="h-20 w-auto mix-blend-multiply" />
             <span className="text-xs opacity-80 leading-tight">ניהול פודטראקס</span>
           </Link>
 

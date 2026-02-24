@@ -31,7 +31,7 @@ export default function Index() {
       <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center mb-6">
-            <img src={ashdodLogo} alt="לוגו עיריית אשדוד" className="h-20 w-auto" />
+            <img src={ashdodLogo} alt="לוגו עיריית אשדוד" className="h-40 w-auto mix-blend-multiply" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             מערכת ניהול פודטראקס
