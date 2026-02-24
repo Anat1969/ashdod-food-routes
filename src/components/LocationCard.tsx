@@ -396,13 +396,15 @@ function ReadOnlyRow({ label, value }: { label: string; value: string | null | u
   );
 }
 
-function PhotoSlot({ label, url }: { label: string; url: string | null }) {
+function PhotoSlot({ label, url, square }: { label: string; url: string | null; square?: boolean }) {
+  const sizeClass = square ? "aspect-square" : "w-full h-36";
   return (
     <div className="space-y-1">
+      <p className="text-xs text-center font-medium text-muted-foreground">{label}</p>
       {url ? (
-        <img src={url} alt={label} className="w-full h-36 object-cover rounded-lg border border-sky-200" />
+        <img src={url} alt={label} className={`w-full object-cover rounded-lg border border-sky-200 ${sizeClass}`} />
       ) : (
-        <div className="w-full h-36 bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground">{label} — לא הועלה</div>
+        <div className={`w-full bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground ${sizeClass}`}>{label} — לא הועלה</div>
       )}
     </div>
   );
