@@ -144,6 +144,59 @@ export default function Directory() {
     return matchesSearch && matchesStatus;
   });
 
+  const toggleSort = (col: SortColumn) => {
+    if (sortColumn === col) {
+      if (sortDirection === "asc") setSortDirection("desc");
+      else if (sortDirection === "desc") { setSortColumn(null); setSortDirection(null); }
+      else setSortDirection("asc");
+    } else {
+      setSortColumn(col);
+      setSortDirection("asc");
+    }
+  };
+
+  const sorted = useMemo(() => {
+    if (!sortColumn || !sortDirection) return filtered;
+    const dir = sortDirection === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      let valA = "";
+      let valB = "";
+      switch (sortColumn) {
+        case "station_type":
+          valA = a.location?.location_type || "";
+          valB = b.location?.location_type || "";
+          break;
+        case "truck_name":
+          valA = a.truck_name || "";
+          valB = b.truck_name || "";
+          break;
+        case "has_truck":
+          valA = a.vehicle_type ? "1" : "0";
+          valB = b.vehicle_type ? "1" : "0";
+          break;
+        case "operator_name":
+          valA = (a as any).operator_name || "";
+          valB = (b as any).operator_name || "";
+          break;
+        case "status":
+          valA = STATUS_LABELS[a.status as TruckStatus] || a.status;
+          valB = STATUS_LABELS[b.status as TruckStatus] || b.status;
+          break;
+        case "submitted_at":
+          valA = a.submitted_at || "";
+          valB = b.submitted_at || "";
+          break;
+      }
+      return valA.localeCompare(valB, "he") * dir;
+    });
+  }, [filtered, sortColumn, sortDirection]);
+
+  const SortIcon = ({ col }: { col: SortColumn }) => {
+    if (sortColumn !== col) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    if (sortDirection === "asc") return <ArrowUp className="h-3 w-3" />;
+    return <ArrowDown className="h-3 w-3" />;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8" dir="rtl">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מאגר פודטראקים</h1>
