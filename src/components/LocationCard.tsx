@@ -33,11 +33,9 @@ interface LocationCardProps {
 }
 
 export default function LocationCard({ truck, location, operator, expertOpinion, isAdmin, userId, onUpdate }: LocationCardProps) {
-  // Expert opinion fields
   const [fieldNotes, setFieldNotes] = useState(expertOpinion?.field_notes || "");
   const [conditions, setConditions] = useState(expertOpinion?.conditions || "");
 
-  // Editable location fields
   const [locName, setLocName] = useState(location?.name || "");
   const [locStreet, setLocStreet] = useState(location?.street || "");
   const [locNeighborhood, setLocNeighborhood] = useState(location?.neighborhood || "");
@@ -51,13 +49,11 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [locWater, setLocWater] = useState(location?.infra_water ?? false);
   const [locSewage, setLocSewage] = useState(location?.infra_sewage ?? false);
 
-  // Editable operator fields
   const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
 
   const [saving, setSaving] = useState(false);
 
-  // Sync state when props change
   useEffect(() => {
     setFieldNotes(expertOpinion?.field_notes || "");
     setConditions(expertOpinion?.conditions || "");
@@ -87,7 +83,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     if (!isAdmin) return;
     setSaving(true);
 
-    // Save location (upsert)
     if (location?.id) {
       await supabase.from("locations").update({
         name: locName || "ללא שם",
@@ -104,7 +99,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         infra_sewage: locSewage,
       }).eq("id", location.id);
     } else {
-      // Create new location and link to truck
       const { data: newLoc } = await supabase.from("locations").insert({
         name: locName || "מיקום חדש",
         street: locStreet || null,
@@ -124,19 +118,16 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
       }
     }
 
-    // Save operator name to food_trucks
     await supabase.from("food_trucks").update({
       operator_name: opName || null,
     } as any).eq("id", truck.id);
 
-    // Save operator phone to profile
     if (operator?.id) {
       await supabase.from("profiles").update({
         phone: opPhone || null,
       }).eq("id", operator.id);
     }
 
-    // Save expert opinion
     if (expertOpinion?.id) {
       await supabase.from("expert_opinions").update({ field_notes: fieldNotes, conditions }).eq("id", expertOpinion.id);
     } else {
@@ -170,83 +161,118 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const isApproved = truck.status === "approved";
 
   return (
-    <div className="bg-sky-50 rounded-xl p-4 space-y-4 border border-sky-200" dir="rtl">
-      {/* Photos row: 2 square location photos + 1 rectangular truck photo */}
-      <div className="grid grid-cols-3 gap-3">
-        {isAdmin ? (
-          <>
-            {/* Right: מיקום עירוני - square */}
-            <div className="aspect-square">
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/street1`}
-                currentUrl={truck.street_photo_1_url}
-                onUploaded={async (url) => {
-                  await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                onDeleted={async () => {
-                  await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                label="מיקום עירוני"
-                accept="image/*"
-              />
-            </div>
-            {/* Center: מיקום סביבה - square */}
-            <div className="aspect-square">
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/street2`}
-                currentUrl={truck.street_photo_2_url}
-                onUploaded={async (url) => {
-                  await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                onDeleted={async () => {
-                  await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                label="מיקום סביבה"
-                accept="image/*"
-              />
-            </div>
-            {/* Left: הפודטראק - rectangular, spans full height */}
-            <div className="row-span-1">
-              <FileUpload
-                bucket="truck-photos"
-                storagePath={`${truck.id}/vehicle`}
-                currentUrl={truck.vehicle_photo_url}
-                onUploaded={async (url) => {
-                  await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                onDeleted={async () => {
-                  await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
-                  onUpdate();
-                }}
-                label="הפודטראק"
-                accept="image/*"
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} square />
-            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} square />
-            <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} />
-          </>
-        )}
+    <div className="bg-sky-50 rounded-xl p-4 space-y-3 border border-sky-200" dir="rtl">
+
+      {/* === ROW 1: Photos === */}
+      {/* Layout: הפודטראק (large rectangular ~2/3) | מיקום עירוני + מיקום סביבה stacked squares (~1/3) */}
+      <div className="grid grid-cols-3 gap-3" style={{ gridTemplateRows: "1fr 1fr" }}>
+        {/* הפודטראק - spans 2 cols and 2 rows */}
+        <div className="col-span-2 row-span-2">
+          {isAdmin ? (
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/vehicle`}
+              currentUrl={truck.vehicle_photo_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="הפודטראק"
+              accept="image/*"
+              className="h-full"
+            />
+          ) : (
+            <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
+          )}
+        </div>
+        {/* מיקום עירוני - top right square */}
+        <div className="aspect-square">
+          {isAdmin ? (
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/street1`}
+              currentUrl={truck.street_photo_1_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="מיקום עירוני"
+              accept="image/*"
+              className="h-full"
+            />
+          ) : (
+            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} className="h-full aspect-square" />
+          )}
+        </div>
+        {/* מיקום סביבה - bottom right square */}
+        <div className="aspect-square">
+          {isAdmin ? (
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/street2`}
+              currentUrl={truck.street_photo_2_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="מיקום סביבה"
+              accept="image/*"
+              className="h-full"
+            />
+          ) : (
+            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
+          )}
+        </div>
       </div>
 
-      {/* Main grid: 3 columns */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        {/* Right: Location details */}
+      {/* === ROW 2: מפעיל (full width) === */}
+      <Card className="border-sky-300 bg-white/80">
+        <CardHeader className="pb-2 pt-3">
+          <CardTitle className="text-base">מפעיל</CardTitle>
+        </CardHeader>
+        <CardContent className="flex gap-6 text-sm pb-3">
+          {isAdmin ? (
+            <>
+              <div className="flex-1">
+                <EditableRow label="שם" value={opName} onChange={setOpName} />
+              </div>
+              <div className="flex-1">
+                <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex-1">
+                <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+              </div>
+              <div className="flex-1">
+                <ReadOnlyRow label="נייד" value={operator?.phone} />
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* === ROW 3: מיקום | מצב בשטח | הערות ותנאים === */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* מיקום (right in RTL) */}
         <Card className="border-sky-300 bg-white/80">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-base">מיקום</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          <CardContent className="space-y-2 text-sm pb-3">
             {isAdmin ? (
               <>
                 <EditableRow label="שם מיקום" value={locName} onChange={setLocName} />
@@ -296,12 +322,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           </CardContent>
         </Card>
 
-        {/* Center: Field status */}
+        {/* מצב בשטח (center) */}
         <Card className="border-sky-300 bg-white/80">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">מצב קיים בשטח</CardTitle>
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-base">מצב בשטח</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm">
+          <CardContent className="space-y-3 text-sm pb-3">
             <BoolField
               label="מצב סביבה תקין"
               value={expertOpinion?.environment_ok ?? null}
@@ -325,54 +351,39 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           </CardContent>
         </Card>
 
-        {/* Left: Operator + conditions + approval */}
-        <div className="space-y-4">
-          <Card className="border-sky-300 bg-white/80">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">המפעיל</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              {isAdmin ? (
-                <>
-                  <EditableRow label="שם" value={opName} onChange={setOpName} />
-                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-                </>
-              ) : (
-                <>
-                  <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
-                  <ReadOnlyRow label="נייד" value={operator?.phone} />
-                </>
-              )}
-            </CardContent>
-          </Card>
+        {/* הערות ותנאים (left in RTL) */}
+        <Card className="border-sky-300 bg-white/80">
+          <CardHeader className="pb-2 pt-3">
+            <CardTitle className="text-base">הערות ותנאים</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm pb-3">
+            {isAdmin ? (
+              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="הערות ותנאים..." rows={6} />
+            ) : (
+              <p>{expertOpinion?.conditions || "—"}</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-          <Card className="border-sky-300 bg-white/80">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">הערות ותנאים</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm">
-              {isAdmin ? (
-                <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="הערות ותנאים..." rows={3} />
-              ) : (
-                <p>{expertOpinion?.conditions || "—"}</p>
-              )}
-            </CardContent>
-          </Card>
+      {/* === ROW 4: סטטוס + שמור שינויים === */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card className={`border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
+          <CardContent className="py-3 text-center">
+            <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
+            <p className="text-lg font-bold">
+              {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
+            </p>
+          </CardContent>
+        </Card>
 
-          {isAdmin && (
-            <Button onClick={saveAll} disabled={saving} className="w-full">
-              {saving ? "שומר..." : "שמור שינויים"}
-            </Button>
-          )}
-
-          <Card className={`border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
-            <CardContent className="py-4 text-center">
-              <p className="text-lg font-bold">
-                {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+        {isAdmin ? (
+          <Button onClick={saveAll} disabled={saving} className="h-full text-lg font-bold">
+            {saving ? "שומר..." : "שמור שינויים"}
+          </Button>
+        ) : (
+          <div />
+        )}
       </div>
     </div>
   );
@@ -396,15 +407,14 @@ function ReadOnlyRow({ label, value }: { label: string; value: string | null | u
   );
 }
 
-function PhotoSlot({ label, url, square }: { label: string; url: string | null; square?: boolean }) {
-  const sizeClass = square ? "aspect-square" : "w-full h-36";
+function PhotoSlot({ label, url, className = "" }: { label: string; url: string | null; className?: string }) {
   return (
-    <div className="space-y-1">
+    <div className={`space-y-1 ${className}`}>
       <p className="text-xs text-center font-medium text-muted-foreground">{label}</p>
       {url ? (
-        <img src={url} alt={label} className={`w-full object-cover rounded-lg border border-sky-200 ${sizeClass}`} />
+        <img src={url} alt={label} className="w-full h-full object-cover rounded-lg border border-sky-200" />
       ) : (
-        <div className={`w-full bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground ${sizeClass}`}>{label} — לא הועלה</div>
+        <div className="w-full h-full min-h-[80px] bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground">{label} — לא הועלה</div>
       )}
     </div>
   );
