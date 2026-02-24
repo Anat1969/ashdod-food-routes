@@ -54,8 +54,8 @@ export default function TruckProfile() {
       const { data: op } = await supabase.from("profiles").select("*").eq("id", truckRes.data.operator_id).single();
       setOperator(op);
     }
-    const { data: expert } = await supabase.from("expert_opinions").select("*").eq("truck_id", id).maybeSingle();
-    setExpertOpinion(expert);
+    const { data: expertArr } = await supabase.from("expert_opinions").select("*").eq("truck_id", id).order("created_at", { ascending: false }).limit(1);
+    setExpertOpinion(expertArr && expertArr.length > 0 ? expertArr[0] : null);
 
     setLoading(false);
   };
