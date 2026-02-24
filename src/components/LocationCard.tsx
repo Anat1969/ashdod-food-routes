@@ -163,8 +163,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   return (
     <div className="bg-sky-50 rounded-xl p-4 space-y-3 border border-sky-200" dir="rtl">
 
-      {/* === ROW 1: Photos === */}
-      {/* RTL: right = stacked squares, left = large rectangle */}
+      {/* === ROW 1: Photos + Operator === */}
+      {/* Right: 2 stacked squares | Left: truck photo (3:2) + מפעיל underneath, aligned bottom */}
       <div className="flex gap-3">
         {/* Right side: two stacked square photos */}
         <div className="flex flex-col gap-3 w-1/3 flex-shrink-0">
@@ -213,58 +213,60 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             )}
           </div>
         </div>
-        {/* Left side (in RTL): large rectangular truck photo */}
-        <div className="flex-1">
-          {isAdmin ? (
-            <FileUpload
-              bucket="truck-photos"
-              storagePath={`${truck.id}/vehicle`}
-              currentUrl={truck.vehicle_photo_url}
-              onUploaded={async (url) => {
-                await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
-                onUpdate();
-              }}
-              onDeleted={async () => {
-                await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
-                onUpdate();
-              }}
-              label="הפודטראק"
-              accept="image/*"
-              className="h-full"
-            />
-          ) : (
-            <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
-          )}
+        {/* Left side (in RTL): truck photo + מפעיל stacked */}
+        <div className="flex-1 flex flex-col gap-3">
+          {/* Truck photo - classic 3:2 rectangle */}
+          <div className="aspect-[3/2]">
+            {isAdmin ? (
+              <FileUpload
+                bucket="truck-photos"
+                storagePath={`${truck.id}/vehicle`}
+                currentUrl={truck.vehicle_photo_url}
+                onUploaded={async (url) => {
+                  await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                onDeleted={async () => {
+                  await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
+                  onUpdate();
+                }}
+                label="הפודטראק"
+                accept="image/*"
+                className="h-full"
+              />
+            ) : (
+              <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
+            )}
+          </div>
+          {/* מפעיל - fills remaining space */}
+          <Card className="border-sky-300 bg-white/80 flex-1">
+            <CardHeader className="pb-2 pt-3">
+              <CardTitle className="text-base">מפעיל</CardTitle>
+            </CardHeader>
+            <CardContent className="flex gap-6 text-sm pb-3">
+              {isAdmin ? (
+                <>
+                  <div className="flex-1">
+                    <EditableRow label="שם" value={opName} onChange={setOpName} />
+                  </div>
+                  <div className="flex-1">
+                    <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex-1">
+                    <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+                  </div>
+                  <div className="flex-1">
+                    <ReadOnlyRow label="נייד" value={operator?.phone} />
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
-
-      {/* === ROW 2: מפעיל (full width) === */}
-      <Card className="border-sky-300 bg-white/80">
-        <CardHeader className="pb-2 pt-3">
-          <CardTitle className="text-base">מפעיל</CardTitle>
-        </CardHeader>
-        <CardContent className="flex gap-6 text-sm pb-3">
-          {isAdmin ? (
-            <>
-              <div className="flex-1">
-                <EditableRow label="שם" value={opName} onChange={setOpName} />
-              </div>
-              <div className="flex-1">
-                <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex-1">
-                <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
-              </div>
-              <div className="flex-1">
-                <ReadOnlyRow label="נייד" value={operator?.phone} />
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
 
       {/* === ROW 3: מיקום | מצב בשטח | הערות ותנאים === */}
       <div className="grid grid-cols-3 gap-3">
