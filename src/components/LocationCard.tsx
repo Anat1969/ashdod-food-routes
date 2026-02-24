@@ -299,9 +299,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} />
-                <EditableRow label="אופי מיקום" value={locType} onChange={setLocType} />
-                <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
-                <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
                 <div className="flex gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
                     <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
@@ -324,9 +321,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <ReadOnlyRow label="שכונה" value={location?.neighborhood} />
                 <ReadOnlyRow label="גוש" value={location?.gush} />
                 <ReadOnlyRow label="חלקה" value={location?.chelka} />
-                <ReadOnlyRow label="אופי מיקום" value={location?.location_type} />
-                <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
-                <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
                 <div className="flex items-center gap-2 pt-1">
                   <span className="text-muted-foreground">מיקום רצוי:</span>
                   {location?.is_desired ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-destructive" />}
