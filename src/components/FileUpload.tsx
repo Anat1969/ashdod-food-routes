@@ -184,7 +184,7 @@ export default function FileUpload({
       onPaste={handlePaste}
       tabIndex={0}
     >
-      <p className="text-sm font-medium">{label}</p>
+      <p className="text-sm font-medium mb-2">{label}</p>
 
       {currentUrl && isImage && (
         <div className="relative rounded-lg overflow-hidden border bg-muted flex-1 min-h-[8rem]">
