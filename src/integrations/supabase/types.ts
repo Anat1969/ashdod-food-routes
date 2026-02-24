@@ -208,6 +208,8 @@ export type Database = {
           hours_to: string | null
           id: string
           location_id: string | null
+          operator_address: string | null
+          operator_email: string | null
           operator_id: string | null
           operator_name: string | null
           status: string
@@ -229,6 +231,8 @@ export type Database = {
           hours_to?: string | null
           id?: string
           location_id?: string | null
+          operator_address?: string | null
+          operator_email?: string | null
           operator_id?: string | null
           operator_name?: string | null
           status?: string
@@ -250,6 +254,8 @@ export type Database = {
           hours_to?: string | null
           id?: string
           location_id?: string | null
+          operator_address?: string | null
+          operator_email?: string | null
           operator_id?: string | null
           operator_name?: string | null
           status?: string

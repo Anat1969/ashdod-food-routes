@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, X, Zap, Droplets, CircleDot } from "lucide-react";
+import { Check, X, Zap, Droplets, CircleDot, Mail } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 
 import { toast } from "sonner";
@@ -51,6 +51,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
   const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
+  const [opEmail, setOpEmail] = useState((truck as any).operator_email || "");
+  const [opAddress, setOpAddress] = useState((truck as any).operator_address || "");
 
   const [saving, setSaving] = useState(false);
 
@@ -77,7 +79,9 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   useEffect(() => {
     setOpName((truck as any).operator_name || "");
     setOpPhone(operator?.phone || "");
-  }, [operator, (truck as any).operator_name]);
+    setOpEmail((truck as any).operator_email || "");
+    setOpAddress((truck as any).operator_address || "");
+  }, [operator, (truck as any).operator_name, (truck as any).operator_email, (truck as any).operator_address]);
 
   const saveAll = async () => {
     if (!isAdmin) return;
@@ -120,6 +124,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
     await supabase.from("food_trucks").update({
       operator_name: opName || null,
+      operator_email: opEmail || null,
+      operator_address: opAddress || null,
     } as any).eq("id", truck.id);
 
     if (operator?.id) {
@@ -243,25 +249,35 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-base">מפעיל</CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-6 text-sm pb-3">
+            <CardContent className="space-y-3 text-sm pb-3">
               {isAdmin ? (
-                <>
-                  <div className="flex-1">
-                    <EditableRow label="שם" value={opName} onChange={setOpName} />
-                  </div>
-                  <div className="flex-1">
-                    <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-                  </div>
-                </>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                  <EditableRow label="שם" value={opName} onChange={setOpName} />
+                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
+                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} />
+                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} />
+                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
+                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
+                </div>
               ) : (
-                <>
-                  <div className="flex-1">
-                    <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+                  <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+                  <ReadOnlyRow label="נייד" value={operator?.phone} />
+                  <ReadOnlyRow label="כתובת" value={(truck as any).operator_address} />
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">מייל:</span>
+                    {(truck as any).operator_email ? (
+                      <a href={`mailto:${(truck as any).operator_email}`} className="font-medium text-primary flex items-center gap-1 hover:underline">
+                        <Mail className="h-3 w-3" />
+                        {(truck as any).operator_email}
+                      </a>
+                    ) : (
+                      <span className="font-medium">—</span>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <ReadOnlyRow label="נייד" value={operator?.phone} />
-                  </div>
-                </>
+                  <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
+                  <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
+                </div>
               )}
             </CardContent>
           </Card>
@@ -283,9 +299,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} />
-                <EditableRow label="אופי מיקום" value={locType} onChange={setLocType} />
-                <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
-                <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
                 <div className="flex gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
                     <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
@@ -308,9 +321,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <ReadOnlyRow label="שכונה" value={location?.neighborhood} />
                 <ReadOnlyRow label="גוש" value={location?.gush} />
                 <ReadOnlyRow label="חלקה" value={location?.chelka} />
-                <ReadOnlyRow label="אופי מיקום" value={location?.location_type} />
-                <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
-                <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
                 <div className="flex items-center gap-2 pt-1">
                   <span className="text-muted-foreground">מיקום רצוי:</span>
                   {location?.is_desired ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-destructive" />}
