@@ -334,7 +334,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 </>
               ) : (
                 <>
-                  <ReadOnlyRow label="שם" value={operator?.full_name} />
+                  <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
                   <ReadOnlyRow label="נייד" value={operator?.phone} />
                 </>
               )}
