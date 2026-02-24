@@ -225,6 +225,10 @@ export default function Directory() {
         </Select>
       </div>
 
+      <div className="mb-6 rounded-lg overflow-hidden border shadow-sm">
+        <img src={ashdodMap} alt="מפת פודטראקים באשדוד" className="w-full h-auto object-cover max-h-[250px]" />
+      </div>
+
       {loading ? (
         <div className="text-center py-12 text-muted-foreground">טוען...</div>
       ) : filtered.length === 0 ? (
