@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import StatusBadge from "@/components/StatusBadge";
-import type { FoodTruck, Application, TruckStatus } from "@/lib/types";
+import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { BarChart3, Clock, CheckCircle, XCircle, Search } from "lucide-react";
 
@@ -14,7 +14,6 @@ export default function AdminDashboard() {
   const { isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [trucks, setTrucks] = useState<FoodTruck[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -27,12 +26,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetch = async () => {
-      const [trucksRes, appsRes] = await Promise.all([
-        supabase.from("food_trucks").select("*").order("created_at", { ascending: false }),
-        supabase.from("applications").select("*").order("submitted_at", { ascending: false }),
-      ]);
-      setTrucks((trucksRes.data as FoodTruck[]) || []);
-      setApplications((appsRes.data as Application[]) || []);
+      const { data } = await supabase
+        .from("food_trucks")
+        .select("*")
+        .order("created_at", { ascending: false });
+      setTrucks(data || []);
       setLoading(false);
     };
     if (isAdmin) fetch();
@@ -42,24 +40,21 @@ export default function AdminDashboard() {
 
   const stats = {
     total: trucks.length,
-    pending: trucks.filter(t => t.status === "ממתין_לבדיקה").length,
-    approved: trucks.filter(t => t.status === "מאושר").length,
-    rejected: trucks.filter(t => t.status === "נדחה").length,
+    pending: trucks.filter(t => t.status === "submitted").length,
+    approved: trucks.filter(t => t.status === "approved").length,
+    rejected: trucks.filter(t => t.status === "rejected").length,
   };
 
   const filteredTrucks = trucks.filter((t) => {
-    const matchesSearch = !search || t.name.includes(search) || t.operator_name.includes(search);
+    const matchesSearch = !search || t.truck_name.includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
-
-  const pendingApps = applications.filter(a => a.status === "ממתין_לבדיקה");
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">לוח בקרה – אדריכל העיר</h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <StatCard icon={BarChart3} label="סה״כ פודטראקים" value={stats.total} color="text-primary" />
         <StatCard icon={Clock} label="ממתינים לבדיקה" value={stats.pending} color="text-accent" />
@@ -67,31 +62,6 @@ export default function AdminDashboard() {
         <StatCard icon={XCircle} label="נדחו" value={stats.rejected} color="text-destructive" />
       </div>
 
-      {/* Pending Applications */}
-      {pendingApps.length > 0 && (
-        <Card className="municipal-shadow mb-8">
-          <CardHeader>
-            <CardTitle className="text-lg">בקשות חדשות ממתינות ({pendingApps.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {pendingApps.map((app) => (
-                <div key={app.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{app.applicant_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {app.food_category} • {app.requested_neighborhood} • {new Date(app.submitted_at).toLocaleDateString("he-IL")}
-                    </p>
-                  </div>
-                  <StatusBadge status={app.status} />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Truck Management */}
       <Card className="municipal-shadow">
         <CardHeader>
           <CardTitle className="text-lg">ניהול פודטראקים</CardTitle>
@@ -127,9 +97,9 @@ export default function AdminDashboard() {
                   className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer"
                 >
                   <div>
-                    <p className="font-medium text-sm">{truck.name}</p>
+                    <p className="font-medium text-sm">{truck.truck_name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {truck.operator_name} • {truck.neighborhood || "ללא שכונה"}
+                      {truck.vehicle_type || "ללא סוג"}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">

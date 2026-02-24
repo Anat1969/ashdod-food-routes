@@ -1,95 +1,39 @@
-export type TruckStatus = 'ממתין_לבדיקה' | 'בבדיקה' | 'מאושר' | 'נדחה';
+import type { Tables } from "@/integrations/supabase/types";
+
+export type FoodTruck = Tables<"food_trucks">;
+export type ComplianceChecklist = Tables<"compliance_checklist">;
+export type ExpertOpinion = Tables<"expert_opinions">;
+export type ActivityLog = Tables<"activity_log">;
+export type Location = Tables<"locations">;
+export type Profile = Tables<"profiles">;
+
+export type TruckStatus = 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected';
 
 export const STATUS_LABELS: Record<TruckStatus, string> = {
-  'ממתין_לבדיקה': 'ממתין לבדיקה',
-  'בבדיקה': 'בבדיקה',
-  'מאושר': 'מאושר',
-  'נדחה': 'נדחה',
+  draft: 'טיוטה',
+  submitted: 'הוגש',
+  under_review: 'בבדיקה',
+  approved: 'מאושר',
+  rejected: 'נדחה',
 };
 
 export const STATUS_VARIANTS: Record<TruckStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  'ממתין_לבדיקה': 'outline',
-  'בבדיקה': 'secondary',
-  'מאושר': 'default',
-  'נדחה': 'destructive',
+  draft: 'outline',
+  submitted: 'secondary',
+  under_review: 'secondary',
+  approved: 'default',
+  rejected: 'destructive',
 };
-
-export interface FoodTruck {
-  id: string;
-  name: string;
-  operator_name: string;
-  operator_id: string | null;
-  vehicle_type: string | null;
-  vehicle_description: string | null;
-  cuisine: string | null;
-  operating_hours: string | null;
-  contact_phone: string | null;
-  contact_email: string | null;
-  street_address: string | null;
-  neighborhood: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  status: TruckStatus;
-  logo_url: string | null;
-  admin_notes: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Application {
-  id: string;
-  applicant_name: string;
-  applicant_id: string;
-  applicant_phone: string;
-  applicant_email: string | null;
-  vehicle_type: string | null;
-  vehicle_dimensions: string | null;
-  food_category: string | null;
-  operating_hours: string | null;
-  requested_street: string | null;
-  requested_neighborhood: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  status: TruckStatus;
-  submitted_at: string;
-  truck_id: string | null;
-}
-
-export interface ComplianceItem {
-  id: string;
-  truck_id: string;
-  item_key: string;
-  item_label: string;
-  passed: boolean;
-}
-
-export interface StatusHistoryEntry {
-  id: string;
-  truck_id: string;
-  old_status: TruckStatus | null;
-  new_status: TruckStatus;
-  changed_by: string | null;
-  note: string | null;
-  created_at: string;
-}
-
-export interface AdminNote {
-  id: string;
-  truck_id: string;
-  note: string;
-  admin_user_id: string | null;
-  created_at: string;
-}
 
 export const COMPLIANCE_ITEMS = [
   { key: 'professional_design', label: 'עיצוב מקצועי' },
-  { key: 'appearance_approval', label: 'אישור חזות ושילוט' },
-  { key: 'curb_distance', label: 'מרחק 60 ס"מ מקו אבן השפה' },
-  { key: 'no_furniture_blocking', label: 'אי חסימת רהוט רחוב' },
-  { key: 'counter_height', label: 'גובה דלפק מקס\' 110 ס"מ' },
-  { key: 'access_width', label: 'רוחב נתיב גישה 90 ס"מ' },
+  { key: 'signage_approved', label: 'אישור חזות ושילוט' },
+  { key: 'counter_height_ok', label: 'גובה דלפק מקס\' 110 ס"מ' },
+  { key: 'access_path_90cm', label: 'רוחב נתיב גישה 90 ס"מ' },
+  { key: 'wheelchair_space_ok', label: 'מרחב נגיש לכיסא גלגלים' },
   { key: 'edge_kitchen_only', label: 'מטבח קצה בלבד' },
-  { key: 'fire_system', label: 'מערכת כיבוי אש' },
+  { key: 'fire_suppression_ok', label: 'מערכת כיבוי אש' },
+  { key: 'no_alcohol_tobacco', label: 'ללא אלכוהול וטבק' },
 ];
 
 export const NEIGHBORHOODS = [

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,40 +12,29 @@ import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Send } from "lucide-react";
 
 interface FormData {
-  applicant_name: string;
-  applicant_id: string;
-  applicant_phone: string;
-  applicant_email: string;
+  truck_name: string;
   vehicle_type: string;
-  vehicle_dimensions: string;
   food_category: string;
-  operating_hours: string;
-  requested_street: string;
-  requested_neighborhood: string;
+  hours_from: string;
+  hours_to: string;
 }
 
 const STEPS = [
-  "פרטי מגיש",
   "פרטי הרכב",
-  "מיקום מבוקש",
   "סיכום ואישור",
 ];
 
 export default function ApplicationForm() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<FormData>({
-    applicant_name: "",
-    applicant_id: "",
-    applicant_phone: "",
-    applicant_email: "",
+    truck_name: "",
     vehicle_type: "",
-    vehicle_dimensions: "",
     food_category: "",
-    operating_hours: "",
-    requested_street: "",
-    requested_neighborhood: "",
+    hours_from: "",
+    hours_to: "",
   });
 
   const update = (field: keyof FormData, value: string) => {
@@ -52,25 +42,25 @@ export default function ApplicationForm() {
   };
 
   const canNext = () => {
-    if (step === 0) return form.applicant_name && form.applicant_id && form.applicant_phone;
-    if (step === 1) return form.vehicle_type && form.food_category;
-    if (step === 2) return form.requested_street && form.requested_neighborhood;
+    if (step === 0) return form.truck_name && form.vehicle_type;
     return true;
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("יש להתחבר כדי להגיש בקשה");
+      return;
+    }
     setSubmitting(true);
-    const { error } = await supabase.rpc("submit_application", {
-      p_applicant_name: form.applicant_name,
-      p_applicant_id: form.applicant_id,
-      p_applicant_phone: form.applicant_phone,
-      p_applicant_email: form.applicant_email || null,
-      p_vehicle_type: form.vehicle_type || null,
-      p_vehicle_dimensions: form.vehicle_dimensions || null,
-      p_food_category: form.food_category || null,
-      p_operating_hours: form.operating_hours || null,
-      p_requested_street: form.requested_street || null,
-      p_requested_neighborhood: form.requested_neighborhood || null,
+    const { error } = await supabase.from("food_trucks").insert({
+      truck_name: form.truck_name,
+      vehicle_type: form.vehicle_type || null,
+      food_category: form.food_category || null,
+      hours_from: form.hours_from || null,
+      hours_to: form.hours_to || null,
+      operator_id: user.id,
+      status: "submitted",
+      submitted_at: new Date().toISOString(),
     });
     setSubmitting(false);
     if (error) {
@@ -86,7 +76,6 @@ export default function ApplicationForm() {
       <h1 className="text-2xl font-bold mb-2">הגשת בקשה להעמדת פודטראק</h1>
       <p className="text-muted-foreground mb-6">מלא את הפרטים הבאים להגשת בקשה חדשה</p>
 
-      {/* Step indicator */}
       <div className="flex items-center gap-2 mb-8">
         {STEPS.map((s, i) => (
           <div key={i} className="flex items-center gap-2 flex-1">
@@ -110,58 +99,34 @@ export default function ApplicationForm() {
         <CardContent className="space-y-4">
           {step === 0 && (
             <>
-              <Field label="שם מלא *" value={form.applicant_name} onChange={(v) => update("applicant_name", v)} />
-              <Field label="תעודת זהות *" value={form.applicant_id} onChange={(v) => update("applicant_id", v)} />
-              <Field label="טלפון *" value={form.applicant_phone} onChange={(v) => update("applicant_phone", v)} type="tel" />
-              <Field label="אימייל" value={form.applicant_email} onChange={(v) => update("applicant_email", v)} type="email" />
+              <Field label="שם הפודטראק *" value={form.truck_name} onChange={(v) => update("truck_name", v)} />
+              <div>
+                <Label className="text-sm mb-1.5 block">סוג רכב *</Label>
+                <Select value={form.vehicle_type} onValueChange={(v) => update("vehicle_type", v)}>
+                  <SelectTrigger><SelectValue placeholder="בחר סוג" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="truck">משאית</SelectItem>
+                    <SelectItem value="caravan">קרוואן</SelectItem>
+                    <SelectItem value="stand">דוכן</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Field label="קטגוריית מזון" value={form.food_category} onChange={(v) => update("food_category", v)} placeholder="לדוגמה: המבורגרים, פיצה" />
+              <Field label="שעת התחלה" value={form.hours_from} onChange={(v) => update("hours_from", v)} type="time" />
+              <Field label="שעת סיום" value={form.hours_to} onChange={(v) => update("hours_to", v)} type="time" />
             </>
           )}
 
           {step === 1 && (
-            <>
-              <Field label="סוג רכב *" value={form.vehicle_type} onChange={(v) => update("vehicle_type", v)} placeholder="לדוגמה: משאית, קרוואן, נגרר" />
-              <Field label="מידות הרכב" value={form.vehicle_dimensions} onChange={(v) => update("vehicle_dimensions", v)} placeholder="אורך x רוחב x גובה" />
-              <Field label="קטגוריית מזון *" value={form.food_category} onChange={(v) => update("food_category", v)} placeholder="לדוגמה: המבורגרים, פיצה, אסיאתי" />
-              <Field label="שעות פעילות מבוקשות" value={form.operating_hours} onChange={(v) => update("operating_hours", v)} placeholder="לדוגמה: 10:00-22:00" />
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <Field label="כתובת מבוקשת *" value={form.requested_street} onChange={(v) => update("requested_street", v)} />
-              <div>
-                <Label className="text-sm mb-1.5 block">שכונה *</Label>
-                <Select value={form.requested_neighborhood} onValueChange={(v) => update("requested_neighborhood", v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר שכונה" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {NEIGHBORHOODS.map((n) => (
-                      <SelectItem key={n} value={n}>{n}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </>
-          )}
-
-          {step === 3 && (
             <div className="space-y-3">
               <h3 className="font-semibold">סיכום הבקשה</h3>
-              <SummaryRow label="שם" value={form.applicant_name} />
-              <SummaryRow label="ת.ז." value={form.applicant_id} />
-              <SummaryRow label="טלפון" value={form.applicant_phone} />
-              <SummaryRow label="אימייל" value={form.applicant_email} />
+              <SummaryRow label="שם הפודטראק" value={form.truck_name} />
               <SummaryRow label="סוג רכב" value={form.vehicle_type} />
-              <SummaryRow label="מידות" value={form.vehicle_dimensions} />
               <SummaryRow label="קטגוריית מזון" value={form.food_category} />
-              <SummaryRow label="שעות פעילות" value={form.operating_hours} />
-              <SummaryRow label="כתובת" value={form.requested_street} />
-              <SummaryRow label="שכונה" value={form.requested_neighborhood} />
+              <SummaryRow label="שעות" value={form.hours_from && form.hours_to ? `${form.hours_from} - ${form.hours_to}` : ""} />
             </div>
           )}
 
-          {/* Navigation */}
           <div className="flex items-center justify-between pt-4 border-t">
             <Button variant="outline" onClick={() => setStep(step - 1)} disabled={step === 0}>
               <ChevronRight className="h-4 w-4 ml-1" />

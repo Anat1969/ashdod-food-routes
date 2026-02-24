@@ -14,22 +14,21 @@ export default function TruckCard({ truck }: TruckCardProps) {
       <Card className="municipal-shadow hover:municipal-shadow-lg transition-shadow cursor-pointer h-full">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-lg leading-tight">{truck.name}</CardTitle>
+            <CardTitle className="text-lg leading-tight">{truck.truck_name}</CardTitle>
             <StatusBadge status={truck.status} />
           </div>
-          <p className="text-sm text-muted-foreground">{truck.operator_name}</p>
         </CardHeader>
         <CardContent className="pt-0 space-y-2">
-          {truck.cuisine && (
+          {truck.food_category && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Utensils className="h-4 w-4 flex-shrink-0" />
-              <span>{truck.cuisine}</span>
+              <span>{truck.food_category}</span>
             </div>
           )}
-          {(truck.neighborhood || truck.street_address) && (
+          {truck.vehicle_type && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span>{[truck.neighborhood, truck.street_address].filter(Boolean).join(" – ")}</span>
+              <span>{truck.vehicle_type}</span>
             </div>
           )}
         </CardContent>

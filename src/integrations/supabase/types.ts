@@ -190,7 +190,10 @@ export type Database = {
       }
       food_trucks: {
         Row: {
+          aerial_photo_url: string | null
+          business_license_url: string | null
           created_at: string
+          design_mockup_url: string | null
           food_category: string | null
           hours_from: string | null
           hours_to: string | null
@@ -198,13 +201,19 @@ export type Database = {
           location_id: string | null
           operator_id: string | null
           status: string
+          street_photo_1_url: string | null
+          street_photo_2_url: string | null
           submitted_at: string | null
           truck_name: string
           updated_at: string
+          vehicle_photo_url: string | null
           vehicle_type: string | null
         }
         Insert: {
+          aerial_photo_url?: string | null
+          business_license_url?: string | null
           created_at?: string
+          design_mockup_url?: string | null
           food_category?: string | null
           hours_from?: string | null
           hours_to?: string | null
@@ -212,13 +221,19 @@ export type Database = {
           location_id?: string | null
           operator_id?: string | null
           status?: string
+          street_photo_1_url?: string | null
+          street_photo_2_url?: string | null
           submitted_at?: string | null
           truck_name: string
           updated_at?: string
+          vehicle_photo_url?: string | null
           vehicle_type?: string | null
         }
         Update: {
+          aerial_photo_url?: string | null
+          business_license_url?: string | null
           created_at?: string
+          design_mockup_url?: string | null
           food_category?: string | null
           hours_from?: string | null
           hours_to?: string | null
@@ -226,9 +241,12 @@ export type Database = {
           location_id?: string | null
           operator_id?: string | null
           status?: string
+          street_photo_1_url?: string | null
+          street_photo_2_url?: string | null
           submitted_at?: string | null
           truck_name?: string
           updated_at?: string
+          vehicle_photo_url?: string | null
           vehicle_type?: string | null
         }
         Relationships: [
