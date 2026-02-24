@@ -204,16 +204,16 @@ export default function Directory() {
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="חיפוש לפי שם או קטגוריה..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pr-9"
+            className="pr-10 h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[200px] h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm">
             <SelectValue placeholder="סטטוס" />
           </SelectTrigger>
           <SelectContent>
