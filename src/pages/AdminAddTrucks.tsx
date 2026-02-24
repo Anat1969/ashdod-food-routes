@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import FileUpload from "@/components/FileUpload";
 import AdminLayout from "@/components/AdminLayout";
 import { toast } from "sonner";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, FileSpreadsheet, Loader2 } from "lucide-react";
 
 interface Location {
   id: string;
@@ -29,6 +29,7 @@ export default function AdminAddTrucks() {
   const [locationId, setLocationId] = useState("");
 
   const [docUrl, setDocUrl] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !isAdmin) navigate("/login");
@@ -69,6 +70,48 @@ export default function AdminAddTrucks() {
     setVehicleType("");
     setFoodCategory("");
     setLocationId("");
+  };
+
+  // Extract the storage path from the public URL
+  const getStoragePath = (url: string): string | null => {
+    const marker = "/storage/v1/object/public/documents/";
+    const idx = url.indexOf(marker);
+    if (idx === -1) return null;
+    return url.substring(idx + marker.length);
+  };
+
+  const handleImport = async () => {
+    if (!docUrl) return;
+
+    const storagePath = getStoragePath(docUrl);
+    if (!storagePath) {
+      toast.error("לא ניתן לזהות את נתיב הקובץ");
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("parse-excel", {
+        body: { storage_path: storagePath },
+      });
+
+      if (error) {
+        toast.error("שגיאה בייבוא הנתונים");
+        console.error(error);
+        return;
+      }
+
+      toast.success(`יובאו ${data.imported} פודטראקים בהצלחה${data.skipped ? ` (${data.skipped} דולגו)` : ""}`);
+      if (data.errors?.length) {
+        console.warn("Import errors:", data.errors);
+      }
+      setDocUrl(null);
+    } catch (err) {
+      toast.error("שגיאה בייבוא הנתונים");
+      console.error(err);
+    } finally {
+      setImporting(false);
+    }
   };
 
   return (
@@ -143,11 +186,11 @@ export default function AdminAddTrucks() {
         {/* File upload section */}
         <Card className="municipal-shadow">
           <CardHeader>
-            <CardTitle className="text-lg">העלאת קובץ PDF / Excel</CardTitle>
+            <CardTitle className="text-lg">העלאת קובץ Excel</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              ניתן להעלות קובץ PDF או Excel עם רשימת פודטראקים לייבוא.
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              העלה קובץ Excel עם רשימת פודטראקים ומתחמים לייבוא אוטומטי.
             </p>
             <FileUpload
               bucket="documents"
@@ -155,10 +198,25 @@ export default function AdminAddTrucks() {
               currentUrl={docUrl}
               onUploaded={(url) => setDocUrl(url)}
               onDeleted={() => setDocUrl(null)}
-              accept=".pdf,.xlsx,.xls"
+              accept=".xlsx,.xls"
               label="קובץ רשימה"
               isImage={false}
             />
+            {docUrl && (
+              <Button
+                onClick={handleImport}
+                disabled={importing}
+                className="w-full"
+                variant="default"
+              >
+                {importing ? (
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="h-4 w-4 ml-2" />
+                )}
+                {importing ? "מייבא נתונים..." : "ייבא נתונים מהקובץ"}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
