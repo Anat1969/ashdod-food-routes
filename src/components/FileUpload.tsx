@@ -172,7 +172,7 @@ export default function FileUpload({
 
   return (
     <div
-      className={`space-y-2 rounded-lg border-2 border-dashed p-3 transition-colors outline-none ${
+      className={`flex flex-col rounded-lg border-2 border-dashed p-3 transition-colors outline-none ${
         dragging
           ? "border-primary bg-primary/10"
           : "border-muted-foreground/25 hover:border-muted-foreground/40"
