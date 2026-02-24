@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Building2, LogOut, Menu, X } from "lucide-react";
@@ -7,7 +7,13 @@ import { useState } from "react";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, isAdmin, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   const navLinks = [
     { to: "/", label: "ראשי" },
@@ -52,7 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="text-primary-foreground hover:bg-primary-foreground/10 mr-2"
               >
                 <LogOut className="h-4 w-4 ml-1" />
@@ -92,7 +98,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
             ))}
             {user ? (
-              <button onClick={() => { signOut(); setMobileMenuOpen(false); }} className="block px-6 py-3 text-sm font-medium w-full text-start">
+              <button onClick={() => { handleSignOut(); setMobileMenuOpen(false); }} className="block px-6 py-3 text-sm font-medium w-full text-start">
                 יציאה
               </button>
             ) : (
