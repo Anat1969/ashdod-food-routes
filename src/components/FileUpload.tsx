@@ -37,6 +37,7 @@ export default function FileUpload({
   accept,
   label,
   isImage = true,
+  className,
 }: FileUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
