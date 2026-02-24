@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import ashdodLogo from "@/assets/ashdod-logo.jpeg";
+import ashdodEmblem from "@/assets/ashdod-emblem.png";
 
 export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const { user, isAdmin, signOut } = useAuth();
