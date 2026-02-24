@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import TruckCard from "@/components/TruckCard";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import StatusBadge from "@/components/StatusBadge";
 import { Search } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
@@ -13,15 +15,19 @@ export default function Directory() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
+  const fetchTrucks = async () => {
+    const { data, error } = await supabase
+      .from("food_trucks")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) {
+      console.error("Error fetching trucks:", error);
+    }
+    setTrucks(data || []);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchTrucks = async () => {
-      const { data } = await supabase
-        .from("food_trucks")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setTrucks(data || []);
-      setLoading(false);
-    };
     fetchTrucks();
 
     const channel = supabase
@@ -75,10 +81,45 @@ export default function Directory() {
           {trucks.length === 0 ? "אין פודטראקים רשומים עדיין" : "לא נמצאו תוצאות"}
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((truck) => (
-            <TruckCard key={truck.id} truck={truck} />
-          ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-right">שם הפודטראק</TableHead>
+                <TableHead className="text-right">סוג רכב</TableHead>
+                <TableHead className="text-right">קטגוריית מזון</TableHead>
+                <TableHead className="text-right">שעות פעילות</TableHead>
+                <TableHead className="text-right">סטטוס</TableHead>
+                <TableHead className="text-right">תאריך הגשה</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((truck) => (
+                <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell>
+                    <Link to={`/truck/${truck.id}`} className="font-medium text-primary hover:underline">
+                      {truck.truck_name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{truck.vehicle_type || "—"}</TableCell>
+                  <TableCell>{truck.food_category || "—"}</TableCell>
+                  <TableCell>
+                    {truck.hours_from && truck.hours_to
+                      ? `${truck.hours_from} - ${truck.hours_to}`
+                      : "—"}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={truck.status} />
+                  </TableCell>
+                  <TableCell>
+                    {truck.submitted_at
+                      ? new Date(truck.submitted_at).toLocaleDateString("he-IL")
+                      : "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
