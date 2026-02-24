@@ -230,6 +230,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               }}
               label="הפודטראק"
               accept="image/*"
+              className="h-full"
             />
           ) : (
             <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
