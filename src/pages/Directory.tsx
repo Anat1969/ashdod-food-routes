@@ -65,6 +65,56 @@ export default function Directory() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
+  const updateLocationType = async (truck: TruckWithLocation, value: string) => {
+    if (!truck.location_id || !truck.location) return;
+    const { error } = await supabase
+      .from("locations")
+      .update({ location_type: value })
+      .eq("id", truck.location_id);
+    if (error) {
+      toast.error("שגיאה בעדכון סוג עמדה");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) =>
+        t.id === truck.id ? { ...t, location: { ...t.location!, location_type: value } } : t
+      )
+    );
+  };
+
+  const updateInfra = async (truck: TruckWithLocation, field: "infra_electricity" | "infra_water" | "infra_sewage", checked: boolean) => {
+    if (!truck.location_id || !truck.location) return;
+    const { error } = await supabase
+      .from("locations")
+      .update({ [field]: checked })
+      .eq("id", truck.location_id);
+    if (error) {
+      toast.error("שגיאה בעדכון תשתית");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) =>
+        t.id === truck.id ? { ...t, location: { ...t.location!, [field]: checked } } : t
+      )
+    );
+  };
+
+  const updateHasTruck = async (truck: TruckWithLocation, checked: boolean) => {
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ vehicle_type: checked ? "פודטראק" : null })
+      .eq("id", truck.id);
+    if (error) {
+      toast.error("שגיאה בעדכון פודטראק");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) =>
+        t.id === truck.id ? { ...t, vehicle_type: checked ? "פודטראק" : null } : t
+      )
+    );
+  };
+
   const filtered = trucks.filter((t) => {
     const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
@@ -114,7 +164,6 @@ export default function Directory() {
                 <TableHead className="text-right">עמדה</TableHead>
                 <TableHead className="text-right">פודטראק</TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
-                <TableHead className="text-right">פעל</TableHead>
                 <TableHead className="text-right">מיקום עמדה</TableHead>
                 <TableHead className="text-right">סטטוס</TableHead>
                 <TableHead className="text-right">תאריך הגשה</TableHead>
@@ -123,9 +172,21 @@ export default function Directory() {
             <TableBody>
               {filtered.map((truck) => (
                 <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
-                  {/* סוג עמדה */}
+                  {/* סוג עמדה - dropdown */}
                   <TableCell>
-                    {truck.location?.location_type || "—"}
+                    <Select
+                      value={truck.location?.location_type || ""}
+                      onValueChange={(val) => updateLocationType(truck, val)}
+                    >
+                      <SelectTrigger className="w-[140px] h-8 text-xs">
+                        <SelectValue placeholder="—" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATION_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
@@ -133,25 +194,38 @@ export default function Directory() {
                       {truck.truck_name}
                     </Link>
                   </TableCell>
-                  {/* פודטראק */}
-                  <TableCell>{truck.food_category || "—"}</TableCell>
-                  {/* תשתית */}
+                  {/* פודטראק - checkbox */}
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className={truck.location?.infra_electricity ? "text-green-600" : "text-muted-foreground"}>
-                        <Zap className="h-4 w-4 inline" />
-                      </span>
-                      <span className={truck.location?.infra_water ? "text-green-600" : "text-muted-foreground"}>
-                        <Droplets className="h-4 w-4 inline" />
-                      </span>
-                      <span className={truck.location?.infra_sewage ? "text-green-600" : "text-muted-foreground"}>
-                        <CircleDot className="h-4 w-4 inline" />
-                      </span>
-                    </div>
+                    <Checkbox
+                      checked={!!truck.vehicle_type}
+                      onCheckedChange={(checked) => updateHasTruck(truck, !!checked)}
+                    />
                   </TableCell>
-                  {/* פעל */}
+                  {/* תשתית - 3 checkboxes */}
                   <TableCell>
-                    <Checkbox checked={!!truck.vehicle_type} disabled />
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1" title="חשמל">
+                        <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Checkbox
+                          checked={truck.location?.infra_electricity ?? false}
+                          onCheckedChange={(checked) => updateInfra(truck, "infra_electricity", !!checked)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1" title="מים">
+                        <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Checkbox
+                          checked={truck.location?.infra_water ?? false}
+                          onCheckedChange={(checked) => updateInfra(truck, "infra_water", !!checked)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1" title="ביוב">
+                        <CircleDot className="h-3.5 w-3.5 text-muted-foreground" />
+                        <Checkbox
+                          checked={truck.location?.infra_sewage ?? false}
+                          onCheckedChange={(checked) => updateInfra(truck, "infra_sewage", !!checked)}
+                        />
+                      </div>
+                    </div>
                   </TableCell>
                   {/* מיקום עמדה */}
                   <TableCell>
