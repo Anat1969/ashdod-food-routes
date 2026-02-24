@@ -258,7 +258,7 @@ export default function Directory() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((truck) => (
+              {sorted.map((truck) => (
                 <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
                   {/* סוג עמדה - dropdown */}
                   <TableCell>
