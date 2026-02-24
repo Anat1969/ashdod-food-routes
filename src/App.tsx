@@ -34,7 +34,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/policy" element={<Policy />} />
-              <Route path="/directory" element={<Directory />} />
+              <Route path="/directory" element={<ProtectedRoute adminOnly><Directory /></ProtectedRoute>} />
               <Route path="/truck/:id" element={<TruckProfile />} />
               <Route path="/apply" element={<ApplicationForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
