@@ -60,24 +60,24 @@ export default function ApplicationForm() {
 
   const handleSubmit = async () => {
     setSubmitting(true);
-    const { error } = await supabase.from("applications").insert({
-      applicant_name: form.applicant_name,
-      applicant_id: form.applicant_id,
-      applicant_phone: form.applicant_phone,
-      applicant_email: form.applicant_email || null,
-      vehicle_type: form.vehicle_type || null,
-      vehicle_dimensions: form.vehicle_dimensions || null,
-      food_category: form.food_category || null,
-      operating_hours: form.operating_hours || null,
-      requested_street: form.requested_street || null,
-      requested_neighborhood: form.requested_neighborhood || null,
+    const { error } = await supabase.rpc("submit_application", {
+      p_applicant_name: form.applicant_name,
+      p_applicant_id: form.applicant_id,
+      p_applicant_phone: form.applicant_phone,
+      p_applicant_email: form.applicant_email || null,
+      p_vehicle_type: form.vehicle_type || null,
+      p_vehicle_dimensions: form.vehicle_dimensions || null,
+      p_food_category: form.food_category || null,
+      p_operating_hours: form.operating_hours || null,
+      p_requested_street: form.requested_street || null,
+      p_requested_neighborhood: form.requested_neighborhood || null,
     });
     setSubmitting(false);
     if (error) {
       toast.error("שגיאה בהגשת הבקשה");
     } else {
       toast.success("הבקשה הוגשה בהצלחה!");
-      navigate("/");
+      navigate("/directory");
     }
   };
 
