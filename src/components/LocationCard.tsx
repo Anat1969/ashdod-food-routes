@@ -167,9 +167,61 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     <div className="bg-sky-50 rounded-xl p-4 space-y-4 border border-sky-200" dir="rtl">
       {/* Photos row */}
       <div className="grid grid-cols-3 gap-3">
-        <PhotoSlot label="תמונת רחוב 1" url={truck.street_photo_1_url} />
-        <PhotoSlot label="תמונת רחוב 2" url={truck.street_photo_2_url} />
-        <PhotoSlot label="תמונה אווירית" url={truck.aerial_photo_url} />
+        {isAdmin ? (
+          <>
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/street1`}
+              currentUrl={truck.street_photo_1_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ street_photo_1_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="מיקום עירוני"
+              accept="image/*"
+            />
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/street2`}
+              currentUrl={truck.street_photo_2_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ street_photo_2_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="מיקום סביבה"
+              accept="image/*"
+            />
+            <FileUpload
+              bucket="truck-photos"
+              storagePath={`${truck.id}/vehicle`}
+              currentUrl={truck.vehicle_photo_url}
+              onUploaded={async (url) => {
+                await supabase.from("food_trucks").update({ vehicle_photo_url: url }).eq("id", truck.id);
+                onUpdate();
+              }}
+              onDeleted={async () => {
+                await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
+                onUpdate();
+              }}
+              label="הפודטראק"
+              accept="image/*"
+            />
+          </>
+        ) : (
+          <>
+            <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} />
+            <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} />
+            <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} />
+          </>
+        )}
       </div>
 
       {/* Main grid: 3 columns */}
