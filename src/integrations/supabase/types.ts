@@ -344,6 +344,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      submit_application: {
+        Args: {
+          p_applicant_email?: string
+          p_applicant_id: string
+          p_applicant_name: string
+          p_applicant_phone: string
+          p_food_category?: string
+          p_operating_hours?: string
+          p_requested_neighborhood?: string
+          p_requested_street?: string
+          p_vehicle_dimensions?: string
+          p_vehicle_type?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "user"
