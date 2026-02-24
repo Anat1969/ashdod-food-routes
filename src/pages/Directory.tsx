@@ -4,13 +4,38 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
+import { toast } from "sonner";
+
+const STATION_TYPES = [
+  "חוף אקספנסיבי",
+  "מרינה",
+  "חוף אינטנסיבי",
+  "נחל לכיש",
+  "פארקים",
+] as const;
+
+interface LocationData {
+  id: string;
+  location_type: string | null;
+  infra_electricity: boolean;
+  infra_water: boolean;
+  infra_sewage: boolean;
+  name: string;
+  street: string | null;
+  neighborhood: string | null;
+}
+
+interface TruckWithLocation extends FoodTruck {
+  location?: LocationData | null;
+}
 
 export default function Directory() {
-  const [trucks, setTrucks] = useState<FoodTruck[]>([]);
+  const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -18,12 +43,12 @@ export default function Directory() {
   const fetchTrucks = async () => {
     const { data, error } = await supabase
       .from("food_trucks")
-      .select("*")
+      .select("*, location:locations(*)")
       .order("created_at", { ascending: false });
     if (error) {
       console.error("Error fetching trucks:", error);
     }
-    setTrucks(data || []);
+    setTrucks((data as TruckWithLocation[]) || []);
     setLoading(false);
   };
 
@@ -41,13 +66,13 @@ export default function Directory() {
   }, []);
 
   const filtered = trucks.filter((t) => {
-    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search);
+    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" dir="rtl">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מאגר פודטראקים</h1>
       <p className="text-muted-foreground mb-6">רשימת הפודטראקים הרשומים בעיר אשדוד</p>
 
@@ -81,14 +106,16 @@ export default function Directory() {
           {trucks.length === 0 ? "אין פודטראקים רשומים עדיין" : "לא נמצאו תוצאות"}
         </div>
       ) : (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">שם הפודטראק</TableHead>
-                <TableHead className="text-right">סוג רכב</TableHead>
-                <TableHead className="text-right">קטגוריית מזון</TableHead>
-                <TableHead className="text-right">שעות פעילות</TableHead>
+                <TableHead className="text-right">סוג עמדה</TableHead>
+                <TableHead className="text-right">עמדה</TableHead>
+                <TableHead className="text-right">פודטראק</TableHead>
+                <TableHead className="text-right">תשתית</TableHead>
+                <TableHead className="text-right">פעל</TableHead>
+                <TableHead className="text-right">מיקום עמדה</TableHead>
                 <TableHead className="text-right">סטטוס</TableHead>
                 <TableHead className="text-right">תאריך הגשה</TableHead>
               </TableRow>
@@ -96,21 +123,45 @@ export default function Directory() {
             <TableBody>
               {filtered.map((truck) => (
                 <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
+                  {/* סוג עמדה */}
+                  <TableCell>
+                    {truck.location?.location_type || "—"}
+                  </TableCell>
+                  {/* עמדה */}
                   <TableCell>
                     <Link to={`/truck/${truck.id}`} className="font-medium text-primary hover:underline">
                       {truck.truck_name}
                     </Link>
                   </TableCell>
-                  <TableCell>{truck.vehicle_type || "—"}</TableCell>
+                  {/* פודטראק */}
                   <TableCell>{truck.food_category || "—"}</TableCell>
+                  {/* תשתית */}
                   <TableCell>
-                    {truck.hours_from && truck.hours_to
-                      ? `${truck.hours_from} - ${truck.hours_to}`
-                      : "—"}
+                    <div className="flex items-center gap-2">
+                      <span className={truck.location?.infra_electricity ? "text-green-600" : "text-muted-foreground"}>
+                        <Zap className="h-4 w-4 inline" />
+                      </span>
+                      <span className={truck.location?.infra_water ? "text-green-600" : "text-muted-foreground"}>
+                        <Droplets className="h-4 w-4 inline" />
+                      </span>
+                      <span className={truck.location?.infra_sewage ? "text-green-600" : "text-muted-foreground"}>
+                        <CircleDot className="h-4 w-4 inline" />
+                      </span>
+                    </div>
                   </TableCell>
+                  {/* פעל */}
+                  <TableCell>
+                    <Checkbox checked={!!truck.vehicle_type} disabled />
+                  </TableCell>
+                  {/* מיקום עמדה */}
+                  <TableCell>
+                    <Checkbox checked={!!truck.location} disabled />
+                  </TableCell>
+                  {/* סטטוס */}
                   <TableCell>
                     <StatusBadge status={truck.status} />
                   </TableCell>
+                  {/* תאריך הגשה */}
                   <TableCell>
                     {truck.submitted_at
                       ? new Date(truck.submitted_at).toLocaleDateString("he-IL")
