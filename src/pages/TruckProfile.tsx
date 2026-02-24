@@ -23,6 +23,9 @@ export default function TruckProfile() {
   const [truck, setTruck] = useState<FoodTruck | null>(null);
   const [compliance, setCompliance] = useState<ComplianceChecklist | null>(null);
   const [history, setHistory] = useState<ActivityLog[]>([]);
+  const [location, setLocation] = useState<Location | null>(null);
+  const [operator, setOperator] = useState<Profile | null>(null);
+  const [expertOpinion, setExpertOpinion] = useState<any>(null);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(true);
 
