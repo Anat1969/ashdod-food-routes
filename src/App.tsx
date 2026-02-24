@@ -12,6 +12,7 @@ import Directory from "./pages/Directory";
 import TruckProfile from "./pages/TruckProfile";
 import ApplicationForm from "./pages/ApplicationForm";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminAddTrucks from "./pages/AdminAddTrucks";
 import AdminLogin from "./pages/AdminLogin";
 import LocationCard from "./pages/LocationCard";
 import Login from "./pages/Login";
