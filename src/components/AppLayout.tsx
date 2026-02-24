@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import ashdodLogo from "@/assets/ashdod-logo.jpeg";
+import ashdodEmblem from "@/assets/ashdod-emblem.png";
 
 export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const { user, isAdmin, signOut } = useAuth();
@@ -32,9 +32,8 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
       {/* Header */}
       <header className="bg-primary text-primary-foreground municipal-shadow sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <img alt="לוגו עיריית אשדוד" className="h-20 w-auto mix-blend-multiply" src={ashdodLogo} />
-            <span className="text-xs opacity-80 leading-tight">ניהול פודטראקס</span>
+          <Link to="/" className="flex items-center">
+            <img alt="סמל עיריית אשדוד" className="h-14 w-auto" src={ashdodEmblem} />
           </Link>
 
           {/* Desktop Nav */}
