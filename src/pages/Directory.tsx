@@ -10,6 +10,7 @@ import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown } fro
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
+import ashdodMap from "@/assets/ashdod-map.jpeg";
 
 type SortDirection = "asc" | "desc" | null;
 type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | null;
