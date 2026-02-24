@@ -124,10 +124,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
       }
     }
 
-    // Save operator profile
+    // Save operator name to food_trucks
+    await supabase.from("food_trucks").update({
+      operator_name: opName || null,
+    } as any).eq("id", truck.id);
+
+    // Save operator phone to profile
     if (operator?.id) {
       await supabase.from("profiles").update({
-        full_name: opName || null,
         phone: opPhone || null,
       }).eq("id", operator.id);
     }
