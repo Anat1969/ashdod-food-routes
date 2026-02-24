@@ -245,9 +245,20 @@ export default function Directory() {
                       </div>
                     </div>
                   </TableCell>
-                  {/* מיקום עמדה */}
+                  {/* שם המפעיל */}
                   <TableCell>
-                    <Checkbox checked={!!truck.location} disabled />
+                    <Input
+                      className="h-8 text-xs w-[140px]"
+                      placeholder="שם המפעיל"
+                      value={operatorEdits[truck.id] ?? (truck as any).operator_name ?? ""}
+                      onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
+                      onBlur={() => {
+                        const val = operatorEdits[truck.id];
+                        if (val !== undefined && val !== ((truck as any).operator_name ?? "")) {
+                          updateOperatorName(truck.id, val);
+                        }
+                      }}
+                    />
                   </TableCell>
                   {/* סטטוס */}
                   <TableCell>

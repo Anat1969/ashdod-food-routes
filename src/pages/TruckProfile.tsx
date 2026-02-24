@@ -187,7 +187,7 @@ export default function TruckProfile() {
                   </label>
                 </div>
               </div>
-              <InfoRow label="מיקום עמדה" value={location ? `${location.street || ""} ${location.neighborhood || ""}`.trim() || "מוגדר" : "לא מוגדר"} icon={<MapPin className="h-4 w-4" />} />
+              <InfoRow label="שם המפעיל" value={(truck as any).operator_name} />
               <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
             </CardContent>
           </Card>
