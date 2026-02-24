@@ -248,10 +248,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="אופי מיקום" value={locType} onChange={setLocType} />
                 <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
                 <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
-                <div className="flex items-center gap-2 pt-1">
-                  <Checkbox checked={locDesired} onCheckedChange={(v) => setLocDesired(!!v)} />
-                  <span>מיקום רצוי</span>
-                </div>
                 <div className="flex gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
                     <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
