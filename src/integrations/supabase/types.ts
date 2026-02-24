@@ -134,13 +134,16 @@ export type Database = {
           compliance_summary: string | null
           conditions: string | null
           created_at: string
+          environment_ok: boolean | null
           executive_summary: string | null
+          field_notes: string | null
           id: string
           is_final: boolean
           location_analysis: string | null
           opinion_date: string
           project_description: string | null
           recommendation: string | null
+          structure_ok: boolean | null
           truck_id: string
         }
         Insert: {
@@ -148,13 +151,16 @@ export type Database = {
           compliance_summary?: string | null
           conditions?: string | null
           created_at?: string
+          environment_ok?: boolean | null
           executive_summary?: string | null
+          field_notes?: string | null
           id?: string
           is_final?: boolean
           location_analysis?: string | null
           opinion_date?: string
           project_description?: string | null
           recommendation?: string | null
+          structure_ok?: boolean | null
           truck_id: string
         }
         Update: {
@@ -162,13 +168,16 @@ export type Database = {
           compliance_summary?: string | null
           conditions?: string | null
           created_at?: string
+          environment_ok?: boolean | null
           executive_summary?: string | null
+          field_notes?: string | null
           id?: string
           is_final?: boolean
           location_analysis?: string | null
           opinion_date?: string
           project_description?: string | null
           recommendation?: string | null
+          structure_ok?: boolean | null
           truck_id?: string
         }
         Relationships: [
