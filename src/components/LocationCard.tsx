@@ -249,25 +249,35 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-base">מפעיל</CardTitle>
             </CardHeader>
-            <CardContent className="flex gap-6 text-sm pb-3">
+            <CardContent className="space-y-3 text-sm pb-3">
               {isAdmin ? (
-                <>
-                  <div className="flex-1">
-                    <EditableRow label="שם" value={opName} onChange={setOpName} />
-                  </div>
-                  <div className="flex-1">
-                    <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-                  </div>
-                </>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                  <EditableRow label="שם" value={opName} onChange={setOpName} />
+                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
+                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} />
+                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} />
+                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
+                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
+                </div>
               ) : (
-                <>
-                  <div className="flex-1">
-                    <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+                  <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
+                  <ReadOnlyRow label="נייד" value={operator?.phone} />
+                  <ReadOnlyRow label="כתובת" value={(truck as any).operator_address} />
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">מייל:</span>
+                    {(truck as any).operator_email ? (
+                      <a href={`mailto:${(truck as any).operator_email}`} className="font-medium text-primary flex items-center gap-1 hover:underline">
+                        <Mail className="h-3 w-3" />
+                        {(truck as any).operator_email}
+                      </a>
+                    ) : (
+                      <span className="font-medium">—</span>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <ReadOnlyRow label="נייד" value={operator?.phone} />
-                  </div>
-                </>
+                  <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
+                  <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
+                </div>
               )}
             </CardContent>
           </Card>
