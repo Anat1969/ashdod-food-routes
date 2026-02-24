@@ -182,7 +182,7 @@ export default function Directory() {
                 <TableHead className="text-right">עמדה</TableHead>
                 <TableHead className="text-right">פודטראק</TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
-                <TableHead className="text-right">מיקום עמדה</TableHead>
+                <TableHead className="text-right">שם המפעיל</TableHead>
                 <TableHead className="text-right">סטטוס</TableHead>
                 <TableHead className="text-right">תאריך הגשה</TableHead>
               </TableRow>
