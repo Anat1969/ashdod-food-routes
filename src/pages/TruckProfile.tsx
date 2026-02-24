@@ -148,10 +148,18 @@ export default function TruckProfile() {
         <TabsContent value="details">
           <Card className="municipal-shadow">
             <CardContent className="pt-6 grid sm:grid-cols-2 gap-4">
-              <InfoRow label="שם הפודטראק" value={truck.truck_name} />
-              <InfoRow label="סוג רכב" value={truck.vehicle_type} />
-              <InfoRow label="קטגוריית מזון" value={truck.food_category} icon={<MapPin className="h-4 w-4" />} />
-              <InfoRow label="שעות פעילות" value={truck.hours_from && truck.hours_to ? `${truck.hours_from} - ${truck.hours_to}` : null} icon={<Clock className="h-4 w-4" />} />
+              <InfoRow label="עמדה" value={truck.truck_name} />
+              <InfoRow label="סוג עמדה" value={location?.location_type} icon={<MapPin className="h-4 w-4" />} />
+              <InfoRow label="פודטראק" value={truck.vehicle_type ? "קיים" : "לא קיים"} />
+              <div>
+                <p className="text-xs text-muted-foreground mb-0.5">תשתית</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className={location?.infra_electricity ? "text-primary" : "text-muted-foreground"} title="חשמל">⚡</span>
+                  <span className={location?.infra_water ? "text-primary" : "text-muted-foreground"} title="מים">💧</span>
+                  <span className={location?.infra_sewage ? "text-primary" : "text-muted-foreground"} title="ביוב">🔵</span>
+                </div>
+              </div>
+              <InfoRow label="מיקום עמדה" value={location ? `${location.street || ""} ${location.neighborhood || ""}`.trim() || "מוגדר" : "לא מוגדר"} icon={<MapPin className="h-4 w-4" />} />
               <InfoRow label="סטטוס" value={STATUS_LABELS[truck.status as TruckStatus] || truck.status} />
             </CardContent>
           </Card>
