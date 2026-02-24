@@ -14,161 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_notes: {
+      activity_log: {
         Row: {
-          admin_user_id: string | null
+          action: string | null
           created_at: string
           id: string
-          note: string
-          truck_id: string
-        }
-        Insert: {
-          admin_user_id?: string | null
-          created_at?: string
-          id?: string
-          note: string
-          truck_id: string
-        }
-        Update: {
-          admin_user_id?: string | null
-          created_at?: string
-          id?: string
-          note?: string
-          truck_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "admin_notes_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "food_trucks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      application_files: {
-        Row: {
-          application_id: string
-          created_at: string
-          file_name: string | null
-          file_type: string
-          file_url: string
-          id: string
-        }
-        Insert: {
-          application_id: string
-          created_at?: string
-          file_name?: string | null
-          file_type: string
-          file_url: string
-          id?: string
-        }
-        Update: {
-          application_id?: string
-          created_at?: string
-          file_name?: string | null
-          file_type?: string
-          file_url?: string
-          id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "application_files_application_id_fkey"
-            columns: ["application_id"]
-            isOneToOne: false
-            referencedRelation: "applications"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      applications: {
-        Row: {
-          applicant_email: string | null
-          applicant_id: string
-          applicant_name: string
-          applicant_phone: string
-          food_category: string | null
-          id: string
-          latitude: number | null
-          longitude: number | null
-          operating_hours: string | null
-          requested_neighborhood: string | null
-          requested_street: string | null
-          status: Database["public"]["Enums"]["truck_status"]
-          submitted_at: string
+          new_status: string | null
+          note: string | null
+          old_status: string | null
           truck_id: string | null
-          vehicle_dimensions: string | null
-          vehicle_type: string | null
+          user_id: string | null
         }
         Insert: {
-          applicant_email?: string | null
-          applicant_id: string
-          applicant_name: string
-          applicant_phone: string
-          food_category?: string | null
+          action?: string | null
+          created_at?: string
           id?: string
-          latitude?: number | null
-          longitude?: number | null
-          operating_hours?: string | null
-          requested_neighborhood?: string | null
-          requested_street?: string | null
-          status?: Database["public"]["Enums"]["truck_status"]
-          submitted_at?: string
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
           truck_id?: string | null
-          vehicle_dimensions?: string | null
-          vehicle_type?: string | null
+          user_id?: string | null
         }
         Update: {
-          applicant_email?: string | null
-          applicant_id?: string
-          applicant_name?: string
-          applicant_phone?: string
-          food_category?: string | null
+          action?: string | null
+          created_at?: string
           id?: string
-          latitude?: number | null
-          longitude?: number | null
-          operating_hours?: string | null
-          requested_neighborhood?: string | null
-          requested_street?: string | null
-          status?: Database["public"]["Enums"]["truck_status"]
-          submitted_at?: string
+          new_status?: string | null
+          note?: string | null
+          old_status?: string | null
           truck_id?: string | null
-          vehicle_dimensions?: string | null
-          vehicle_type?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "applications_truck_id_fkey"
+            foreignKeyName: "activity_log_truck_id_fkey"
             columns: ["truck_id"]
             isOneToOne: false
             referencedRelation: "food_trucks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
       }
       compliance_checklist: {
         Row: {
+          access_path_90cm: boolean | null
+          checked_at: string
+          checked_by: string | null
+          counter_height_ok: boolean | null
+          distance_from_curb_cm: number | null
+          edge_kitchen_only: boolean | null
+          fire_suppression_ok: boolean | null
           id: string
-          item_key: string
-          item_label: string
-          passed: boolean | null
+          no_alcohol_tobacco: boolean | null
+          notes: string | null
+          professional_design: boolean | null
+          signage_approved: boolean | null
           truck_id: string
+          wheelchair_space_ok: boolean | null
         }
         Insert: {
+          access_path_90cm?: boolean | null
+          checked_at?: string
+          checked_by?: string | null
+          counter_height_ok?: boolean | null
+          distance_from_curb_cm?: number | null
+          edge_kitchen_only?: boolean | null
+          fire_suppression_ok?: boolean | null
           id?: string
-          item_key: string
-          item_label: string
-          passed?: boolean | null
+          no_alcohol_tobacco?: boolean | null
+          notes?: string | null
+          professional_design?: boolean | null
+          signage_approved?: boolean | null
           truck_id: string
+          wheelchair_space_ok?: boolean | null
         }
         Update: {
+          access_path_90cm?: boolean | null
+          checked_at?: string
+          checked_by?: string | null
+          counter_height_ok?: boolean | null
+          distance_from_curb_cm?: number | null
+          edge_kitchen_only?: boolean | null
+          fire_suppression_ok?: boolean | null
           id?: string
-          item_key?: string
-          item_label?: string
-          passed?: boolean | null
+          no_alcohol_tobacco?: boolean | null
+          notes?: string | null
+          professional_design?: boolean | null
+          signage_approved?: boolean | null
           truck_id?: string
+          wheelchair_space_ok?: boolean | null
         }
         Relationships: [
+          {
+            foreignKeyName: "compliance_checklist_checked_by_fkey"
+            columns: ["checked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "compliance_checklist_truck_id_fkey"
             columns: ["truck_id"]
@@ -178,165 +128,206 @@ export type Database = {
           },
         ]
       }
+      expert_opinions: {
+        Row: {
+          author_id: string | null
+          compliance_summary: string | null
+          conditions: string | null
+          created_at: string
+          executive_summary: string | null
+          id: string
+          is_final: boolean
+          location_analysis: string | null
+          opinion_date: string
+          project_description: string | null
+          recommendation: string | null
+          truck_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          compliance_summary?: string | null
+          conditions?: string | null
+          created_at?: string
+          executive_summary?: string | null
+          id?: string
+          is_final?: boolean
+          location_analysis?: string | null
+          opinion_date?: string
+          project_description?: string | null
+          recommendation?: string | null
+          truck_id: string
+        }
+        Update: {
+          author_id?: string | null
+          compliance_summary?: string | null
+          conditions?: string | null
+          created_at?: string
+          executive_summary?: string | null
+          id?: string
+          is_final?: boolean
+          location_analysis?: string | null
+          opinion_date?: string
+          project_description?: string | null
+          recommendation?: string | null
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expert_opinions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expert_opinions_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "food_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       food_trucks: {
         Row: {
-          admin_notes: string | null
-          contact_email: string | null
-          contact_phone: string | null
           created_at: string
-          cuisine: string | null
+          food_category: string | null
+          hours_from: string | null
+          hours_to: string | null
           id: string
-          latitude: number | null
-          logo_url: string | null
-          longitude: number | null
-          name: string
-          neighborhood: string | null
-          operating_hours: string | null
+          location_id: string | null
           operator_id: string | null
-          operator_name: string
-          status: Database["public"]["Enums"]["truck_status"]
-          street_address: string | null
+          status: string
+          submitted_at: string | null
+          truck_name: string
           updated_at: string
-          vehicle_description: string | null
           vehicle_type: string | null
         }
         Insert: {
-          admin_notes?: string | null
-          contact_email?: string | null
-          contact_phone?: string | null
           created_at?: string
-          cuisine?: string | null
+          food_category?: string | null
+          hours_from?: string | null
+          hours_to?: string | null
           id?: string
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
-          name: string
-          neighborhood?: string | null
-          operating_hours?: string | null
+          location_id?: string | null
           operator_id?: string | null
-          operator_name: string
-          status?: Database["public"]["Enums"]["truck_status"]
-          street_address?: string | null
+          status?: string
+          submitted_at?: string | null
+          truck_name: string
           updated_at?: string
-          vehicle_description?: string | null
           vehicle_type?: string | null
         }
         Update: {
-          admin_notes?: string | null
-          contact_email?: string | null
-          contact_phone?: string | null
           created_at?: string
-          cuisine?: string | null
+          food_category?: string | null
+          hours_from?: string | null
+          hours_to?: string | null
           id?: string
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
+          location_id?: string | null
+          operator_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          truck_name?: string
+          updated_at?: string
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "food_trucks_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "food_trucks_operator_id_fkey"
+            columns: ["operator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      locations: {
+        Row: {
+          building_area_sqm: number | null
+          chelka: string | null
+          gush: string | null
+          id: string
+          infra_electricity: boolean
+          infra_sewage: boolean
+          infra_water: boolean
+          is_desired: boolean
+          lat: number | null
+          lng: number | null
+          location_type: string | null
+          name: string
+          neighborhood: string | null
+          street: string | null
+          surrounding_area_sqm: number | null
+        }
+        Insert: {
+          building_area_sqm?: number | null
+          chelka?: string | null
+          gush?: string | null
+          id?: string
+          infra_electricity?: boolean
+          infra_sewage?: boolean
+          infra_water?: boolean
+          is_desired?: boolean
+          lat?: number | null
+          lng?: number | null
+          location_type?: string | null
+          name: string
+          neighborhood?: string | null
+          street?: string | null
+          surrounding_area_sqm?: number | null
+        }
+        Update: {
+          building_area_sqm?: number | null
+          chelka?: string | null
+          gush?: string | null
+          id?: string
+          infra_electricity?: boolean
+          infra_sewage?: boolean
+          infra_water?: boolean
+          is_desired?: boolean
+          lat?: number | null
+          lng?: number | null
+          location_type?: string | null
           name?: string
           neighborhood?: string | null
-          operating_hours?: string | null
-          operator_id?: string | null
-          operator_name?: string
-          status?: Database["public"]["Enums"]["truck_status"]
-          street_address?: string | null
-          updated_at?: string
-          vehicle_description?: string | null
-          vehicle_type?: string | null
+          street?: string | null
+          surrounding_area_sqm?: number | null
         }
         Relationships: []
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           full_name: string | null
           id: string
-          updated_at: string
-          user_id: string
+          phone: string | null
+          role: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
-          id?: string
-          updated_at?: string
-          user_id: string
+          id: string
+          phone?: string | null
+          role?: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
-          updated_at?: string
-          user_id?: string
+          phone?: string | null
+          role?: string
         }
         Relationships: []
-      }
-      status_history: {
-        Row: {
-          changed_by: string | null
-          created_at: string
-          id: string
-          new_status: Database["public"]["Enums"]["truck_status"]
-          note: string | null
-          old_status: Database["public"]["Enums"]["truck_status"] | null
-          truck_id: string
-        }
-        Insert: {
-          changed_by?: string | null
-          created_at?: string
-          id?: string
-          new_status: Database["public"]["Enums"]["truck_status"]
-          note?: string | null
-          old_status?: Database["public"]["Enums"]["truck_status"] | null
-          truck_id: string
-        }
-        Update: {
-          changed_by?: string | null
-          created_at?: string
-          id?: string
-          new_status?: Database["public"]["Enums"]["truck_status"]
-          note?: string | null
-          old_status?: Database["public"]["Enums"]["truck_status"] | null
-          truck_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "status_history_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "food_trucks"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      truck_photos: {
-        Row: {
-          created_at: string
-          id: string
-          photo_type: string
-          photo_url: string
-          truck_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          photo_type: string
-          photo_url: string
-          truck_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          photo_type?: string
-          photo_url?: string
-          truck_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "truck_photos_truck_id_fkey"
-            columns: ["truck_id"]
-            isOneToOne: false
-            referencedRelation: "food_trucks"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       user_roles: {
         Row: {
@@ -368,25 +359,10 @@ export type Database = {
         }
         Returns: boolean
       }
-      submit_application: {
-        Args: {
-          p_applicant_email?: string
-          p_applicant_id: string
-          p_applicant_name: string
-          p_applicant_phone: string
-          p_food_category?: string
-          p_operating_hours?: string
-          p_requested_neighborhood?: string
-          p_requested_street?: string
-          p_vehicle_dimensions?: string
-          p_vehicle_type?: string
-        }
-        Returns: string
-      }
+      is_privileged: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
-      truck_status: "ממתין_לבדיקה" | "בבדיקה" | "מאושר" | "נדחה"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -515,7 +491,6 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
-      truck_status: ["ממתין_לבדיקה", "בבדיקה", "מאושר", "נדחה"],
     },
   },
 } as const
