@@ -52,7 +52,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [locSewage, setLocSewage] = useState(location?.infra_sewage ?? false);
 
   // Editable operator fields
-  const [opName, setOpName] = useState(operator?.full_name || "");
+  const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
 
   const [saving, setSaving] = useState(false);
@@ -79,9 +79,9 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   }, [location]);
 
   useEffect(() => {
-    setOpName(operator?.full_name || "");
+    setOpName((truck as any).operator_name || "");
     setOpPhone(operator?.phone || "");
-  }, [operator]);
+  }, [operator, (truck as any).operator_name]);
 
   const saveAll = async () => {
     if (!isAdmin) return;
@@ -124,10 +124,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
       }
     }
 
-    // Save operator profile
+    // Save operator name to food_trucks
+    await supabase.from("food_trucks").update({
+      operator_name: opName || null,
+    } as any).eq("id", truck.id);
+
+    // Save operator phone to profile
     if (operator?.id) {
       await supabase.from("profiles").update({
-        full_name: opName || null,
         phone: opPhone || null,
       }).eq("id", operator.id);
     }
@@ -330,7 +334,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 </>
               ) : (
                 <>
-                  <ReadOnlyRow label="שם" value={operator?.full_name} />
+                  <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
                   <ReadOnlyRow label="נייד" value={operator?.phone} />
                 </>
               )}
