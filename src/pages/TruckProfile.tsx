@@ -132,7 +132,7 @@ export default function TruckProfile() {
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{truck.truck_name}</h1>
-          <p className="text-muted-foreground">{truck.vehicle_type || "—"}</p>
+          <p className="text-muted-foreground">{location?.location_type || "—"}</p>
         </div>
         <StatusBadge status={truck.status} className="text-sm" />
       </div>
