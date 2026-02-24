@@ -52,7 +52,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [locSewage, setLocSewage] = useState(location?.infra_sewage ?? false);
 
   // Editable operator fields
-  const [opName, setOpName] = useState(operator?.full_name || "");
+  const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
 
   const [saving, setSaving] = useState(false);
