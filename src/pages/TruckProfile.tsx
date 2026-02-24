@@ -118,6 +118,13 @@ export default function TruckProfile() {
     fetchData();
   };
 
+  const updateInfra = async (field: string, value: boolean) => {
+    if (!location || !isAdmin) return;
+    await supabase.from("locations").update({ [field]: value }).eq("id", location.id);
+    toast.success("תשתית עודכנה");
+    fetchData();
+  };
+
   const updateFileUrl = async (field: string, url: string | null) => {
     if (!truck || !canUpload) return;
     await supabase.from("food_trucks").update({ [field]: url }).eq("id", truck.id);
@@ -153,10 +160,31 @@ export default function TruckProfile() {
               <InfoRow label="פודטראק" value={truck.vehicle_type ? "קיים" : "לא קיים"} />
               <div>
                 <p className="text-xs text-muted-foreground mb-0.5">תשתית</p>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className={location?.infra_electricity ? "text-primary" : "text-muted-foreground"} title="חשמל">⚡</span>
-                  <span className={location?.infra_water ? "text-primary" : "text-muted-foreground"} title="מים">💧</span>
-                  <span className={location?.infra_sewage ? "text-primary" : "text-muted-foreground"} title="ביוב">🔵</span>
+                <div className="flex flex-col gap-2 mt-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={!!location?.infra_electricity}
+                      disabled={!isAdmin}
+                      onCheckedChange={(v) => updateInfra("infra_electricity", !!v)}
+                    />
+                    <span className="text-sm">⚡ חשמל</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={!!location?.infra_water}
+                      disabled={!isAdmin}
+                      onCheckedChange={(v) => updateInfra("infra_water", !!v)}
+                    />
+                    <span className="text-sm">💧 מים</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={!!location?.infra_sewage}
+                      disabled={!isAdmin}
+                      onCheckedChange={(v) => updateInfra("infra_sewage", !!v)}
+                    />
+                    <span className="text-sm">🔵 ביוב</span>
+                  </label>
                 </div>
               </div>
               <InfoRow label="מיקום עמדה" value={location ? `${location.street || ""} ${location.neighborhood || ""}`.trim() || "מוגדר" : "לא מוגדר"} icon={<MapPin className="h-4 w-4" />} />
