@@ -5,25 +5,25 @@ import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function Index() {
   const actions = [
-    {
-      icon: FileText,
-      title: "מדיניות והנחיות",
-      description: "צפייה בהנחיות העירייה לפודטראקים במרחב הציבורי",
-      to: "/policy",
-    },
-    {
-      icon: List,
-      title: "רשימת פודטראקס פעילים",
-      description: "מאגר פודטראקים מורשים ומאושרים בעיר אשדוד",
-      to: "/directory",
-    },
-    {
-      icon: PenLine,
-      title: "הגש בקשה להעמדה",
-      description: "הגשת בקשה חדשה להצבת פודטראק במרחב הציבורי",
-      to: "/apply",
-    },
-  ];
+  {
+    icon: FileText,
+    title: "מדיניות והנחיות",
+    description: "צפייה בהנחיות העירייה לפודטראקים במרחב הציבורי",
+    to: "/policy"
+  },
+  {
+    icon: List,
+    title: "רשימת פודטראקס פעילים",
+    description: "מאגר פודטראקים מורשים ומאושרים בעיר אשדוד",
+    to: "/directory"
+  },
+  {
+    icon: PenLine,
+    title: "הגש בקשה להעמדה",
+    description: "הגשת בקשה חדשה להצבת פודטראק במרחב הציבורי",
+    to: "/apply"
+  }];
+
 
   return (
     <div>
@@ -31,7 +31,7 @@ export default function Index() {
       <section className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center mb-6">
-            <img src={ashdodLogo} alt="לוגו עיריית אשדוד" className="h-40 w-auto mix-blend-multiply" />
+            <img alt="לוגו עיריית אשדוד" className="h-40 w-auto mix-blend-multiply" src="/lovable-uploads/446d2d2a-fb58-4b3c-aae4-43a3d7ce79d7.png" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             מערכת ניהול פודטראקס
@@ -48,8 +48,8 @@ export default function Index() {
       {/* Action Cards */}
       <section className="container mx-auto px-4 -mt-8 pb-16">
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {actions.map((action) => (
-            <Link key={action.to} to={action.to}>
+          {actions.map((action) =>
+          <Link key={action.to} to={action.to}>
               <Card className="municipal-shadow hover:municipal-shadow-lg transition-shadow cursor-pointer h-full group">
                 <CardContent className="pt-8 pb-6 text-center">
                   <div className="bg-accent/10 w-14 h-14 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-colors">
@@ -60,9 +60,9 @@ export default function Index() {
                 </CardContent>
               </Card>
             </Link>
-          ))}
+          )}
         </div>
       </section>
-    </div>
-  );
+    </div>);
+
 }
