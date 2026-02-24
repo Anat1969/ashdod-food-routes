@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
+
+type SortDirection = "asc" | "desc" | null;
+type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | null;
 
 const STATION_TYPES = [
   "חוף אקספנסיבי",
@@ -39,6 +42,8 @@ export default function Directory() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortColumn, setSortColumn] = useState<SortColumn>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const fetchTrucks = async () => {
     const { data, error } = await supabase
@@ -139,6 +144,59 @@ export default function Directory() {
     return matchesSearch && matchesStatus;
   });
 
+  const toggleSort = (col: SortColumn) => {
+    if (sortColumn === col) {
+      if (sortDirection === "asc") setSortDirection("desc");
+      else if (sortDirection === "desc") { setSortColumn(null); setSortDirection(null); }
+      else setSortDirection("asc");
+    } else {
+      setSortColumn(col);
+      setSortDirection("asc");
+    }
+  };
+
+  const sorted = useMemo(() => {
+    if (!sortColumn || !sortDirection) return filtered;
+    const dir = sortDirection === "asc" ? 1 : -1;
+    return [...filtered].sort((a, b) => {
+      let valA = "";
+      let valB = "";
+      switch (sortColumn) {
+        case "station_type":
+          valA = a.location?.location_type || "";
+          valB = b.location?.location_type || "";
+          break;
+        case "truck_name":
+          valA = a.truck_name || "";
+          valB = b.truck_name || "";
+          break;
+        case "has_truck":
+          valA = a.vehicle_type ? "1" : "0";
+          valB = b.vehicle_type ? "1" : "0";
+          break;
+        case "operator_name":
+          valA = (a as any).operator_name || "";
+          valB = (b as any).operator_name || "";
+          break;
+        case "status":
+          valA = STATUS_LABELS[a.status as TruckStatus] || a.status;
+          valB = STATUS_LABELS[b.status as TruckStatus] || b.status;
+          break;
+        case "submitted_at":
+          valA = a.submitted_at || "";
+          valB = b.submitted_at || "";
+          break;
+      }
+      return valA.localeCompare(valB, "he") * dir;
+    });
+  }, [filtered, sortColumn, sortDirection]);
+
+  const SortIcon = ({ col }: { col: SortColumn }) => {
+    if (sortColumn !== col) return <ArrowUpDown className="h-3 w-3 opacity-40" />;
+    if (sortDirection === "asc") return <ArrowUp className="h-3 w-3" />;
+    return <ArrowDown className="h-3 w-3" />;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8" dir="rtl">
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מאגר פודטראקים</h1>
@@ -178,17 +236,29 @@ export default function Directory() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-right">סוג עמדה</TableHead>
-                <TableHead className="text-right">עמדה</TableHead>
-                <TableHead className="text-right">פודטראק</TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("station_type")}>
+                  <span className="flex items-center gap-1">סוג עמדה <SortIcon col="station_type" /></span>
+                </TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
+                  <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
+                </TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
+                  <span className="flex items-center gap-1">פודטראק <SortIcon col="has_truck" /></span>
+                </TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
-                <TableHead className="text-right">שם המפעיל</TableHead>
-                <TableHead className="text-right">סטטוס</TableHead>
-                <TableHead className="text-right">תאריך הגשה</TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
+                  <span className="flex items-center gap-1">שם המפעיל <SortIcon col="operator_name" /></span>
+                </TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("status")}>
+                  <span className="flex items-center gap-1">סטטוס <SortIcon col="status" /></span>
+                </TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("submitted_at")}>
+                  <span className="flex items-center gap-1">תאריך הגשה <SortIcon col="submitted_at" /></span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((truck) => (
+              {sorted.map((truck) => (
                 <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
                   {/* סוג עמדה - dropdown */}
                   <TableCell>
