@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -6,10 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
+
+type SortDirection = "asc" | "desc" | null;
+type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | null;
 
 const STATION_TYPES = [
   "חוף אקספנסיבי",
