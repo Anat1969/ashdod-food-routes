@@ -102,7 +102,7 @@ export default function TruckProfile() {
   if (!truck) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">פודטראק לא נמצא</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{truck.truck_name}</h1>
@@ -114,8 +114,7 @@ export default function TruckProfile() {
       <Tabs defaultValue="details" className="space-y-4">
         <TabsList className="w-full justify-start">
           <TabsTrigger value="details">פרטי הרכב</TabsTrigger>
-          <TabsTrigger value="photos">תמונות ומסמכים</TabsTrigger>
-          <TabsTrigger value="compliance">עמידה בהנחיות</TabsTrigger>
+          <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
         </TabsList>
 
@@ -131,134 +130,124 @@ export default function TruckProfile() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="photos">
-          <Card className="municipal-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg">תמונות ומסמכים</CardTitle>
-              {!canUpload && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
-            </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 gap-6">
-              {canUpload ? (
-                <>
-                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_1_url} onUploaded={(url) => updateFileUrl("street_photo_1_url", url)} onDeleted={() => updateFileUrl("street_photo_1_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 1" />
-                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_2_url} onUploaded={(url) => updateFileUrl("street_photo_2_url", url)} onDeleted={() => updateFileUrl("street_photo_2_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 2" />
-                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/aerial`} currentUrl={truck.aerial_photo_url} onUploaded={(url) => updateFileUrl("aerial_photo_url", url)} onDeleted={() => updateFileUrl("aerial_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונה אווירית" />
-                  <FileUpload bucket="truck-photos" storagePath={`${truck.id}/vehicle`} currentUrl={truck.vehicle_photo_url} onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)} onDeleted={() => updateFileUrl("vehicle_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת הרכב" />
-                  <FileUpload bucket="documents" storagePath={`${truck.id}/license`} currentUrl={truck.business_license_url} onUploaded={(url) => updateFileUrl("business_license_url", url)} onDeleted={() => updateFileUrl("business_license_url", null)} accept="application/pdf,image/jpeg,image/png" label="רישיון עסק" isImage={false} />
-                  <FileUpload bucket="documents" storagePath={`${truck.id}/design`} currentUrl={truck.design_mockup_url} onUploaded={(url) => updateFileUrl("design_mockup_url", url)} onDeleted={() => updateFileUrl("design_mockup_url", null)} accept="application/pdf,image/jpeg,image/png" label="הדמיית עיצוב" isImage={false} />
-                </>
-              ) : (
-                <>
-                  <PhotoPreview label="תמונת רחוב 1" url={truck.street_photo_1_url} />
-                  <PhotoPreview label="תמונת רחוב 2" url={truck.street_photo_2_url} />
-                  <PhotoPreview label="תמונה אווירית" url={truck.aerial_photo_url} />
-                  <PhotoPreview label="תמונת הרכב" url={truck.vehicle_photo_url} />
-                  <PhotoPreview label="רישיון עסק" url={truck.business_license_url} isImage={false} />
-                  <PhotoPreview label="הדמיית עיצוב" url={truck.design_mockup_url} isImage={false} />
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Combined: compliance on the left, documents on the right */}
+        <TabsContent value="review">
+          <div className="grid lg:grid-cols-2 gap-4">
+            {/* Compliance checklist */}
+            <Card className="municipal-shadow">
+              <CardHeader>
+                <CardTitle className="text-lg">רשימת עמידה בהנחיות</CardTitle>
+                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {COMPLIANCE_ITEMS.map((item) => {
+                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                  return (
+                    <div key={item.key} className="flex items-center gap-3 py-2 border-b last:border-b-0">
+                      {isAdmin ? (
+                        <Checkbox
+                          checked={!!value}
+                          onCheckedChange={() => toggleCompliance(item.key, value)}
+                        />
+                      ) : (
+                        value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
+                      )}
+                      <span className="text-sm">{item.label}</span>
+                    </div>
+                  );
+                })}
 
-        <TabsContent value="compliance">
-          <Card className="municipal-shadow">
-            <CardHeader>
-              <CardTitle className="text-lg">רשימת עמידה בהנחיות</CardTitle>
-              {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד — עריכה זמינה למנהלים בלבד</p>}
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {COMPLIANCE_ITEMS.map((item) => {
-                const value = compliance ? (compliance as any)[item.key] ?? false : false;
-                return (
-                  <div key={item.key} className="flex items-center gap-3 py-2 border-b last:border-b-0">
-                    {isAdmin ? (
-                      <Checkbox
-                        checked={!!value}
-                        onCheckedChange={() => toggleCompliance(item.key, value)}
-                      />
-                    ) : (
-                      value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
-                    )}
-                    <span className="text-sm">{item.label}</span>
+                {isAdmin && (
+                  <div className="pt-4 space-y-3 border-t">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">עדכון סטטוס</label>
+                      <Select value={truck.status} onValueChange={(v) => updateStatus(v as TruckStatus)}>
+                        <SelectTrigger className="w-[200px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">הערות מנהל</label>
+                      <Textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="הוסף הערה..." />
+                      <Button onClick={addNote} className="mt-2" size="sm" disabled={!newNote.trim()}>
+                        הוסף הערה
+                      </Button>
+                    </div>
                   </div>
-                );
-              })}
+                )}
+              </CardContent>
+            </Card>
 
-              {isAdmin && (
-                <div className="pt-4 space-y-3 border-t">
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">עדכון סטטוס</label>
-                    <Select value={truck.status} onValueChange={(v) => updateStatus(v as TruckStatus)}>
-                      <SelectTrigger className="w-[200px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1 block">הערות מנהל</label>
-                    <Textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="הוסף הערה..." />
-                    <Button onClick={addNote} className="mt-2" size="sm" disabled={!newNote.trim()}>
-                      הוסף הערה
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            {/* Documents & photos */}
+            <Card className="municipal-shadow">
+              <CardHeader>
+                <CardTitle className="text-lg">תמונות ומסמכים</CardTitle>
+                {!canUpload && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                {canUpload ? (
+                  <>
+                    <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_1_url} onUploaded={(url) => updateFileUrl("street_photo_1_url", url)} onDeleted={() => updateFileUrl("street_photo_1_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 1" />
+                    <FileUpload bucket="truck-photos" storagePath={`${truck.id}/street`} currentUrl={truck.street_photo_2_url} onUploaded={(url) => updateFileUrl("street_photo_2_url", url)} onDeleted={() => updateFileUrl("street_photo_2_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת רחוב 2" />
+                    <FileUpload bucket="truck-photos" storagePath={`${truck.id}/aerial`} currentUrl={truck.aerial_photo_url} onUploaded={(url) => updateFileUrl("aerial_photo_url", url)} onDeleted={() => updateFileUrl("aerial_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונה אווירית" />
+                    <FileUpload bucket="truck-photos" storagePath={`${truck.id}/vehicle`} currentUrl={truck.vehicle_photo_url} onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)} onDeleted={() => updateFileUrl("vehicle_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת הרכב" />
+                    <FileUpload bucket="documents" storagePath={`${truck.id}/license`} currentUrl={truck.business_license_url} onUploaded={(url) => updateFileUrl("business_license_url", url)} onDeleted={() => updateFileUrl("business_license_url", null)} accept="application/pdf,image/jpeg,image/png" label="רישיון עסק" isImage={false} />
+                    <FileUpload bucket="documents" storagePath={`${truck.id}/design`} currentUrl={truck.design_mockup_url} onUploaded={(url) => updateFileUrl("design_mockup_url", url)} onDeleted={() => updateFileUrl("design_mockup_url", null)} accept="application/pdf,image/jpeg,image/png" label="הדמיית עיצוב" isImage={false} />
+                  </>
+                ) : (
+                  <>
+                    <PhotoPreview label="תמונת רחוב 1" url={truck.street_photo_1_url} />
+                    <PhotoPreview label="תמונת רחוב 2" url={truck.street_photo_2_url} />
+                    <PhotoPreview label="תמונה אווירית" url={truck.aerial_photo_url} />
+                    <PhotoPreview label="תמונת הרכב" url={truck.vehicle_photo_url} />
+                    <PhotoPreview label="רישיון עסק" url={truck.business_license_url} isImage={false} />
+                    <PhotoPreview label="הדמיית עיצוב" url={truck.design_mockup_url} isImage={false} />
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="history">
-          {/* Admin notes section - visible to operators too */}
-          {history.filter(e => e.action === "note").length > 0 && (
-            <Card className="municipal-shadow mb-4 border-primary/20">
-              <CardHeader>
-                <CardTitle className="text-lg">הערות מנהל</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {history.filter(e => e.action === "note").map((entry) => (
-                  <div key={entry.id} className="flex items-start justify-between gap-3 py-2 border-b last:border-b-0">
-                    <div className="flex gap-3 items-start">
-                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-primary" />
-                      <div>
-                        <p className="text-sm">{entry.note}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
-                      </div>
-                    </div>
-                    {isAdmin && (
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteNote(entry.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
           <Card className="municipal-shadow">
             <CardHeader>
-              <CardTitle className="text-lg">היסטוריית שינויים</CardTitle>
+              <CardTitle className="text-lg">היסטוריה והערות</CardTitle>
             </CardHeader>
             <CardContent>
-              {history.filter(e => e.action !== "note").length === 0 ? (
+              {history.length === 0 ? (
                 <p className="text-muted-foreground text-sm">אין היסטוריה עדיין</p>
               ) : (
                 <div className="space-y-4">
-                  {history.filter(e => e.action !== "note").map((entry) => (
-                    <div key={entry.id} className="flex gap-3 items-start border-b pb-3 last:border-b-0">
-                      <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0 bg-accent" />
-                      <div>
-                        <p className="text-sm">
-                          שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status as TruckStatus] || entry.old_status : "חדש"} ← {STATUS_LABELS[entry.new_status as TruckStatus] || entry.new_status}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
+                  {history.map((entry) => (
+                    <div key={entry.id} className="flex items-start justify-between gap-3 border-b pb-3 last:border-b-0">
+                      <div className="flex gap-3 items-start">
+                        <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${entry.action === "note" ? "bg-primary" : "bg-accent"}`} />
+                        <div>
+                          {entry.action === "status_change" ? (
+                            <p className="text-sm">
+                              שינוי סטטוס: {entry.old_status ? STATUS_LABELS[entry.old_status as TruckStatus] || entry.old_status : "חדש"} ← {STATUS_LABELS[entry.new_status as TruckStatus] || entry.new_status}
+                            </p>
+                          ) : (
+                            <p className="text-sm">
+                              <span className="font-medium text-primary">הערת מנהל: </span>
+                              {entry.note}
+                            </p>
+                          )}
+                          <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString("he-IL")}</p>
+                        </div>
                       </div>
+                      {isAdmin && entry.action === "note" && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => deleteNote(entry.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
