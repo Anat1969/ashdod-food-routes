@@ -79,7 +79,9 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   useEffect(() => {
     setOpName((truck as any).operator_name || "");
     setOpPhone(operator?.phone || "");
-  }, [operator, (truck as any).operator_name]);
+    setOpEmail((truck as any).operator_email || "");
+    setOpAddress((truck as any).operator_address || "");
+  }, [operator, (truck as any).operator_name, (truck as any).operator_email, (truck as any).operator_address]);
 
   const saveAll = async () => {
     if (!isAdmin) return;
