@@ -389,6 +389,27 @@ export type Database = {
         }
         Relationships: []
       }
+      zone_images: {
+        Row: {
+          id: string
+          image_url: string
+          updated_at: string
+          zone_name: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          updated_at?: string
+          zone_name: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          updated_at?: string
+          zone_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
