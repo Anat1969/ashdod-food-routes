@@ -198,12 +198,12 @@ export default function TruckProfile() {
             </Card>
 
             {/* Design Guidelines - CENTER */}
-            <Card className="municipal-shadow self-start">
+            <Card className="municipal-shadow">
               <CardHeader>
                 <CardTitle className="text-base">א. הנחיות למבנה (הפודטראק)</CardTitle>
                 {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
               </CardHeader>
-              <CardContent className="space-y-3 overflow-y-auto max-h-[400px]">
+              <CardContent className="space-y-3">
                 {DESIGN_ITEMS.map((item) => {
                   const value = compliance ? (compliance as any)[item.key] ?? false : false;
                   return (
@@ -227,12 +227,12 @@ export default function TruckProfile() {
             </Card>
 
             {/* Structure & Environment - LEFT in RTL */}
-            <Card className="municipal-shadow self-start">
+            <Card className="municipal-shadow">
               <CardHeader>
                 <CardTitle className="text-base">ב. הנחיות לסביבה והעמדה</CardTitle>
                 {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
               </CardHeader>
-              <CardContent className="space-y-3 overflow-y-auto max-h-[400px]">
+              <CardContent className="space-y-3">
                 {STRUCTURE_ENV_ITEMS.map((item) => {
                   const value = compliance ? (compliance as any)[item.key] ?? false : false;
                   return (
