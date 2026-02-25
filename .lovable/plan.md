@@ -1,35 +1,36 @@
 
 
-## Plan: Shorten Columns א and ב to End at the Same Level as "תמונה אווירית"
+## Analysis
 
-### Understanding
-The user wants columns א (הנחיות למבנה) and ב (הנחיות לסביבה והעמדה) to be shorter vertically - their bottom edge should align with the bottom of the "תמונה אווירית" (aerial photo) field in the documents column. Currently these columns stretch much longer due to their checklist content.
+The network requests reveal the root cause. When uploading zone images, the storage path includes the Hebrew zone name directly:
 
-The image shows two empty tall columns that need to be shortened upward.
+```
+zones/המצודה_1772023103592.jpg  → 400 InvalidKey
+zones/נחל לכיש_1772023117745.jpg → 400 InvalidKey
+```
 
-### Approach
-The documents column has 6 upload fields. The aerial photo is the 3rd item. The two checklist columns currently contain many items that make them tall. To align bottoms, we need to constrain the height of columns א and ב so they don't exceed the documents column height, using `max-height` with overflow scroll, or by restructuring the grid.
+Storage keys do not support Hebrew characters or spaces. The error `"Invalid key"` is returned by the storage service.
 
-A practical approach: make columns א and ב scrollable with a constrained max-height, or use `self-start` on the cards so they don't stretch, combined with a max-height. Since the user wants them to end at the aerial photo line, the simplest approach is to add `overflow-y-auto` and a `max-height` to the card content of both columns so they match the documents column height approximately.
+## Fix
 
-Actually, re-reading: the user wants to **shorten** the columns upward - meaning reduce the content height. But the columns have fixed checklist items. The most practical interpretation is to make both checklist cards use scrollable overflow so they don't extend beyond the documents column.
+In `src/pages/ZoneCharacterization.tsx`, the `filePath` is built using `zone.name` which contains Hebrew text. The fix is to encode or replace the zone name with an ASCII-safe identifier (e.g., using `encodeURIComponent` or a simple index/hash).
 
-### Changes in `src/pages/TruckProfile.tsx`
+### Change in `ZoneCharacterization.tsx`
 
-1. **Add `self-start` and `max-h-fit`** to columns א and ב cards, and add `overflow-y-auto` to their `CardContent` with a constrained max-height that roughly matches the documents column up to the aerial photo field.
+Replace the line:
+```typescript
+const filePath = `zones/${zone.name}_${Date.now()}.${ext}`;
+```
+With:
+```typescript
+const safeName = encodeURIComponent(zone.name);
+const filePath = `zones/${safeName}_${Date.now()}.${ext}`;
+```
 
-2. Alternatively, use CSS `grid` row alignment: wrap the 3 columns in a grid where columns א and ב align to the top and don't stretch beyond the documents column.
-
-The simplest clean approach: add `overflow-y-auto max-h-[500px]` to the `CardContent` of both checklist cards (lines 206 and 235), so they become scrollable and don't exceed the documents column height.
+This ensures the storage key contains only URL-safe ASCII characters while still being unique per zone.
 
 ### Technical Details
-
-**File: `src/pages/TruckProfile.tsx`**
-
-- Line 201 (Card for column א): Add `self-start` class so it doesn't stretch in the grid
-- Line 206: Change `<CardContent className="space-y-3">` to `<CardContent className="space-y-3 overflow-y-auto max-h-[400px]">`
-- Line 230 (Card for column ב): Add `self-start` class
-- Line 235: Change `<CardContent className="space-y-3">` to `<CardContent className="space-y-3 overflow-y-auto max-h-[400px]">`
-
-This will make both columns scrollable and shorter, ending approximately at the same level as the aerial photo in the documents column.
+- **Root cause**: Supabase Storage rejects keys with non-ASCII characters (Hebrew) and spaces
+- **File changed**: `src/pages/ZoneCharacterization.tsx` (single line change)
+- **No database changes needed** - the `zone_images` table and RLS policies are already correct
 
