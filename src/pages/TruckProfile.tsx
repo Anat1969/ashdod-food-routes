@@ -183,6 +183,14 @@ export default function TruckProfile() {
                     <FileUpload bucket="truck-photos" storagePath={`${truck.id}/vehicle`} currentUrl={truck.vehicle_photo_url} onUploaded={(url) => updateFileUrl("vehicle_photo_url", url)} onDeleted={() => updateFileUrl("vehicle_photo_url", null)} accept="image/jpeg,image/png,image/webp" label="תמונת הרכב" />
                     <FileUpload bucket="documents" storagePath={`${truck.id}/license`} currentUrl={truck.business_license_url} onUploaded={(url) => updateFileUrl("business_license_url", url)} onDeleted={() => updateFileUrl("business_license_url", null)} accept="application/pdf,image/jpeg,image/png" label="רישיון עסק" isImage={false} />
                     <FileUpload bucket="documents" storagePath={`${truck.id}/design`} currentUrl={truck.design_mockup_url} onUploaded={(url) => updateFileUrl("design_mockup_url", url)} onDeleted={() => updateFileUrl("design_mockup_url", null)} accept="application/pdf,image/jpeg,image/png" label="הדמיית עיצוב" isImage={false} />
+                    <div className="border-t pt-3 mt-2">
+                      <p className="text-sm font-medium mb-2">אפיון אזורים</p>
+                      <div className="grid grid-cols-2 gap-0 border rounded-lg overflow-hidden">
+                        {ZONE_PROFILES.map((zone) => (
+                          <ZoneCollapsible key={zone.name} zone={zone} />
+                        ))}
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -192,6 +200,14 @@ export default function TruckProfile() {
                     <PhotoPreview label="תמונת הרכב" url={truck.vehicle_photo_url} />
                     <PhotoPreview label="רישיון עסק" url={truck.business_license_url} isImage={false} />
                     <PhotoPreview label="הדמיית עיצוב" url={truck.design_mockup_url} isImage={false} />
+                    <div className="border-t pt-3 mt-2">
+                      <p className="text-sm font-medium mb-2">אפיון אזורים</p>
+                      <div className="grid grid-cols-2 gap-0 border rounded-lg overflow-hidden">
+                        {ZONE_PROFILES.map((zone) => (
+                          <ZoneCollapsible key={zone.name} zone={zone} />
+                        ))}
+                      </div>
+                    </div>
                   </>
                 )}
               </CardContent>
@@ -277,17 +293,6 @@ export default function TruckProfile() {
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Zone Guidelines - Collapsible */}
-          <div className="mt-4" dir="rtl">
-            <Card className="municipal-shadow">
-              <CardContent className="p-0">
-                {ZONE_PROFILES.map((zone) => (
-                  <ZoneCollapsible key={zone.name} zone={zone} />
-                ))}
               </CardContent>
             </Card>
           </div>
