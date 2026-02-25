@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check, X, Zap, Droplets, CircleDot, Mail } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
+import ImageLightbox from "@/components/ImageLightbox";
 
 import { toast } from "sonner";
 import type { FoodTruck, Location, Profile, TruckStatus } from "@/lib/types";
@@ -429,7 +430,11 @@ function PhotoSlot({ label, url, className = "" }: { label: string; url: string 
     <div className={`space-y-1 ${className}`}>
       <p className="text-xs text-center font-medium text-muted-foreground">{label}</p>
       {url ? (
-        <img src={url} alt={label} className="w-full h-full object-cover rounded-lg border border-sky-200" />
+        <ImageLightbox src={url} alt={label}>
+          {({ onClick }) => (
+            <img src={url} alt={label} className="w-full h-full object-cover rounded-lg border border-sky-200 cursor-zoom-in" onClick={onClick} />
+          )}
+        </ImageLightbox>
       ) : (
         <div className="w-full h-full min-h-[80px] bg-sky-100 rounded-lg border border-sky-200 flex items-center justify-center text-xs text-muted-foreground">{label} — לא הועלה</div>
       )}
