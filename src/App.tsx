@@ -8,6 +8,7 @@ import AppLayout from "@/components/AppLayout";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Policy from "./pages/Policy";
+import ZoneCharacterization from "./pages/ZoneCharacterization";
 import Directory from "./pages/Directory";
 import TruckProfile from "./pages/TruckProfile";
 import ApplicationForm from "./pages/ApplicationForm";
@@ -35,6 +36,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/policy" element={<Policy />} />
+              <Route path="/zones" element={<ZoneCharacterization />} />
               <Route path="/directory" element={<ProtectedRoute adminOnly><Directory /></ProtectedRoute>} />
               <Route path="/truck/:id" element={<TruckProfile />} />
               <Route path="/apply" element={<ApplicationForm />} />

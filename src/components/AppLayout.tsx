@@ -19,6 +19,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const navLinks = [
   { to: "/", label: "ראשי" },
   { to: "/policy", label: "מדיניות" },
+  { to: "/zones", label: "אפיון אזורים" },
   { to: "/directory", label: "מאגר פודטראקים" },
   { to: "/apply", label: "הגשת בקשה" }];
 
