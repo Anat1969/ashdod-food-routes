@@ -280,22 +280,23 @@ export default function TruckProfile() {
               </CardContent>
             </Card>
 
-            {/* Zone Characterization - below the two checklist columns */}
-            <div className="lg:col-span-2">
-              <Card className="municipal-shadow">
-                <CardHeader>
-                  <CardTitle className="text-base">אפיון אזורים</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="grid grid-cols-2 gap-0">
-                    {ZONE_PROFILES.map((zone) => (
-                      <ZoneCollapsible key={zone.name} zone={zone} />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
+
+          {/* Zone Characterization - full-width bar above history */}
+          <Card className="municipal-shadow mt-4" dir="rtl">
+            <CardHeader className="pb-2 pt-3">
+              <CardTitle className="text-base">אפיון אזורים</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="flex flex-row overflow-x-auto">
+                {ZONE_PROFILES.map((zone) => (
+                  <div key={zone.name} className="flex-1 min-w-0 border-l last:border-l-0">
+                    <ZoneCollapsible zone={zone} />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="history">
