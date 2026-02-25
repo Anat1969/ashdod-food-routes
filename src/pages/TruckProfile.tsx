@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import StatusBadge from "@/components/StatusBadge";
 import FileUpload from "@/components/FileUpload";
 import LocationCard from "@/components/LocationCard";
-import { COMPLIANCE_ITEMS } from "@/lib/types";
+import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { Clock, Check, X, Trash2 } from "lucide-react";
@@ -167,26 +167,58 @@ export default function TruckProfile() {
         {/* Combined: compliance on the left, documents on the right */}
         <TabsContent value="review">
           <div className="grid lg:grid-cols-2 gap-4">
-            {/* Compliance checklist */}
+            {/* Design Guidelines */}
             <Card className="municipal-shadow">
               <CardHeader>
-                <CardTitle className="text-lg">רשימת עמידה בהנחיות</CardTitle>
+                <CardTitle className="text-lg">הנחיות עיצוב</CardTitle>
                 {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
               </CardHeader>
               <CardContent className="space-y-3">
-                {COMPLIANCE_ITEMS.map((item) => {
+                {DESIGN_ITEMS.map((item) => {
                   const value = compliance ? (compliance as any)[item.key] ?? false : false;
                   return (
-                    <div key={item.key} className="flex items-center gap-3 py-2 border-b last:border-b-0">
-                      {isAdmin ? (
-                        <Checkbox
-                          checked={!!value}
-                          onCheckedChange={() => toggleCompliance(item.key, value)}
-                        />
-                      ) : (
-                        value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
-                      )}
-                      <span className="text-sm">{item.label}</span>
+                    <div key={item.key} className="py-2 border-b last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        {isAdmin ? (
+                          <Checkbox
+                            checked={!!value}
+                            onCheckedChange={() => toggleCompliance(item.key, value)}
+                          />
+                        ) : (
+                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
+                        )}
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 mr-8">{item.description}</p>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Structure & Environment */}
+            <Card className="municipal-shadow">
+              <CardHeader>
+                <CardTitle className="text-lg">מבנה וסביבה</CardTitle>
+                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {STRUCTURE_ENV_ITEMS.map((item) => {
+                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                  return (
+                    <div key={item.key} className="py-2 border-b last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        {isAdmin ? (
+                          <Checkbox
+                            checked={!!value}
+                            onCheckedChange={() => toggleCompliance(item.key, value)}
+                          />
+                        ) : (
+                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
+                        )}
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 mr-8">{item.description}</p>
                     </div>
                   );
                 })}
