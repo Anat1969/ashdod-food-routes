@@ -70,12 +70,14 @@ export type Database = {
           counter_height_ok: boolean | null
           distance_from_curb_cm: number | null
           edge_kitchen_only: boolean | null
+          finish_quality: boolean | null
           fire_suppression_ok: boolean | null
           id: string
           no_alcohol_tobacco: boolean | null
           notes: string | null
           professional_design: boolean | null
           signage_approved: boolean | null
+          systems_hidden: boolean | null
           truck_id: string
           wheelchair_space_ok: boolean | null
         }
@@ -86,12 +88,14 @@ export type Database = {
           counter_height_ok?: boolean | null
           distance_from_curb_cm?: number | null
           edge_kitchen_only?: boolean | null
+          finish_quality?: boolean | null
           fire_suppression_ok?: boolean | null
           id?: string
           no_alcohol_tobacco?: boolean | null
           notes?: string | null
           professional_design?: boolean | null
           signage_approved?: boolean | null
+          systems_hidden?: boolean | null
           truck_id: string
           wheelchair_space_ok?: boolean | null
         }
@@ -102,12 +106,14 @@ export type Database = {
           counter_height_ok?: boolean | null
           distance_from_curb_cm?: number | null
           edge_kitchen_only?: boolean | null
+          finish_quality?: boolean | null
           fire_suppression_ok?: boolean | null
           id?: string
           no_alcohol_tobacco?: boolean | null
           notes?: string | null
           professional_design?: boolean | null
           signage_approved?: boolean | null
+          systems_hidden?: boolean | null
           truck_id?: string
           wheelchair_space_ok?: boolean | null
         }
