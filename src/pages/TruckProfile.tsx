@@ -166,91 +166,8 @@ export default function TruckProfile() {
 
         {/* Combined: compliance on the left, documents on the right */}
         <TabsContent value="review">
-          <div className="grid lg:grid-cols-2 gap-4">
-            {/* Design Guidelines */}
-            <Card className="municipal-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">הנחיות עיצוב</CardTitle>
-                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {DESIGN_ITEMS.map((item) => {
-                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
-                  return (
-                    <div key={item.key} className="py-2 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        {isAdmin ? (
-                          <Checkbox
-                            checked={!!value}
-                            onCheckedChange={() => toggleCompliance(item.key, value)}
-                          />
-                        ) : (
-                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
-                        )}
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 mr-8">{item.description}</p>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* Structure & Environment */}
-            <Card className="municipal-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">מבנה וסביבה</CardTitle>
-                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {STRUCTURE_ENV_ITEMS.map((item) => {
-                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
-                  return (
-                    <div key={item.key} className="py-2 border-b last:border-b-0">
-                      <div className="flex items-center gap-3">
-                        {isAdmin ? (
-                          <Checkbox
-                            checked={!!value}
-                            onCheckedChange={() => toggleCompliance(item.key, value)}
-                          />
-                        ) : (
-                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
-                        )}
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1 mr-8">{item.description}</p>
-                    </div>
-                  );
-                })}
-
-                {isAdmin && (
-                  <div className="pt-4 space-y-3 border-t">
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">עדכון סטטוס</label>
-                      <Select value={truck.status} onValueChange={(v) => updateStatus(v as TruckStatus)}>
-                        <SelectTrigger className="w-[200px]">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
-                            <SelectItem key={key} value={key}>{label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1 block">הערות מנהל</label>
-                      <Textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="הוסף הערה..." />
-                      <Button onClick={addNote} className="mt-2" size="sm" disabled={!newNote.trim()}>
-                        הוסף הערה
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Documents & photos */}
+          <div className="grid lg:grid-cols-3 gap-4" dir="rtl">
+            {/* Documents & photos - RIGHT side in RTL */}
             <Card className="municipal-shadow">
               <CardHeader>
                 <CardTitle className="text-lg">תמונות ומסמכים</CardTitle>
@@ -275,6 +192,89 @@ export default function TruckProfile() {
                     <PhotoPreview label="רישיון עסק" url={truck.business_license_url} isImage={false} />
                     <PhotoPreview label="הדמיית עיצוב" url={truck.design_mockup_url} isImage={false} />
                   </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Design Guidelines - CENTER */}
+            <Card className="municipal-shadow">
+              <CardHeader>
+                <CardTitle className="text-base">א. הנחיות למבנה (הפודטראק)</CardTitle>
+                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {DESIGN_ITEMS.map((item) => {
+                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                  return (
+                    <div key={item.key} className="py-2 border-b last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        {isAdmin ? (
+                          <Checkbox
+                            checked={!!value}
+                            onCheckedChange={() => toggleCompliance(item.key, value)}
+                          />
+                        ) : (
+                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
+                        )}
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 mr-8 whitespace-pre-line">{item.description}</p>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Structure & Environment - LEFT in RTL */}
+            <Card className="municipal-shadow">
+              <CardHeader>
+                <CardTitle className="text-base">ב. הנחיות לסביבה והעמדה</CardTitle>
+                {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {STRUCTURE_ENV_ITEMS.map((item) => {
+                  const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                  return (
+                    <div key={item.key} className="py-2 border-b last:border-b-0">
+                      <div className="flex items-center gap-3">
+                        {isAdmin ? (
+                          <Checkbox
+                            checked={!!value}
+                            onCheckedChange={() => toggleCompliance(item.key, value)}
+                          />
+                        ) : (
+                          value ? <Check className="h-5 w-5 text-primary" /> : <X className="h-5 w-5 text-destructive" />
+                        )}
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 mr-8 whitespace-pre-line">{item.description}</p>
+                    </div>
+                  );
+                })}
+
+                {isAdmin && (
+                  <div className="pt-4 space-y-3 border-t">
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">עדכון סטטוס</label>
+                      <Select value={truck.status} onValueChange={(v) => updateStatus(v as TruckStatus)}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>{label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium mb-1 block">הערות מנהל</label>
+                      <Textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="הוסף הערה..." />
+                      <Button onClick={addNote} className="mt-2" size="sm" disabled={!newNote.trim()}>
+                        הוסף הערה
+                      </Button>
+                    </div>
+                  </div>
                 )}
               </CardContent>
             </Card>
