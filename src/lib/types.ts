@@ -86,6 +86,105 @@ export const COMPLIANCE_ITEMS = [
   ...STRUCTURE_ENV_ITEMS,
 ];
 
+export type ZoneRule = {
+  category: string;
+  allowed: boolean;
+  note?: string;
+};
+
+export type ZoneProfile = {
+  name: string;
+  description: string;
+  rules: ZoneRule[];
+};
+
+export const ZONE_PROFILES: ZoneProfile[] = [
+  {
+    name: 'רצועת חוף אקספנסיבית',
+    description: 'אזור טיילת ים רחב עם נוף פתוח',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: false, note: 'עדיפות לריהוט אינטגרלי מובנה בסביבה' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'חסימת קו ראייה לים', allowed: false },
+    ],
+  },
+  {
+    name: 'מרינה',
+    description: 'אזור הנמל והמרינה',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: true, note: 'בכפוף לאישור' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'חסימת קו ראייה לים', allowed: false },
+    ],
+  },
+  {
+    name: 'חוף אינטנסיבי',
+    description: 'אזור חוף רחצה מוכרז עם תשתיות קיימות',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: false, note: 'ריהוט אינטגרלי בלבד' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי (חול)', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'חסימת קו ראייה לים', allowed: false },
+    ],
+  },
+  {
+    name: 'פארקים',
+    description: 'שטחים ירוקים ופארקים עירוניים',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: false, note: 'ריהוט אינטגרלי בלבד' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי (דשא/אדמה)', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'פגיעה בצמחייה קיימת', allowed: false },
+    ],
+  },
+  {
+    name: 'נחל לכיש',
+    description: 'רצועת נחל לכיש והטיילת לאורכו',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: false, note: 'ריהוט אינטגרלי בלבד' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'חסימת קו ראייה לנחל', allowed: false },
+    ],
+  },
+  {
+    name: 'המצודה',
+    description: 'אזור מצודת אשדוד-ים ההיסטורית',
+    rules: [
+      { category: 'עמדת מזון ניידת (פודטראק)', allowed: true },
+      { category: 'דלפק-בר אינטגרלי', allowed: true },
+      { category: 'ריהוט חיצוני קבוע', allowed: false, note: 'ריהוט אינטגרלי בלבד' },
+      { category: 'שלטים בולטים / על הגג', allowed: false },
+      { category: 'מחסנים / ציוד חיצוני', allowed: false },
+      { category: 'הצבה על משטח טבעי', allowed: false },
+      { category: 'תאורה חיצונית עצמאית', allowed: false },
+      { category: 'פגיעה באתר עתיקות', allowed: false },
+    ],
+  },
+];
+
 export const NEIGHBORHOODS = [
   'רובע א\'',
   'רובע ב\'',
