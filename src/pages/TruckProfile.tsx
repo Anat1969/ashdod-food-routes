@@ -16,6 +16,7 @@ import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { Clock, Check, X, Trash2 } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 
 export default function TruckProfile() {
@@ -388,7 +389,11 @@ function PhotoPreview({ label, url, isImage = true }: { label: string; url: stri
       <p className="text-sm font-medium">{label}</p>
       {url ? (
         isImage ? (
-          <img src={url} alt={label} className="w-full h-32 object-cover rounded-lg border" />
+          <ImageLightbox src={url} alt={label}>
+            {({ onClick }) => (
+              <img src={url} alt={label} className="w-full h-32 object-cover rounded-lg border cursor-zoom-in" onClick={onClick} />
+            )}
+          </ImageLightbox>
         ) : (
           <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">צפה בקובץ</a>
         )

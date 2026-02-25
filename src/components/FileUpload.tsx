@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Upload, Trash2, FileText, Image } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 
 interface FileUploadProps {
@@ -187,13 +188,17 @@ export default function FileUpload({
       <p className="text-sm font-medium mb-2">{label}</p>
 
       {currentUrl && isImage && (
-        <div className="relative rounded-lg overflow-hidden border bg-muted flex-1 min-h-[8rem]">
-          <img
-            src={currentUrl}
-            alt={label}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <ImageLightbox src={currentUrl} alt={label}>
+          {({ onClick }) => (
+            <div className="relative rounded-lg overflow-hidden border bg-muted flex-1 min-h-[8rem] cursor-zoom-in" onClick={onClick}>
+              <img
+                src={currentUrl}
+                alt={label}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+        </ImageLightbox>
       )}
 
       {currentUrl && !isImage && (

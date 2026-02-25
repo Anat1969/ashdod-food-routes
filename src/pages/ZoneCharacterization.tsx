@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ZONE_PROFILES } from "@/lib/types";
 import { Check, X, ChevronDown, MapPin, ImagePlus, Loader2 } from "lucide-react";
+import ImageLightbox from "@/components/ImageLightbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -106,7 +107,11 @@ function ZoneColumn({
         onClick={() => !uploading && inputRef.current?.click()}
       >
         {imageUrl ? (
-          <img src={imageUrl} alt={zone.name} className="w-full h-full object-cover" />
+          <ImageLightbox src={imageUrl} alt={zone.name}>
+            {({ onClick }) => (
+              <img src={imageUrl} alt={zone.name} className="w-full h-full object-cover cursor-zoom-in" onClick={(e) => { e.stopPropagation(); onClick(); }} />
+            )}
+          </ImageLightbox>
         ) : (
           <div className="flex flex-col items-center justify-center h-full gap-1 text-muted-foreground">
             {uploading ? <Loader2 className="h-6 w-6 animate-spin" /> : <ImagePlus className="h-6 w-6" />}
