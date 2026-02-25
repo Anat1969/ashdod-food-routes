@@ -66,7 +66,8 @@ function ZoneColumn({
     setUploading(true);
 
     const ext = file.name.split(".").pop();
-    const filePath = `zones/${zone.name}_${Date.now()}.${ext}`;
+    const safeName = encodeURIComponent(zone.name);
+    const filePath = `zones/${safeName}_${Date.now()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("truck-photos")
