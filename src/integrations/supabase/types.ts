@@ -64,58 +64,58 @@ export type Database = {
       }
       compliance_checklist: {
         Row: {
-          access_path_90cm: boolean | null
           checked_at: string
           checked_by: string | null
-          counter_height_ok: boolean | null
           distance_from_curb_cm: number | null
-          edge_kitchen_only: boolean | null
           finish_quality: boolean | null
-          fire_suppression_ok: boolean | null
           id: string
-          no_alcohol_tobacco: boolean | null
+          infrastructure: boolean | null
+          integral_furniture: boolean | null
+          lighting: boolean | null
+          materials_color: boolean | null
+          mobility: boolean | null
           notes: string | null
-          professional_design: boolean | null
-          signage_approved: boolean | null
+          physical_location: boolean | null
+          signage: boolean | null
           systems_hidden: boolean | null
           truck_id: string
-          wheelchair_space_ok: boolean | null
+          view_preservation: boolean | null
         }
         Insert: {
-          access_path_90cm?: boolean | null
           checked_at?: string
           checked_by?: string | null
-          counter_height_ok?: boolean | null
           distance_from_curb_cm?: number | null
-          edge_kitchen_only?: boolean | null
           finish_quality?: boolean | null
-          fire_suppression_ok?: boolean | null
           id?: string
-          no_alcohol_tobacco?: boolean | null
+          infrastructure?: boolean | null
+          integral_furniture?: boolean | null
+          lighting?: boolean | null
+          materials_color?: boolean | null
+          mobility?: boolean | null
           notes?: string | null
-          professional_design?: boolean | null
-          signage_approved?: boolean | null
+          physical_location?: boolean | null
+          signage?: boolean | null
           systems_hidden?: boolean | null
           truck_id: string
-          wheelchair_space_ok?: boolean | null
+          view_preservation?: boolean | null
         }
         Update: {
-          access_path_90cm?: boolean | null
           checked_at?: string
           checked_by?: string | null
-          counter_height_ok?: boolean | null
           distance_from_curb_cm?: number | null
-          edge_kitchen_only?: boolean | null
           finish_quality?: boolean | null
-          fire_suppression_ok?: boolean | null
           id?: string
-          no_alcohol_tobacco?: boolean | null
+          infrastructure?: boolean | null
+          integral_furniture?: boolean | null
+          lighting?: boolean | null
+          materials_color?: boolean | null
+          mobility?: boolean | null
           notes?: string | null
-          professional_design?: boolean | null
-          signage_approved?: boolean | null
+          physical_location?: boolean | null
+          signage?: boolean | null
           systems_hidden?: boolean | null
           truck_id?: string
-          wheelchair_space_ok?: boolean | null
+          view_preservation?: boolean | null
         }
         Relationships: [
           {

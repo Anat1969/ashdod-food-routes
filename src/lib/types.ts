@@ -27,12 +27,12 @@ export const STATUS_VARIANTS: Record<TruckStatus, 'default' | 'secondary' | 'des
 
 export const DESIGN_ITEMS = [
   {
-    key: 'professional_design',
+    key: 'mobility',
     label: '1. ניידות',
     description: 'חובה על המבנה להיות נייד באופן מלא על גלגלים, ללא עיגון קבוע לקרקע וללא יסודות.',
   },
   {
-    key: 'signage_approved',
+    key: 'materials_color',
     label: '2. חומריות וצבע',
     description: 'עיצוב מינימליסטי. שימוש בפלטה מוגבלת של עד שני גוונים ועד שני חומרים עיקריים בלבד.',
   },
@@ -47,12 +47,12 @@ export const DESIGN_ITEMS = [
     description: 'a. מיזוג: מוסתר ומשולב בתוך המבנה (לא מנוע חיצוני תלוי).\nb. אחסון: פנימי בלבד. אין להציב מחסנים, ארגזים או ציוד היקפי מחוץ למבנה.',
   },
   {
-    key: 'fire_suppression_ok',
+    key: 'integral_furniture',
     label: '5. ריהוט אינטגרלי',
     description: 'העדפה לריהוט המובנה, הקבוע כחלק אינטגרלי מהסביבה.\n(דלפק-בר וכיסאות השייכים לסביבה הנופית – בטיילת, לדוגמא).',
   },
   {
-    key: 'no_alcohol_tobacco',
+    key: 'signage',
     label: '6. שילוט',
     description: 'הלוגו והשילוט יהיו משולבים בגוף המבנה (חזית וצד) בצורה מוצנעת ושטוחה, לא בולטת מהמבנה.\nאין להציב שלטים על הגג.',
   },
@@ -60,22 +60,22 @@ export const DESIGN_ITEMS = [
 
 export const STRUCTURE_ENV_ITEMS = [
   {
-    key: 'wheelchair_space_ok',
+    key: 'physical_location',
     label: 'מיקום פיזי',
     description: 'ההצבה תעשה אך ורק על משטח ריצוף קיים.\nאסור להציב על משטח טבעי (חול, אדמה, צמחייה) ואסור לבצע עבודות קרקע.',
   },
   {
-    key: 'edge_kitchen_only',
+    key: 'infrastructure',
     label: 'תשתיות',
     description: 'התחברות לנקודות קיימות ומסומנות בלבד (מים, חשמל, ביוב).\nאין להעביר כבלים או צינורות חשופים במרחב הציבורי.',
   },
   {
-    key: 'counter_height_ok',
+    key: 'lighting',
     label: 'תאורה',
     description: 'תאורה אינטגרלית מתוך המבנה בלבד.\nאין להציב גופי תאורה חיצוניים או עמודי תאורה פרוביזוריים.',
   },
   {
-    key: 'access_path_90cm',
+    key: 'view_preservation',
     label: 'שימור מבטים',
     description: 'העמדה לא תסתיר את הנוף הטבעי (ים, נחל) ולא תמוקם על ציר הליכה ראשי או שער כניסה.',
   },
