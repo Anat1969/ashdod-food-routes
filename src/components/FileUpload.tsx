@@ -235,7 +235,7 @@ export default function FileUpload({
         {currentUrl && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
+              <Button variant="ghost" size="sm">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
