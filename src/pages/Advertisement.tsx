@@ -30,7 +30,12 @@ export default function Advertisement() {
   // Build map URL: if a truck is selected and has coords, center on it; otherwise show Ashdod
   const getMapUrl = () => {
     if (selectedTruck?.locations?.lat && selectedTruck?.locations?.lng) {
-      return `https://www.google.com/maps?q=${selectedTruck.locations.lat},${selectedTruck.locations.lng}&z=16&output=embed`;
+      const label = encodeURIComponent(`${selectedTruck.truck_name} - ${selectedTruck.locations.name || "אשדוד"}`);
+      return `https://www.google.com/maps?q=${selectedTruck.locations.lat},${selectedTruck.locations.lng}&z=17&output=embed&t=m`;
+    }
+    if (selectedTruck) {
+      const query = encodeURIComponent(`${selectedTruck.truck_name} אשדוד`);
+      return `https://www.google.com/maps?q=${query}&z=15&output=embed`;
     }
     return `https://www.google.com/maps?q=31.8044,34.6553&z=13&output=embed`;
   };
