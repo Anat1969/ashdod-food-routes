@@ -167,19 +167,24 @@ export default function Advertisement() {
                       <div className="grid grid-cols-2 gap-2">
                         {truck.street_photo_1_url && (
                           <ImageLightbox src={truck.street_photo_1_url} alt="תמונת רחוב">
-                            <img
-                              src={truck.street_photo_1_url}
-                              alt="תמונת רחוב"
-                              className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
-                            />
+                            {({ onClick }) => (
+                              <img
+                                onClick={onClick}
+                                src={truck.street_photo_1_url!}
+                                alt="תמונת רחוב"
+                                className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
+                              />
+                            )}
                           </ImageLightbox>
                         )}
                         {truck.street_photo_2_url && (
                           <ImageLightbox src={truck.street_photo_2_url} alt="תמונת רחוב">
-                            <img
-                              src={truck.street_photo_2_url}
-                              alt="תמונת רחוב"
-                              className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
+                            {({ onClick }) => (
+                              <img
+                                onClick={onClick}
+                                src={truck.street_photo_2_url!}
+                                alt="תמונת רחוב"
+                                className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
                             />
                           </ImageLightbox>
                         )}
