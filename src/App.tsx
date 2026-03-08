@@ -21,6 +21,7 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import Dashboard from "./pages/Dashboard";
+import Advertisement from "./pages/Advertisement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
               <Route path="/location-card" element={<LocationCard />} />
+              <Route path="/advertisement" element={<Advertisement />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

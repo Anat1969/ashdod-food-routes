@@ -27,6 +27,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   if (isAdmin) {
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
+  navLinks.push({ to: "/advertisement", label: "פרסומת" });
 
   return (
     <div className="min-h-screen flex flex-col">
