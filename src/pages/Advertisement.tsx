@@ -167,9 +167,9 @@ function TruckSidebarCard({
     >
       {/* Truck photo */}
       <div className="relative h-44 sm:h-48">
-        {truck.vehicle_photo_url ? (
+        {(truck.street_photo_1_url || truck.vehicle_photo_url) ? (
           <img
-            src={truck.vehicle_photo_url}
+            src={(truck.street_photo_1_url || truck.vehicle_photo_url)!}
             alt={truck.truck_name}
             className="w-full h-full object-cover"
           />
