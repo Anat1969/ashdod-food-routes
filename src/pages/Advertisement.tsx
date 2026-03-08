@@ -185,7 +185,8 @@ export default function Advertisement() {
                                 src={truck.street_photo_2_url!}
                                 alt="תמונת רחוב"
                                 className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
-                            />
+                              />
+                            )}
                           </ImageLightbox>
                         )}
                       </div>
