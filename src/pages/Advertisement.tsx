@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, UtensilsCrossed, Truck } from "lucide-react";
+import { MapPin, Clock, Truck, UtensilsCrossed } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import type { FoodTruck, Location } from "@/lib/types";
 
@@ -12,6 +11,7 @@ export default function Advertisement() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTruck, setSelectedTruck] = useState<TruckWithLocation | null>(null);
+  const mapRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const fetchTrucks = async () => {
@@ -19,195 +19,188 @@ export default function Advertisement() {
         .from("food_trucks")
         .select("*, locations(*)")
         .eq("status", "approved");
-      setTrucks((data as TruckWithLocation[]) || []);
+      const result = (data as TruckWithLocation[]) || [];
+      setTrucks(result);
+      if (result.length > 0) setSelectedTruck(result[0]);
       setLoading(false);
     };
     fetchTrucks();
   }, []);
 
+  // Build map URL: if a truck is selected and has coords, center on it; otherwise show Ashdod
+  const getMapUrl = () => {
+    if (selectedTruck?.locations?.lat && selectedTruck?.locations?.lng) {
+      return `https://www.google.com/maps?q=${selectedTruck.locations.lat},${selectedTruck.locations.lng}&z=16&output=embed`;
+    }
+    return `https://www.google.com/maps?q=31.8044,34.6553&z=13&output=embed`;
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
+      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
         טוען...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-12 md:py-16">
+      <section className="bg-primary text-primary-foreground py-6">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-3">
-            <UtensilsCrossed className="inline-block h-8 w-8 ml-2 mb-1" />
+          <h1 className="text-2xl md:text-3xl font-bold">
+            <UtensilsCrossed className="inline-block h-7 w-7 ml-2 mb-1" />
             פודטראקים באשדוד
           </h1>
-          <p className="text-lg opacity-80 max-w-2xl mx-auto">
-            גלו את מגוון הפודטראקים המאושרים ברחבי העיר – מיקומים, תפריטים ושעות פעילות
-          </p>
+          <p className="text-sm opacity-80 mt-1">לחצו על פודטראק כדי לראות את המיקום והתפריט</p>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-8">
-        {trucks.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground">
+      {trucks.length === 0 ? (
+        <div className="flex-1 flex items-center justify-center text-muted-foreground">
+          <div className="text-center">
             <Truck className="h-16 w-16 mx-auto mb-4 opacity-40" />
             <p className="text-lg">אין פודטראקים מאושרים כרגע</p>
-            <p className="text-sm mt-1">חזרו בקרוב!</p>
           </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trucks.map((truck) => (
-              <Card
-                key={truck.id}
-                className="municipal-shadow hover:municipal-shadow-lg transition-shadow cursor-pointer group overflow-hidden"
-                onClick={() => setSelectedTruck(selectedTruck?.id === truck.id ? null : truck)}
-              >
-                {/* Truck Image */}
-                {truck.vehicle_photo_url ? (
-                  <div className="relative h-48 overflow-hidden">
-                    <ImageLightbox src={truck.vehicle_photo_url} alt={truck.truck_name}>
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 180px)" }}>
+          {/* Right sidebar – truck cards */}
+          <aside className="md:w-[380px] lg:w-[420px] overflow-y-auto border-s bg-muted/30 flex-shrink-0">
+            <div className="flex flex-col gap-0">
+              {trucks.map((truck) => (
+                <TruckSidebarCard
+                  key={truck.id}
+                  truck={truck}
+                  isSelected={selectedTruck?.id === truck.id}
+                  onSelect={() => setSelectedTruck(truck)}
+                />
+              ))}
+            </div>
+          </aside>
+
+          {/* Left – Dynamic Map + selected truck menu */}
+          <div className="flex-1 flex flex-col min-h-[300px]">
+            {/* Map */}
+            <div className="flex-1 relative">
+              <iframe
+                ref={mapRef}
+                key={getMapUrl()}
+                title="מפת פודטראקים באשדוד"
+                src={getMapUrl()}
+                className="w-full h-full absolute inset-0"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Selected truck details bar */}
+            {selectedTruck && (
+              <div className="border-t bg-card p-4 space-y-3">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h2 className="text-lg font-bold">{selectedTruck.truck_name}</h2>
+                  {selectedTruck.food_category && (
+                    <Badge variant="secondary" className="text-xs">{selectedTruck.food_category}</Badge>
+                  )}
+                  {selectedTruck.locations && (
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {selectedTruck.locations.name}
+                      {selectedTruck.locations.street && ` – ${selectedTruck.locations.street}`}
+                    </span>
+                  )}
+                  {(selectedTruck.hours_from || selectedTruck.hours_to) && (
+                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                      <Clock className="h-3.5 w-3.5" />
+                      {selectedTruck.hours_from && selectedTruck.hours_to
+                        ? `${selectedTruck.hours_from} – ${selectedTruck.hours_to}`
+                        : selectedTruck.hours_from || selectedTruck.hours_to}
+                    </span>
+                  )}
+                </div>
+
+                {/* Menu / Design mockup */}
+                {selectedTruck.design_mockup_url && (
+                  <div>
+                    <p className="text-sm font-medium mb-1">תפריט / הדמיה</p>
+                    <ImageLightbox src={selectedTruck.design_mockup_url} alt="תפריט">
                       {({ onClick }) => (
                         <img
                           onClick={onClick}
-                          src={truck.vehicle_photo_url!}
-                          alt={truck.truck_name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-zoom-in"
+                          src={selectedTruck.design_mockup_url!}
+                          alt="תפריט"
+                          className="max-h-40 rounded-md border cursor-zoom-in"
                         />
                       )}
                     </ImageLightbox>
                   </div>
-                ) : (
-                  <div className="h-48 bg-muted flex items-center justify-center">
-                    <Truck className="h-12 w-12 text-muted-foreground/40" />
-                  </div>
                 )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    {truck.truck_name}
-                    {truck.food_category && (
-                      <Badge variant="secondary" className="text-xs font-normal">
-                        {truck.food_category}
-                      </Badge>
-                    )}
-                  </CardTitle>
-                </CardHeader>
+/* ── Sidebar card component ── */
 
-                <CardContent className="space-y-3">
-                  {/* Location */}
-                  {truck.locations && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-accent mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-medium">{truck.locations.name}</p>
-                        {truck.locations.street && (
-                          <p className="text-muted-foreground text-xs">{truck.locations.street}</p>
-                        )}
-                        {truck.locations.neighborhood && (
-                          <p className="text-muted-foreground text-xs">{truck.locations.neighborhood}</p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Google Map */}
-                  {truck.locations?.lat && truck.locations?.lng && (
-                    <div className="rounded-lg overflow-hidden border">
-                      <iframe
-                        title={`מפת ${truck.truck_name}`}
-                        src={`https://www.google.com/maps?q=${truck.locations.lat},${truck.locations.lng}&z=16&output=embed`}
-                        className="w-full h-40"
-                        loading="lazy"
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
-
-                  {/* Hours */}
-                  {(truck.hours_from || truck.hours_to) && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-accent flex-shrink-0" />
-                      <span>
-                        {truck.hours_from && truck.hours_to
-                          ? `${truck.hours_from} – ${truck.hours_to}`
-                          : truck.hours_from || truck.hours_to}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Operator */}
-                  {truck.operator_name && (
-                    <p className="text-xs text-muted-foreground">
-                      מפעיל: {truck.operator_name}
-                    </p>
-                  )}
-
-                  {/* Expanded details */}
-                  {selectedTruck?.id === truck.id && (
-                    <div className="pt-3 border-t space-y-3 animate-in slide-in-from-top-2 duration-200">
-
-                      {/* Design mockup as menu preview */}
-                      {truck.design_mockup_url && (
-                        <div>
-                          <p className="text-sm font-medium mb-1">תפריט / הדמיה</p>
-                          <ImageLightbox src={truck.design_mockup_url} alt="תפריט">
-                            {({ onClick }) => (
-                              <img
-                                onClick={onClick}
-                                src={truck.design_mockup_url!}
-                                alt="תפריט"
-                                className="w-full rounded-md border cursor-zoom-in"
-                              />
-                            )}
-                          </ImageLightbox>
-                        </div>
-                      )}
-
-                      {/* Street photos */}
-                      <div className="grid grid-cols-2 gap-2">
-                        {truck.street_photo_1_url && (
-                          <ImageLightbox src={truck.street_photo_1_url} alt="תמונת רחוב">
-                            {({ onClick }) => (
-                              <img
-                                onClick={onClick}
-                                src={truck.street_photo_1_url!}
-                                alt="תמונת רחוב"
-                                className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
-                              />
-                            )}
-                          </ImageLightbox>
-                        )}
-                        {truck.street_photo_2_url && (
-                          <ImageLightbox src={truck.street_photo_2_url} alt="תמונת רחוב">
-                            {({ onClick }) => (
-                              <img
-                                onClick={onClick}
-                                src={truck.street_photo_2_url!}
-                                alt="תמונת רחוב"
-                                className="w-full h-24 object-cover rounded-md border cursor-zoom-in"
-                              />
-                            )}
-                          </ImageLightbox>
-                        )}
-                      </div>
-
-                      {truck.locations && (
-                        <div className="text-xs text-muted-foreground space-y-1 bg-muted/50 rounded-md p-2">
-                          <p className="font-medium text-foreground">פרטי מיקום</p>
-                          {truck.locations.location_type && <p>סוג: {truck.locations.location_type}</p>}
-                          {truck.locations.gush && <p>גוש: {truck.locations.gush}</p>}
-                          {truck.locations.chelka && <p>חלקה: {truck.locations.chelka}</p>}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+function TruckSidebarCard({
+  truck,
+  isSelected,
+  onSelect,
+}: {
+  truck: TruckWithLocation;
+  isSelected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      onClick={onSelect}
+      className={`relative w-full text-start border-b last:border-b-0 transition-colors overflow-hidden
+        ${isSelected ? "bg-accent/20 ring-2 ring-inset ring-accent" : "hover:bg-muted/60"}`}
+    >
+      {/* Truck photo */}
+      <div className="relative h-44 sm:h-48">
+        {truck.vehicle_photo_url ? (
+          <img
+            src={truck.vehicle_photo_url}
+            alt={truck.truck_name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <Truck className="h-10 w-10 text-muted-foreground/40" />
           </div>
         )}
+
+        {/* Status badge overlay */}
+        {isSelected && (
+          <div className="absolute top-2 left-2">
+            <Badge className="bg-accent text-accent-foreground text-xs shadow">נבחר</Badge>
+          </div>
+        )}
+
+        {/* Name + location overlay at bottom */}
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-white">{truck.truck_name}</span>
+            {truck.food_category && (
+              <Badge variant="secondary" className="text-[10px] bg-white/20 text-white border-0">
+                {truck.food_category}
+              </Badge>
+            )}
+          </div>
+          {truck.locations && (
+            <p className="text-xs text-white/80 flex items-center gap-1 mt-0.5">
+              <MapPin className="h-3 w-3" />
+              {truck.locations.name}
+              {truck.locations.neighborhood && `, ${truck.locations.neighborhood}`}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
