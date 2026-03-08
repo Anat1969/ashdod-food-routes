@@ -87,14 +87,10 @@ export default function Advertisement() {
           <div className="flex-1 flex flex-col min-h-[300px]">
             {/* Map */}
             <div className="flex-1 relative">
-              <iframe
-                ref={mapRef}
-                key={getMapUrl()}
-                title="מפת פודטראקים באשדוד"
-                src={getMapUrl()}
-                className="w-full h-full absolute inset-0"
-                loading="lazy"
-                allowFullScreen
+              <TruckMap
+                trucks={trucks}
+                selectedTruckId={selectedTruck?.id || null}
+                onSelectTruck={(truck) => setSelectedTruck(truck)}
               />
             </div>
 
