@@ -12,7 +12,6 @@ export default function Advertisement() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTruck, setSelectedTruck] = useState<TruckWithLocation | null>(null);
-  const mapRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const fetchTrucks = async () => {
