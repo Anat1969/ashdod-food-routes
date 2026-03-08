@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Truck, UtensilsCrossed } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
+import TruckMap from "@/components/TruckMap";
 import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
@@ -11,7 +12,6 @@ export default function Advertisement() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTruck, setSelectedTruck] = useState<TruckWithLocation | null>(null);
-  const mapRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const fetchTrucks = async () => {
@@ -26,18 +26,6 @@ export default function Advertisement() {
     fetchTrucks();
   }, []);
 
-  // Build map URL: if a truck is selected and has coords, center on it; otherwise show Ashdod
-  const getMapUrl = () => {
-    if (selectedTruck?.locations?.lat && selectedTruck?.locations?.lng) {
-      const label = encodeURIComponent(`${selectedTruck.truck_name} - ${selectedTruck.locations.name || "אשדוד"}`);
-      return `https://www.google.com/maps?q=${selectedTruck.locations.lat},${selectedTruck.locations.lng}&z=17&output=embed&t=m`;
-    }
-    if (selectedTruck) {
-      const query = encodeURIComponent(`${selectedTruck.truck_name} אשדוד`);
-      return `https://www.google.com/maps?q=${query}&z=15&output=embed`;
-    }
-    return `https://www.google.com/maps?q=31.8044,34.6553&z=13&output=embed`;
-  };
 
   if (loading) {
     return (
@@ -87,14 +75,10 @@ export default function Advertisement() {
           <div className="flex-1 flex flex-col min-h-[300px]">
             {/* Map */}
             <div className="flex-1 relative">
-              <iframe
-                ref={mapRef}
-                key={getMapUrl()}
-                title="מפת פודטראקים באשדוד"
-                src={getMapUrl()}
-                className="w-full h-full absolute inset-0"
-                loading="lazy"
-                allowFullScreen
+              <TruckMap
+                trucks={trucks}
+                selectedTruckId={selectedTruck?.id || null}
+                onSelectTruck={(truck) => setSelectedTruck(truck)}
               />
             </div>
 
