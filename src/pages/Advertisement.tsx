@@ -67,11 +67,14 @@ export default function Advertisement() {
                 {truck.vehicle_photo_url ? (
                   <div className="relative h-48 overflow-hidden">
                     <ImageLightbox src={truck.vehicle_photo_url} alt={truck.truck_name}>
-                      <img
-                        src={truck.vehicle_photo_url}
-                        alt={truck.truck_name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-zoom-in"
-                      />
+                      {({ onClick }) => (
+                        <img
+                          onClick={onClick}
+                          src={truck.vehicle_photo_url!}
+                          alt={truck.truck_name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-zoom-in"
+                        />
+                      )}
                     </ImageLightbox>
                   </div>
                 ) : (
