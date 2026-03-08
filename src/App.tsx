@@ -21,6 +21,7 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import Dashboard from "./pages/Dashboard";
+import Advertisement from "./pages/Advertisement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
