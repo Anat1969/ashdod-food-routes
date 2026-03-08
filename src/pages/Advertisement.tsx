@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Truck, UtensilsCrossed } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
+import TruckMap from "@/components/TruckMap";
 import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
