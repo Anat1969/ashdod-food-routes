@@ -151,11 +151,14 @@ export default function Advertisement() {
                         <div>
                           <p className="text-sm font-medium mb-1">תפריט / הדמיה</p>
                           <ImageLightbox src={truck.design_mockup_url} alt="תפריט">
-                            <img
-                              src={truck.design_mockup_url}
-                              alt="תפריט"
-                              className="w-full rounded-md border cursor-zoom-in"
-                            />
+                            {({ onClick }) => (
+                              <img
+                                onClick={onClick}
+                                src={truck.design_mockup_url!}
+                                alt="תפריט"
+                                className="w-full rounded-md border cursor-zoom-in"
+                              />
+                            )}
                           </ImageLightbox>
                         </div>
                       )}
