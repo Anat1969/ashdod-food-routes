@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { NEIGHBORHOODS } from "@/lib/types";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Send } from "lucide-react";
+import PageNavigation from "@/components/PageNavigation";
 
 interface FormData {
   truck_name: string;

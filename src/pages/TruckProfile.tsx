@@ -18,6 +18,7 @@ import { STATUS_LABELS } from "@/lib/types";
 import { Clock, Check, X, Trash2 } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function TruckProfile() {
   const { id } = useParams<{ id: string }>();

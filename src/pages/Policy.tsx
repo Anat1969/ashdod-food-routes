@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import PageNavigation from "@/components/PageNavigation";
 
 interface PolicyRow {
   requirement: string;
