@@ -66,19 +66,21 @@ export default function Advertisement() {
   };
 
   const addMenuItem = async () => {
-    if (!menuDialogTruck) return;
+    if (!menuDialogTruck || !newItem.item_name.trim()) return;
+    const price = parseFloat(newItem.price) || 0;
     const { data, error } = await supabase
       .from("menu_items")
       .insert({
         truck_id: menuDialogTruck.id,
-        item_name: "פריט חדש",
-        price: 0,
+        item_name: newItem.item_name.trim(),
+        price,
         sort_order: menuItems.length,
       })
       .select()
       .single();
     if (error) { toast.error("שגיאה בהוספת פריט"); return; }
     setMenuItems([...menuItems, data as MenuItem]);
+    setNewItem({ item_name: "", price: "" });
   };
 
   const updateMenuItem = async (id: string, field: string, value: string | number) => {
