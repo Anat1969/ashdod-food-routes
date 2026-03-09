@@ -7,6 +7,7 @@ import { Check, X, MapPin, ImagePlus, Loader2, Palette } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function ZoneCharacterization() {
   const [zoneImages, setZoneImages] = useState<Record<string, string>>({});
