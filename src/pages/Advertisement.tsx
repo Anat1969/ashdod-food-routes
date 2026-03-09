@@ -13,6 +13,11 @@ import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
 
+interface NewItemDraft {
+  item_name: string;
+  price: string;
+}
+
 interface MenuItem {
   id: string;
   truck_id: string;
