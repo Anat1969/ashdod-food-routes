@@ -96,6 +96,7 @@ export type ZoneProfile = {
   name: string;
   description: string;
   rules: ZoneRule[];
+  designTraits: string[];
 };
 
 export const ZONE_PROFILES: ZoneProfile[] = [
