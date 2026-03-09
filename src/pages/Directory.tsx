@@ -143,7 +143,8 @@ export default function Directory() {
   const filtered = trucks.filter((t) => {
     const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search) || ((t as any).operator_name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesZone = zoneFilter === "all" || (t.location?.location_type || "") === zoneFilter;
+    return matchesSearch && matchesStatus && matchesZone;
   });
 
   const toggleSort = (col: SortColumn) => {
