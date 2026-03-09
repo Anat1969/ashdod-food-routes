@@ -13,6 +13,11 @@ import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
 
+interface NewItemDraft {
+  item_name: string;
+  price: string;
+}
+
 interface MenuItem {
   id: string;
   truck_id: string;
@@ -28,6 +33,7 @@ export default function Advertisement() {
   const [menuDialogTruck, setMenuDialogTruck] = useState<TruckWithLocation | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
+  const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
   const { isAdmin, user } = useAuth();
 
   useEffect(() => {
@@ -60,19 +66,21 @@ export default function Advertisement() {
   };
 
   const addMenuItem = async () => {
-    if (!menuDialogTruck) return;
+    if (!menuDialogTruck || !newItem.item_name.trim()) return;
+    const price = parseFloat(newItem.price) || 0;
     const { data, error } = await supabase
       .from("menu_items")
       .insert({
         truck_id: menuDialogTruck.id,
-        item_name: "פריט חדש",
-        price: 0,
+        item_name: newItem.item_name.trim(),
+        price,
         sort_order: menuItems.length,
       })
       .select()
       .single();
     if (error) { toast.error("שגיאה בהוספת פריט"); return; }
     setMenuItems([...menuItems, data as MenuItem]);
+    setNewItem({ item_name: "", price: "" });
   };
 
   const updateMenuItem = async (id: string, field: string, value: string | number) => {
@@ -189,65 +197,104 @@ export default function Advertisement() {
         </div>
       )}
 
-      {/* Menu Dialog */}
-      <Dialog open={!!menuDialogTruck} onOpenChange={(open) => !open && setMenuDialogTruck(null)}>
-        <DialogContent className="max-w-md" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <UtensilsCrossed className="h-5 w-5" />
-              תפריט – {menuDialogTruck?.truck_name}
-            </DialogTitle>
-          </DialogHeader>
-
-          {menuLoading ? (
-            <p className="text-sm text-muted-foreground text-center py-4">טוען תפריט...</p>
-          ) : (
-            <div className="space-y-2 max-h-[60vh] overflow-y-auto">
-              {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
-                <p className="text-sm text-muted-foreground text-center py-4">אין פריטים בתפריט</p>
-              )}
-
-              {menuItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 border rounded-md p-2">
-                  {canEditMenu(menuDialogTruck!) ? (
-                    <>
-                      <Input
-                        className="flex-1 h-8 text-sm"
-                        value={item.item_name}
-                        onChange={(e) => updateMenuItem(item.id, "item_name", e.target.value)}
-                        onBlur={(e) => updateMenuItem(item.id, "item_name", e.target.value)}
-                        placeholder="שם הפריט"
-                      />
-                      <Input
-                        className="w-20 h-8 text-sm text-center"
-                        type="number"
-                        value={item.price}
-                        onChange={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
-                        onBlur={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
-                        placeholder="מחיר"
-                      />
-                      <span className="text-xs text-muted-foreground">₪</span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMenuItem(item.id)}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <span className="flex-1 text-sm">{item.item_name}</span>
-                      <span className="text-sm font-medium">₪{item.price}</span>
-                    </>
-                  )}
-                </div>
-              ))}
-
-              {canEditMenu(menuDialogTruck!) && (
-                <Button variant="outline" size="sm" className="w-full mt-2" onClick={addMenuItem}>
-                  <Plus className="h-4 w-4 ml-1" />
-                  הוסף פריט
-                </Button>
+      {/* Menu Dialog – Catalog style */}
+      <Dialog open={!!menuDialogTruck} onOpenChange={(open) => { if (!open) { setMenuDialogTruck(null); setNewItem({ item_name: "", price: "" }); } }}>
+        <DialogContent className="max-w-md p-0 overflow-hidden" dir="rtl">
+          {/* Header with truck photo */}
+          <div className="relative h-32 bg-muted">
+            {menuDialogTruck?.street_photo_1_url ? (
+              <img src={menuDialogTruck.street_photo_1_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Truck className="h-10 w-10 text-muted-foreground/30" />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+            <div className="absolute bottom-3 right-4 left-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <UtensilsCrossed className="h-5 w-5" />
+                {menuDialogTruck?.truck_name}
+              </h2>
+              {menuDialogTruck?.food_category && (
+                <p className="text-xs text-white/70 mt-0.5">{menuDialogTruck.food_category}</p>
               )}
             </div>
-          )}
+          </div>
+
+          <div className="px-5 pb-5 pt-3">
+            {menuLoading ? (
+              <p className="text-sm text-muted-foreground text-center py-6">טוען תפריט...</p>
+            ) : (
+              <>
+                {/* Menu items list */}
+                <div className="space-y-0 max-h-[45vh] overflow-y-auto">
+                  {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
+                    <p className="text-sm text-muted-foreground text-center py-6">אין פריטים בתפריט</p>
+                  )}
+
+                  {menuItems.map((item, idx) => (
+                    <div key={item.id} className={`flex items-center gap-3 py-2.5 ${idx < menuItems.length - 1 ? 'border-b border-dashed' : ''}`}>
+                      {canEditMenu(menuDialogTruck!) ? (
+                        <>
+                          <Input
+                            className="flex-1 h-8 text-sm border-0 border-b rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary"
+                            value={item.item_name}
+                            onChange={(e) => updateMenuItem(item.id, "item_name", e.target.value)}
+                            placeholder="שם המנה"
+                          />
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-muted-foreground">₪</span>
+                            <Input
+                              className="w-16 h-8 text-sm text-center border-0 border-b rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary font-medium"
+                              type="number"
+                              value={item.price}
+                              onChange={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
+                              placeholder="0"
+                            />
+                          </div>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive flex-shrink-0" onClick={() => deleteMenuItem(item.id)}>
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="flex-1 text-sm">{item.item_name}</span>
+                          <span className="text-sm font-bold tabular-nums">₪{item.price}</span>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Inline new item row */}
+                {canEditMenu(menuDialogTruck!) && (
+                  <div className="mt-3 pt-3 border-t">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        className="flex-1 h-9 text-sm"
+                        value={newItem.item_name}
+                        onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
+                        placeholder="שם המנה החדשה..."
+                        onKeyDown={(e) => e.key === "Enter" && addMenuItem()}
+                      />
+                      <Input
+                        className="w-20 h-9 text-sm text-center"
+                        type="number"
+                        value={newItem.price}
+                        onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                        placeholder="מחיר"
+                        onKeyDown={(e) => e.key === "Enter" && addMenuItem()}
+                      />
+                      <Button size="sm" className="h-9 px-3 flex-shrink-0" onClick={addMenuItem} disabled={!newItem.item_name.trim()}>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1">הקלד שם ומחיר ולחץ Enter או + להוספה</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
