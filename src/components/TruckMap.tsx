@@ -70,7 +70,11 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: Tru
           key={truck.id}
           position={[Number(truck.locations!.lat), Number(truck.locations!.lng)]}
           icon={truck.id === selectedTruckId ? selectedIcon : defaultIcon}
-          eventHandlers={{ click: () => onSelectTruck(truck) }}
+          eventHandlers={{
+            click: () => onSelectTruck(truck),
+            mouseover: (e) => e.target.openPopup(),
+            mouseout: (e) => e.target.closePopup(),
+          }}
         >
           <Popup>
             <div className="text-right font-sans">
