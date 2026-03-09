@@ -18,6 +18,7 @@ import { STATUS_LABELS } from "@/lib/types";
 import { Clock, Check, X, Trash2 } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function TruckProfile() {
   const { id } = useParams<{ id: string }>();
@@ -137,7 +138,8 @@ export default function TruckProfile() {
   if (!truck) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">פודטראק לא נמצא</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl">
+    <div className="container mx-auto px-4 py-8 max-w-5xl" dir="rtl">
+      <PageNavigation />
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold">{truck.truck_name}</h1>

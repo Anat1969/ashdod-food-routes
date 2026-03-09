@@ -7,6 +7,7 @@ import { Check, X, MapPin, ImagePlus, Loader2, Palette } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function ZoneCharacterization() {
   const [zoneImages, setZoneImages] = useState<Record<string, string>>({});
@@ -35,6 +36,7 @@ export default function ZoneCharacterization() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl" dir="rtl">
+      <PageNavigation />
       <h1 className="text-2xl font-bold mb-6">אפיון אזורים</h1>
       <Card className="municipal-shadow">
         <CardContent className="p-0">

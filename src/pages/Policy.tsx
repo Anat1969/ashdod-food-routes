@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import PageNavigation from "@/components/PageNavigation";
 
 interface PolicyRow {
   requirement: string;
@@ -78,7 +79,8 @@ const policySections: PolicySection[] = [
 
 export default function Policy() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl" dir="rtl">
+      <PageNavigation />
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מדיניות והנחיות</h1>
       <p className="text-muted-foreground mb-8">
         הנחיות עיריית אשדוד להצבת פודטראקים במרחב הציבורי – מחלקת הנדסה ותכנון עירוני
