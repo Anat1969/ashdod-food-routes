@@ -1,6 +1,6 @@
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, ChevronRight, ChevronLeft, ArrowRight } from "lucide-react";
+import { Home, ChevronRight, ChevronLeft, Undo2 } from "lucide-react";
 
 export default function PageNavigation() {
   const navigate = useNavigate();
@@ -23,26 +23,37 @@ export default function PageNavigation() {
           </Link>
         </Button>
       )}
-      
+
       <Button
         variant="outline"
         size="sm"
         onClick={() => navigate(-1)}
         className="gap-1"
       >
-        <ArrowRight className="h-4 w-4" />
+        <Undo2 className="h-4 w-4" />
         <span className="hidden sm:inline">חזרה</span>
       </Button>
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => navigate(1)}
-        className="gap-1"
-      >
-        <span className="hidden sm:inline">קדימה</span>
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
+      <div className="flex items-center border rounded-md overflow-hidden">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(1)}
+          className="rounded-none border-l px-2"
+          title="קדימה"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="rounded-none px-2"
+          title="אחורה"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
