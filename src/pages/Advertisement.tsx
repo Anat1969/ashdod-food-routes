@@ -33,6 +33,7 @@ export default function Advertisement() {
   const [menuDialogTruck, setMenuDialogTruck] = useState<TruckWithLocation | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
+  const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
   const { isAdmin, user } = useAuth();
 
   useEffect(() => {
