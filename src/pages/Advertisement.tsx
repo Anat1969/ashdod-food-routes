@@ -1,17 +1,34 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Truck, UtensilsCrossed } from "lucide-react";
+import { MapPin, Clock, Truck, UtensilsCrossed, Plus, Trash2, Pencil } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import ImageLightbox from "@/components/ImageLightbox";
 import TruckMap from "@/components/TruckMap";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
+
+interface MenuItem {
+  id: string;
+  truck_id: string;
+  item_name: string;
+  price: number;
+  sort_order: number;
+}
 
 export default function Advertisement() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTruck, setSelectedTruck] = useState<TruckWithLocation | null>(null);
+  const [menuDialogTruck, setMenuDialogTruck] = useState<TruckWithLocation | null>(null);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuLoading, setMenuLoading] = useState(false);
+  const { isAdmin, user } = useAuth();
 
   useEffect(() => {
     const fetchTrucks = async () => {
@@ -26,6 +43,48 @@ export default function Advertisement() {
     fetchTrucks();
   }, []);
 
+  const canEditMenu = (truck: TruckWithLocation) => {
+    return isAdmin || truck.operator_id === user?.id;
+  };
+
+  const openMenuDialog = async (truck: TruckWithLocation) => {
+    setMenuDialogTruck(truck);
+    setMenuLoading(true);
+    const { data } = await supabase
+      .from("menu_items")
+      .select("*")
+      .eq("truck_id", truck.id)
+      .order("sort_order", { ascending: true });
+    setMenuItems((data as MenuItem[]) || []);
+    setMenuLoading(false);
+  };
+
+  const addMenuItem = async () => {
+    if (!menuDialogTruck) return;
+    const { data, error } = await supabase
+      .from("menu_items")
+      .insert({
+        truck_id: menuDialogTruck.id,
+        item_name: "פריט חדש",
+        price: 0,
+        sort_order: menuItems.length,
+      })
+      .select()
+      .single();
+    if (error) { toast.error("שגיאה בהוספת פריט"); return; }
+    setMenuItems([...menuItems, data as MenuItem]);
+  };
+
+  const updateMenuItem = async (id: string, field: string, value: string | number) => {
+    setMenuItems(menuItems.map(item => item.id === id ? { ...item, [field]: value } : item));
+    await supabase.from("menu_items").update({ [field]: value }).eq("id", id);
+  };
+
+  const deleteMenuItem = async (id: string) => {
+    await supabase.from("menu_items").delete().eq("id", id);
+    setMenuItems(menuItems.filter(item => item.id !== id));
+    toast.success("פריט נמחק");
+  };
 
   if (loading) {
     return (
@@ -66,6 +125,7 @@ export default function Advertisement() {
                   truck={truck}
                   isSelected={selectedTruck?.id === truck.id}
                   onSelect={() => setSelectedTruck(truck)}
+                  onPhotoClick={() => openMenuDialog(truck)}
                 />
               ))}
             </div>
@@ -128,6 +188,68 @@ export default function Advertisement() {
           </div>
         </div>
       )}
+
+      {/* Menu Dialog */}
+      <Dialog open={!!menuDialogTruck} onOpenChange={(open) => !open && setMenuDialogTruck(null)}>
+        <DialogContent className="max-w-md" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UtensilsCrossed className="h-5 w-5" />
+              תפריט – {menuDialogTruck?.truck_name}
+            </DialogTitle>
+          </DialogHeader>
+
+          {menuLoading ? (
+            <p className="text-sm text-muted-foreground text-center py-4">טוען תפריט...</p>
+          ) : (
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+              {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
+                <p className="text-sm text-muted-foreground text-center py-4">אין פריטים בתפריט</p>
+              )}
+
+              {menuItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-2 border rounded-md p-2">
+                  {canEditMenu(menuDialogTruck!) ? (
+                    <>
+                      <Input
+                        className="flex-1 h-8 text-sm"
+                        value={item.item_name}
+                        onChange={(e) => updateMenuItem(item.id, "item_name", e.target.value)}
+                        onBlur={(e) => updateMenuItem(item.id, "item_name", e.target.value)}
+                        placeholder="שם הפריט"
+                      />
+                      <Input
+                        className="w-20 h-8 text-sm text-center"
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
+                        onBlur={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
+                        placeholder="מחיר"
+                      />
+                      <span className="text-xs text-muted-foreground">₪</span>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => deleteMenuItem(item.id)}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <span className="flex-1 text-sm">{item.item_name}</span>
+                      <span className="text-sm font-medium">₪{item.price}</span>
+                    </>
+                  )}
+                </div>
+              ))}
+
+              {canEditMenu(menuDialogTruck!) && (
+                <Button variant="outline" size="sm" className="w-full mt-2" onClick={addMenuItem}>
+                  <Plus className="h-4 w-4 ml-1" />
+                  הוסף פריט
+                </Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -138,22 +260,25 @@ function TruckSidebarCard({
   truck,
   isSelected,
   onSelect,
+  onPhotoClick,
 }: {
   truck: TruckWithLocation;
   isSelected: boolean;
   onSelect: () => void;
+  onPhotoClick: () => void;
 }) {
+  const photoUrl = truck.street_photo_1_url || truck.vehicle_photo_url;
+
   return (
-    <button
-      onClick={onSelect}
+    <div
       className={`relative w-full text-start border-b last:border-b-0 transition-colors overflow-hidden
         ${isSelected ? "bg-accent/20 ring-2 ring-inset ring-accent" : "hover:bg-muted/60"}`}
     >
-      {/* Truck photo */}
-      <div className="relative h-44 sm:h-48">
-        {(truck.street_photo_1_url || truck.vehicle_photo_url) ? (
+      {/* Truck photo – clickable for menu */}
+      <div className="relative h-44 sm:h-48 cursor-pointer group" onClick={onPhotoClick}>
+        {photoUrl ? (
           <img
-            src={(truck.street_photo_1_url || truck.vehicle_photo_url)!}
+            src={photoUrl}
             alt={truck.truck_name}
             className="w-full h-full object-cover"
           />
@@ -163,15 +288,24 @@ function TruckSidebarCard({
           </div>
         )}
 
+        {/* Hover overlay with menu icon */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 rounded-full p-2.5 shadow-lg">
+            <UtensilsCrossed className="h-5 w-5 text-primary" />
+          </div>
+        </div>
+
         {/* Status badge overlay */}
         {isSelected && (
           <div className="absolute top-2 left-2">
             <Badge className="bg-accent text-accent-foreground text-xs shadow">נבחר</Badge>
           </div>
         )}
+      </div>
 
-        {/* Name + location overlay at bottom */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-3 pt-8">
+      {/* Name + location – clickable to select on map */}
+      <button onClick={onSelect} className="w-full text-start">
+        <div className="bg-gradient-to-t from-black/70 to-transparent p-3 pt-2 -mt-12 relative z-10">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-white">{truck.truck_name}</span>
             {truck.food_category && (
@@ -188,7 +322,7 @@ function TruckSidebarCard({
             </p>
           )}
         </div>
-      </div>
-    </button>
+      </button>
+    </div>
   );
 }
