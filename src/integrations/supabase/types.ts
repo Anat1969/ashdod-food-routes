@@ -344,6 +344,41 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_items: {
+        Row: {
+          created_at: string
+          id: string
+          item_name: string
+          price: number
+          sort_order: number
+          truck_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_name: string
+          price?: number
+          sort_order?: number
+          truck_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_name?: string
+          price?: number
+          sort_order?: number
+          truck_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_truck_id_fkey"
+            columns: ["truck_id"]
+            isOneToOne: false
+            referencedRelation: "food_trucks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
