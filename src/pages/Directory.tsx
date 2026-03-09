@@ -43,6 +43,7 @@ export default function Directory() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [zoneFilter, setZoneFilter] = useState<string>("all");
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
@@ -142,7 +143,8 @@ export default function Directory() {
   const filtered = trucks.filter((t) => {
     const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search) || ((t as any).operator_name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesZone = zoneFilter === "all" || (t.location?.location_type || "") === zoneFilter;
+    return matchesSearch && matchesStatus && matchesZone;
   });
 
   const toggleSort = (col: SortColumn) => {
@@ -204,17 +206,28 @@ export default function Directory() {
       <p className="text-muted-foreground mb-6">רשימת הפודטראקים הרשומים בעיר אשדוד</p>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative flex-1 max-w-xl">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             placeholder="חיפוש לפי שם או קטגוריה..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-10 h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm"
+            onChange={(e) => { setSearch(e.target.value); setZoneFilter("all"); }}
+            className="pr-10 h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm rounded-l-none"
           />
         </div>
+        <Select value={zoneFilter} onValueChange={(val) => { setZoneFilter(val); if (val !== "all") setSearch(""); }}>
+          <SelectTrigger className="w-[180px] h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm">
+            <SelectValue placeholder="סוג עמדה" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">כל האזורים</SelectItem>
+            {STATION_TYPES.map((type) => (
+              <SelectItem key={type} value={type}>{type}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[200px] h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm">
+          <SelectTrigger className="w-[180px] h-12 text-base border-2 border-primary/40 focus:border-primary shadow-sm">
             <SelectValue placeholder="סטטוס" />
           </SelectTrigger>
           <SelectContent>
