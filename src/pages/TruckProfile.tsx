@@ -15,10 +15,17 @@ import LocationCard from "@/components/LocationCard";
 import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Clock, Check, X, Trash2 } from "lucide-react";
+import { Clock, Check, X, Trash2, Plus, MapPin, Utensils } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import PageNavigation from "@/components/PageNavigation";
+
+interface MenuItem {
+  id: string;
+  item_name: string;
+  price: number;
+  sort_order: number;
+}
 
 export default function TruckProfile() {
   const { id } = useParams<{ id: string }>();
@@ -29,23 +36,27 @@ export default function TruckProfile() {
   const [location, setLocation] = useState<Location | null>(null);
   const [operator, setOperator] = useState<Profile | null>(null);
   const [expertOpinion, setExpertOpinion] = useState<any>(null);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [newNote, setNewNote] = useState("");
   const [loading, setLoading] = useState(true);
 
   // Check if current user is the owner of this truck
   const isOwner = truck?.operator_id === user?.id;
   const canUpload = isOwner || isAdmin;
+  const canEditMenu = isOwner || isAdmin;
 
   const fetchData = async () => {
     if (!id) return;
-    const [truckRes, complianceRes, historyRes] = await Promise.all([
+    const [truckRes, complianceRes, historyRes, menuRes] = await Promise.all([
       supabase.from("food_trucks").select("*").eq("id", id).single(),
       supabase.from("compliance_checklist").select("*").eq("truck_id", id).maybeSingle(),
       supabase.from("activity_log").select("*").eq("truck_id", id).order("created_at", { ascending: false }),
+      supabase.from("menu_items").select("*").eq("truck_id", id).order("sort_order"),
     ]);
     setTruck(truckRes.data);
     setCompliance(complianceRes.data);
     setHistory(historyRes.data || []);
+    setMenuItems(menuRes.data || []);
 
     // Fetch related data for location card
     if (truckRes.data?.location_id) {
@@ -148,12 +159,31 @@ export default function TruckProfile() {
         <StatusBadge status={truck.status} className="text-sm" />
       </div>
 
-      <Tabs defaultValue="location_card" className="space-y-4">
-        <TabsList className="w-full justify-start">
+      <Tabs defaultValue={truck.status === "approved" ? "menu" : "location_card"} className="space-y-4">
+        <TabsList className="w-full justify-start flex-wrap">
+          {truck.status === "approved" && (
+            <TabsTrigger value="menu">תפריט ומחירים</TabsTrigger>
+          )}
           <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
           <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
           <TabsTrigger value="history">היסטוריה</TabsTrigger>
         </TabsList>
+
+        {/* תפריט ומחירים - ציבורי לכולם */}
+        <TabsContent value="menu">
+          <MenuTab
+            truckId={truck.id}
+            truckName={truck.truck_name}
+            foodCategory={truck.food_category}
+            photo={truck.vehicle_photo_url || truck.street_photo_1_url}
+            location={location}
+            hoursFrom={truck.hours_from}
+            hoursTo={truck.hours_to}
+            menuItems={menuItems}
+            canEdit={canEditMenu}
+            onRefresh={fetchData}
+          />
+        </TabsContent>
 
         <TabsContent value="location_card">
           <LocationCard
@@ -331,6 +361,139 @@ export default function TruckProfile() {
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function MenuTab({
+  truckId, truckName, foodCategory, photo, location, hoursFrom, hoursTo,
+  menuItems, canEdit, onRefresh,
+}: {
+  truckId: string;
+  truckName: string;
+  foodCategory: string | null;
+  photo: string | null | undefined;
+  location: Location | null;
+  hoursFrom: string | null;
+  hoursTo: string | null;
+  menuItems: MenuItem[];
+  canEdit: boolean;
+  onRefresh: () => void;
+}) {
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const addItem = async () => {
+    if (!newName.trim() || !newPrice) return;
+    setSaving(true);
+    const { error } = await supabase.from("menu_items").insert({
+      truck_id: truckId,
+      item_name: newName.trim(),
+      price: parseFloat(newPrice),
+      sort_order: menuItems.length,
+    });
+    setSaving(false);
+    if (error) {
+      toast.error("שגיאה בהוספת פריט");
+    } else {
+      setNewName("");
+      setNewPrice("");
+      onRefresh();
+    }
+  };
+
+  const deleteItem = async (itemId: string) => {
+    const { error } = await supabase.from("menu_items").delete().eq("id", itemId);
+    if (error) toast.error("שגיאה במחיקה");
+    else onRefresh();
+  };
+
+  return (
+    <div className="grid md:grid-cols-[auto_1fr] gap-4" dir="rtl">
+      {/* Left: truck info card */}
+      <Card className="municipal-shadow md:w-64">
+        {photo && (
+          <img src={photo} alt={truckName} className="w-full h-40 object-cover rounded-t-lg" />
+        )}
+        <CardContent className="pt-4 space-y-2 pb-4">
+          <h3 className="font-bold text-base">{truckName}</h3>
+          {foodCategory && (
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <Utensils className="h-3.5 w-3.5" />
+              {foodCategory}
+            </p>
+          )}
+          {location?.name && (
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5" />
+              {location.name}
+            </p>
+          )}
+          {hoursFrom && hoursTo && (
+            <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              {hoursFrom} – {hoursTo}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Right: menu */}
+      <Card className="municipal-shadow">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">תפריט</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {menuItems.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              {canEdit ? "הוסף פריטים לתפריט" : "תפריט טרם הוזן"}
+            </p>
+          ) : (
+            <div className="divide-y">
+              {menuItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between py-2.5">
+                  <span className="text-sm font-medium">{item.item_name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-bold text-primary">₪{item.price}</span>
+                    {canEdit && (
+                      <button
+                        onClick={() => deleteItem(item.id)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {canEdit && (
+            <div className="flex items-center gap-2 pt-3 border-t">
+              <Input
+                placeholder="שם הפריט"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="flex-1 h-8 text-sm"
+                onKeyDown={(e) => e.key === "Enter" && addItem()}
+              />
+              <Input
+                placeholder="מחיר"
+                type="number"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+                className="w-20 h-8 text-sm"
+                onKeyDown={(e) => e.key === "Enter" && addItem()}
+              />
+              <Button size="sm" onClick={addItem} disabled={saving || !newName.trim() || !newPrice} className="h-8">
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

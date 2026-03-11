@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { lovable } from "@/integrations/lovable/index";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,14 +12,15 @@ import { LogIn } from "lucide-react";
 export default function Login() {
   const { signIn, user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (user) {
-    navigate("/dashboard");
-    return null;
+    return <Navigate to={redirectTo} replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,7 +32,7 @@ export default function Login() {
     if (err) {
       setError("אימייל או סיסמה שגויים");
     } else {
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     }
   };
 

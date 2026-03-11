@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import Dashboard from "./pages/Dashboard";
 import Advertisement from "./pages/Advertisement";
+import PublicMap from "./pages/PublicMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
           <AppLayout>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/map" element={<PublicMap />} />
               <Route path="/policy" element={<Policy />} />
               <Route path="/zones" element={<ZoneCharacterization />} />
               <Route path="/directory" element={<ProtectedRoute adminOnly><Directory /></ProtectedRoute>} />
