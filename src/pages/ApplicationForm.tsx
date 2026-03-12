@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { NEIGHBORHOODS } from "@/lib/types";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, ExternalLink } from "lucide-react";
 import PageNavigation from "@/components/PageNavigation";
 
 interface FormData {
@@ -21,14 +22,16 @@ interface FormData {
 }
 
 const STEPS = [
+  "אישור מדיניות",
   "פרטי הרכב",
   "סיכום ואישור",
 ];
 
 export default function ApplicationForm() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const [step, setStep] = useState(0);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<FormData>({
     truck_name: "",
@@ -38,20 +41,29 @@ export default function ApplicationForm() {
     hours_to: "",
   });
 
+  if (loading) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <p className="text-muted-foreground">טוען...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login?redirect=/apply" replace />;
+  }
+
   const update = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const canNext = () => {
-    if (step === 0) return form.truck_name && form.vehicle_type;
+    if (step === 0) return policyAccepted;
+    if (step === 1) return form.truck_name && form.vehicle_type;
     return true;
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      toast.error("יש להתחבר כדי להגיש בקשה");
-      return;
-    }
     setSubmitting(true);
     const { error } = await supabase.from("food_trucks").insert({
       truck_name: form.truck_name,
@@ -68,7 +80,7 @@ export default function ApplicationForm() {
       toast.error("שגיאה בהגשת הבקשה");
     } else {
       toast.success("הבקשה הוגשה בהצלחה!");
-      navigate("/directory");
+      navigate("/dashboard");
     }
   };
 
@@ -100,6 +112,40 @@ export default function ApplicationForm() {
         </CardHeader>
         <CardContent className="space-y-4">
           {step === 0 && (
+            <div className="space-y-4">
+              <div className="bg-muted/40 rounded-lg p-4 border text-sm leading-relaxed space-y-2">
+                <p className="font-medium">לפני הגשת הבקשה, עליך לקרוא ולאשר את המדיניות:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground text-sm">
+                  <li>הפודטראק חייב להיות נייד לחלוטין על גלגלים</li>
+                  <li>עיצוב מינימליסטי — עד 2 גוונים ו-2 חומרים עיקריים</li>
+                  <li>חיפוי בצבע אפוי בתנור, ללא מדבקות זולות</li>
+                  <li>הצבה על ריצוף קיים בלבד, ללא עבודות קרקע</li>
+                  <li>חיבור לנקודות תשתית קיימות ומסומנות בלבד</li>
+                </ul>
+                <Link
+                  to="/policy"
+                  target="_blank"
+                  className="inline-flex items-center gap-1 text-primary text-sm font-medium hover:underline mt-1"
+                >
+                  לקריאת המדיניות המלאה
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+              <div className="flex items-start gap-3 p-3 border rounded-lg bg-background">
+                <Checkbox
+                  id="policy"
+                  checked={policyAccepted}
+                  onCheckedChange={(v) => setPolicyAccepted(!!v)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="policy" className="text-sm leading-relaxed cursor-pointer">
+                  קראתי את המדיניות וההנחיות ואני מאשר/ת שהפודטראק שלי עומד בכל הדרישות
+                </Label>
+              </div>
+            </div>
+          )}
+
+          {step === 1 && (
             <>
               <Field label="שם הפודטראק *" value={form.truck_name} onChange={(v) => update("truck_name", v)} />
               <div>
@@ -119,7 +165,7 @@ export default function ApplicationForm() {
             </>
           )}
 
-          {step === 1 && (
+          {step === 2 && (
             <div className="space-y-3">
               <h3 className="font-semibold">סיכום הבקשה</h3>
               <SummaryRow label="שם הפודטראק" value={form.truck_name} />
@@ -141,7 +187,7 @@ export default function ApplicationForm() {
                 <ChevronLeft className="h-4 w-4 mr-1" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={submitting}>
+              <Button onClick={handleSubmit} disabled={submitting || !canNext()}>
                 <Send className="h-4 w-4 ml-1" />
                 {submitting ? "שולח..." : "הגש בקשה"}
               </Button>

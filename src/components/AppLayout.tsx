@@ -18,13 +18,15 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
 
   const navLinks = [
   { to: "/", label: "ראשי" },
+  { to: "/map", label: "מפת עמדות" },
   { to: "/policy", label: "מדיניות" },
-  { to: "/zones", label: "אפיון אזורים" },
-  { to: "/directory", label: "מאגר פודטראקים" },
   { to: "/apply", label: "הגשת בקשה" }];
 
-
+  if (user && !isAdmin) {
+    navLinks.push({ to: "/dashboard", label: "הבקשות שלי" });
+  }
   if (isAdmin) {
+    navLinks.push({ to: "/directory", label: "מאגר פודטראקים" });
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
   navLinks.push({ to: "/advertisement", label: "פרסומת" });
