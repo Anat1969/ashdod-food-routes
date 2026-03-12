@@ -1,419 +1,584 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
-  Building2, User, Users,
-  ChevronDown, ArrowLeftRight,
-  FileText, Upload, CheckCircle2, XCircle,
-  Map, UtensilsCrossed, Star, Bell,
-  ClipboardList, Settings, ShieldCheck, BarChart3,
-  LogIn, PenLine, Eye, Calendar, Megaphone,
-  AlertCircle, RefreshCw,
+  Building2, User, Users, ChevronRight, ChevronDown,
+  ArrowLeftRight, FileText, Upload, CheckCircle2, XCircle,
+  Map, UtensilsCrossed, Bell, ClipboardList, Settings,
+  ShieldCheck, BarChart3, LogIn, PenLine, Eye, Calendar,
+  Megaphone, RefreshCw, AlertCircle, Play, ArrowRight,
+  Sparkles, Lock,
 } from "lucide-react";
 
-/* ─── Color Tokens ─────────────────────────────────────── */
-const ROLES = {
-  owner: {
-    key: "owner",
-    label: "בעל עסק",
-    sub: "פודטראק",
-    icon: User,
-    color: "orange",
-    bg: "bg-orange-50",
-    border: "border-orange-300",
-    header: "bg-orange-500",
-    badge: "bg-orange-100 text-orange-700 border-orange-200",
-    dot: "bg-orange-400",
-    arrow: "text-orange-400",
-    ring: "ring-orange-300",
-  },
-  city: {
-    key: "city",
-    label: "עירייה",
-    sub: "מחלקת הנדסה",
-    icon: Building2,
-    color: "teal",
-    bg: "bg-teal-50",
-    border: "border-teal-300",
-    header: "bg-teal-600",
-    badge: "bg-teal-100 text-teal-700 border-teal-200",
-    dot: "bg-teal-400",
-    arrow: "text-teal-400",
-    ring: "ring-teal-300",
-  },
-  resident: {
-    key: "resident",
-    label: "תושב",
-    sub: "הציבור הרחב",
-    icon: Users,
-    color: "violet",
-    bg: "bg-violet-50",
-    border: "border-violet-300",
-    header: "bg-violet-600",
-    badge: "bg-violet-100 text-violet-700 border-violet-200",
-    dot: "bg-violet-400",
-    arrow: "text-violet-400",
-    ring: "ring-violet-300",
-  },
-} as const;
+/* ─── Types ────────────────────────────────────────────── */
+type RoleKey = "owner" | "city" | "resident";
 
-type RoleKey = keyof typeof ROLES;
-
-/* ─── Step Types ───────────────────────────────────────── */
 interface Step {
   id: string;
   label: string;
   desc: string;
   icon: React.ElementType;
-  to?: string;
-  intersect?: string; // label for cross-lane connection
-  intersectDir?: "right" | "left" | "both";
+  cta?: { label: string; to: string };
+  intersect?: string;
   highlight?: boolean;
 }
 
-/* ─── Owner Steps ──────────────────────────────────────── */
-const ownerSteps: Step[] = [
-  { id: "o1", label: "הרשמה לפלטפורמה", desc: "יצירת חשבון בעל עסק", icon: LogIn, to: "/register" },
-  { id: "o2", label: "קריאת מדיניות והנחיות", desc: "הכרת דרישות העירייה", icon: FileText, to: "/policy" },
-  { id: "o3", label: "סקירת אזורים מותרים", desc: "בחירת אזור ומיקום מתאים", icon: Map, to: "/zones" },
-  { id: "o4", label: "מילוי טופס בקשה", desc: "3 שלבים: פרטים, מיקום, עיצוב", icon: PenLine, to: "/apply" },
-  { id: "o5", label: "העלאת מסמכים", desc: "רישיון עסק, תמונות, פוטו עיצוב", icon: Upload },
-  {
-    id: "o6", label: "הגשה לבדיקה", desc: "הבקשה מועברת לעירייה",
-    icon: Bell, intersect: "העירייה מקבלת התראה", intersectDir: "left", highlight: true,
+/* ─── Color Config ─────────────────────────────────────── */
+const ROLES = {
+  owner: {
+    label: "בעל עסק",
+    sub: "הגש בקשה לפודטראק",
+    emoji: "🚚",
+    icon: User,
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    header: "bg-orange-500",
+    headerHover: "hover:bg-orange-600",
+    text: "text-orange-600",
+    badge: "bg-orange-100 text-orange-700",
+    ring: "ring-orange-400",
+    step: "bg-orange-500",
+    light: "bg-orange-100",
+    gradient: "from-orange-500 to-amber-500",
+    desc: "קרא את המדיניות, הגש בקשה, קבל אישור ופרסם את הפרופיל שלך",
   },
-  { id: "o7", label: "קבלת משוב ותיקונים", desc: "עדכון לפי הנחיות הבודק", icon: RefreshCw },
-  {
-    id: "o8", label: "קבלת אישור", desc: "הודעת אישור / דחייה ממחלקת הנדסה",
-    icon: CheckCircle2, intersect: "תגובת העירייה", intersectDir: "left", highlight: true,
+  city: {
+    label: "עירייה",
+    sub: "נהל בקשות ומדיניות",
+    emoji: "🏛️",
+    icon: Building2,
+    bg: "bg-teal-50",
+    border: "border-teal-200",
+    header: "bg-teal-600",
+    headerHover: "hover:bg-teal-700",
+    text: "text-teal-600",
+    badge: "bg-teal-100 text-teal-700",
+    ring: "ring-teal-400",
+    step: "bg-teal-600",
+    light: "bg-teal-100",
+    gradient: "from-teal-600 to-cyan-500",
+    desc: "קבע מדיניות, בדוק בקשות, אשר עמדות ועקוב אחר הפעילות בעיר",
   },
-  { id: "o9", label: "פרסום פרופיל ציבורי", desc: "העמדה מופיעה במפה הציבורית", icon: Eye, intersect: "תושבים רואים", intersectDir: "right", highlight: true },
-  { id: "o10", label: "ניהול תפריט ואירועים", desc: "עדכון מחירים, שעות, מבצעים", icon: UtensilsCrossed, to: "/dashboard" },
+  resident: {
+    label: "תושב",
+    sub: "מצא מקום לאכול",
+    emoji: "👥",
+    icon: Users,
+    bg: "bg-violet-50",
+    border: "border-violet-200",
+    header: "bg-violet-600",
+    headerHover: "hover:bg-violet-700",
+    text: "text-violet-600",
+    badge: "bg-violet-100 text-violet-700",
+    ring: "ring-violet-400",
+    step: "bg-violet-600",
+    light: "bg-violet-100",
+    gradient: "from-violet-600 to-purple-500",
+    desc: "גלה עמדות אוכל פעילות בעיר, ראה תפריטים, שעות ואירועים מיוחדים",
+  },
+} as const;
+
+/* ─── Step Data ────────────────────────────────────────── */
+const STEPS: Record<RoleKey, Step[]> = {
+  owner: [
+    {
+      id: "o1", label: "הרשמה לפלטפורמה", icon: LogIn,
+      desc: "צור חשבון בעל עסק עם כתובת אימייל או חשבון גוגל",
+      cta: { label: "הירשם עכשיו", to: "/register" },
+    },
+    {
+      id: "o2", label: "קרא את המדיניות", icon: FileText,
+      desc: "הכר את דרישות העירייה, הנחיות העיצוב והאזורים המותרים להצבה",
+      cta: { label: "לדף המדיניות", to: "/policy" },
+      intersect: "מדיניות שקובעת העירייה",
+    },
+    {
+      id: "o3", label: "סקור אזורים מותרים", icon: Map,
+      desc: "5 אזורי אופי בעיר, כל אחד עם דרישות עיצוב ותשתיות ייחודיות",
+      cta: { label: "לאזורי האופי", to: "/zones" },
+      intersect: "אזורים שהוגדרו על ידי העירייה",
+    },
+    {
+      id: "o4", label: "מלא את טופס הבקשה", icon: PenLine,
+      desc: "3 שלבים: פרטי העסק ובעל הרישיון, סוג הרכב ומיקום, הנחיות עיצוב",
+      cta: { label: "התחל בקשה חדשה", to: "/apply" },
+      highlight: true,
+    },
+    {
+      id: "o5", label: "העלה מסמכים ותמונות", icon: Upload,
+      desc: "רישיון עסק, תמונות הרכב מכל הכיוונים, תמונת אוויר ומוקאפ עיצובי",
+    },
+    {
+      id: "o6", label: "הגש את הבקשה", icon: Bell,
+      desc: "הבקשה עוברת לסקירת מחלקת ההנדסה ומקבלת מספר מעקב",
+      highlight: true,
+      intersect: "העירייה מקבלת התראה ומתחילה בדיקה",
+    },
+    {
+      id: "o7", label: "קבל משוב ותקן", icon: RefreshCw,
+      desc: "הודעת אימייל עם הנחיות לתיקון — ייתכן שלב זה חוזר עד לאישור",
+      intersect: "תשובה ממחלקת הנדסה בעירייה",
+    },
+    {
+      id: "o8", label: "קבל אישור סופי", icon: CheckCircle2,
+      desc: "אישור מהעירייה כולל תנאי ההיתר ותקופת תוקף הרישיון",
+      highlight: true,
+      intersect: "אישור/דחייה – הגיע מהעירייה",
+      cta: { label: "מעקב בקשות שלי", to: "/dashboard" },
+    },
+    {
+      id: "o9", label: "פרסם את הפרופיל", icon: Eye,
+      desc: "הפרופיל מופיע למפה הציבורית עם כל פרטי העמדה ותמונות",
+      intersect: "תושבים יכולים לראות אותך על המפה",
+    },
+    {
+      id: "o10", label: "נהל תפריט ואירועים", icon: Settings,
+      desc: "עדכן תפריט ומחירים, שעות פעילות ואירועים מיוחדים בכל עת",
+      cta: { label: "לניהול השוטף", to: "/dashboard" },
+      intersect: "תושבים רואים כל עדכון בזמן אמת",
+    },
+  ],
+  city: [
+    {
+      id: "c1", label: "כניסת מנהל", icon: Lock,
+      desc: "גישה לפאנל הניהול עם הרשאות מנהל מחלקת הנדסה",
+      cta: { label: "כניסה לפאנל ניהול", to: "/admin-login" },
+    },
+    {
+      id: "c2", label: "קבע מדיניות", icon: Settings,
+      desc: "הגדר כללים, מגבלות תפעוליות ודרישות עיצוב לפי תקן עירוני",
+      cta: { label: "עדכן מדיניות", to: "/policy" },
+      intersect: "מחייב את בעלי העסקים",
+      highlight: true,
+    },
+    {
+      id: "c3", label: "הגדר אזורים ואפיון", icon: Map,
+      desc: "5 אזורים עם אפיון ייחודי: חוף יוקרה, מרינה, חוף אינטנסיבי, נחל לכיש, מבצר",
+      cta: { label: "לאפיון אזורים", to: "/zones" },
+      intersect: "בעלי עסקים בוחרים מהרשימה",
+    },
+    {
+      id: "c4", label: "קבל בקשה חדשה", icon: Bell,
+      desc: "בקשה מבעל עסק מגיעה לדשבורד עם כל המסמכים המצורפים",
+      highlight: true,
+      intersect: "בקשה נשלחה על ידי בעל עסק",
+      cta: { label: "לדשבורד ניהול", to: "/admin" },
+    },
+    {
+      id: "c5", label: "בדוק מסמכים", icon: ClipboardList,
+      desc: "סקור רישיון עסק, תמונות הרכב, הדמיה עיצובית ותמונות אוויר",
+      cta: { label: "לרשימת הבקשות", to: "/admin" },
+    },
+    {
+      id: "c6", label: "רשימת תיוג ציות", icon: ShieldCheck,
+      desc: "10 פרמטרים: גמישות, חומרים וצבע, איכות גימור, שילוט, תאורה ועוד",
+    },
+    {
+      id: "c7", label: "חוות דעת מומחה", icon: Eye,
+      desc: "אדריכל מוסמך כותב ניתוח מפורט על עיצוב, מיקום ואיכות סביבתית",
+    },
+    {
+      id: "c8", label: "אשר או דחה", icon: CheckCircle2,
+      desc: "קביעת החלטה עם נימוקים — הבקשה מתעדכנת ובעל העסק מקבל הודעה",
+      highlight: true,
+      intersect: "הודעה אוטומטית לבעל העסק",
+      cta: { label: "לדשבורד ניהול", to: "/admin" },
+    },
+    {
+      id: "c9", label: "עקוב אחר עמדות פעילות", icon: Eye,
+      desc: "ספרייה מלאה עם סינון, מיון וחיפוש לפי סטטוס, מיקום וקטגוריה",
+      cta: { label: "לספרייה המלאה", to: "/directory" },
+    },
+    {
+      id: "c10", label: "ניתוח נתונים ובקרה", icon: BarChart3,
+      desc: "סטטיסטיקות שימוש, מגמות ובחינה מחדש של המדיניות לפי הצורך",
+      cta: { label: "לדשבורד ניהול", to: "/admin" },
+    },
+  ],
+  resident: [
+    {
+      id: "r1", label: "גישה חופשית", icon: Users,
+      desc: "אין צורך בהרשמה — כל המידע פתוח לציבור הרחב ללא תשלום",
+    },
+    {
+      id: "r2", label: "מפת עמדות פעילות", icon: Map,
+      desc: "מפה אינטראקטיבית עם כל פודטראקי העיר — רק עמדות שאושרו על ידי העירייה",
+      cta: { label: "פתח את המפה", to: "/map" },
+      intersect: "מוצגות רק עמדות מאושרות על ידי העירייה",
+      highlight: true,
+    },
+    {
+      id: "r3", label: "סנן וחפש", icon: UtensilsCrossed,
+      desc: "סנן לפי קטגוריה: המבורגר, פיצה, אסיאתי, קינוחים, ים תיכוני, שתייה",
+      cta: { label: "לחיפוש מתקדם", to: "/map" },
+    },
+    {
+      id: "r4", label: "פרטי העמדה", icon: FileText,
+      desc: "שם העמדה, סוג האוכל, תמונות, שעות פעילות ומיקום מדויק על המפה",
+      intersect: "מעודכן בזמן אמת על ידי בעל העסק",
+    },
+    {
+      id: "r5", label: "תפריט ומחירים", icon: ClipboardList,
+      desc: "צפה בתפריט המלא עם מחירים עדכניים ומגוון המנות",
+      intersect: "מנוהל ישירות על ידי בעל העסק",
+    },
+    {
+      id: "r6", label: "מיקום ושעות", icon: Map,
+      desc: "כתובת מדויקת, שכונה, ניווט GPS וימי פעילות שבועיים",
+    },
+    {
+      id: "r7", label: "אירועים מיוחדים", icon: Calendar,
+      desc: "מבצעים, פופ-אפים ואירועים מיוחדים שמפרסם בעל העמדה",
+      intersect: "פורסם על ידי בעל העסק",
+      cta: { label: "לכל אירועי האוכל", to: "/map" },
+    },
+    {
+      id: "r8", label: "פרסום ומיתוג", icon: Megaphone,
+      desc: "מודעות ממוקדות, מבצעים לפי אזור ותוכן שיווקי של בעלי העמדות",
+      cta: { label: "לדף הפרסום", to: "/advertisement" },
+    },
+  ],
+};
+
+/* ─── Intersection Summary ─────────────────────────────── */
+const INTERSECTIONS = [
+  {
+    from: "בעל עסק",
+    to: "עירייה",
+    icon: Bell,
+    title: "הגשת בקשה",
+    desc: "ברגע שבעל העסק מגיש — העירייה מקבלת התראה ומתחילה תהליך בדיקה אוטומטי",
+    color: "from-orange-100 to-teal-100 border-l-4 border-teal-400",
+  },
+  {
+    from: "עירייה",
+    to: "בעל עסק",
+    icon: CheckCircle2,
+    title: "החלטת אישור/דחייה",
+    desc: "החלטת העירייה מועברת מיידית לבעל העסק עם נימוקים ותנאים",
+    color: "from-teal-100 to-orange-100 border-l-4 border-orange-400",
+  },
+  {
+    from: "אישור + בעל עסק",
+    to: "תושבים",
+    icon: Eye,
+    title: "פרסום ציבורי",
+    desc: "לאחר אישור הבקשה ועדכון הפרופיל — העמדה מופיעה למפה הציבורית",
+    color: "from-orange-100 to-violet-100 border-l-4 border-violet-400",
+  },
 ];
 
-/* ─── City Steps ───────────────────────────────────────── */
-const citySteps: Step[] = [
-  { id: "c1", label: "כניסת מנהל", desc: "גישה לפאנל ניהול העירייה", icon: ShieldCheck, to: "/admin-login" },
-  { id: "c2", label: "קביעת מדיניות", desc: "הגדרת כללים ומגבלות לפעילות", icon: Settings, to: "/policy" },
-  { id: "c3", label: "הגדרת אזורים ואפיון", desc: "5 אזורים עם דרישות עיצוב ייחודיות", icon: Map, to: "/zones" },
-  {
-    id: "c4", label: "קבלת בקשה חדשה", desc: "בקשה מבעל עסק מגיעה לדשבורד",
-    icon: Bell, intersect: "בקשה מבעל עסק", intersectDir: "right", highlight: true,
-  },
-  { id: "c5", label: "סקירה ובדיקת מסמכים", desc: "בדיקת רישיון, תמונות ועיצוב", icon: ClipboardList, to: "/admin" },
-  { id: "c6", label: "רשימת תיוג ציות עיצובי", desc: "10 פרמטרים: גמישות, חומרים, שילוט…", icon: CheckCircle2 },
-  { id: "c7", label: "חוות דעת מומחה", desc: "ניתוח אדריכלי ועירוני מפורט", icon: Star },
-  {
-    id: "c8", label: "אישור / דחייה", desc: "עדכון סטטוס + שליחת הודעה לבעל עסק",
-    icon: XCircle, intersect: "הודעה לבעל עסק", intersectDir: "right", highlight: true,
-  },
-  { id: "c9", label: "מעקב עמדות פעילות", desc: "ספרייה עם סינון וחיפוש", icon: Eye, to: "/directory" },
-  { id: "c10", label: "ניתוח נתונים ובקרה", desc: "סטטיסטיקות, דוחות ביצועים", icon: BarChart3, to: "/admin" },
-];
-
-/* ─── Resident Steps ───────────────────────────────────── */
-const residentSteps: Step[] = [
-  { id: "r1", label: "גישה ציבורית", desc: "ללא הרשמה – פתוח לכולם", icon: Users },
-  { id: "r2", label: "מפת עמדות פעילות", desc: "כל הפודטראקים המאושרים על המפה", icon: Map, to: "/map" },
-  { id: "r3", label: "סינון לפי קטגוריה", desc: "המבורגר, פיצה, אסיאתי, קינוחים…", icon: UtensilsCrossed, to: "/map" },
-  {
-    id: "r4", label: "צפייה בעמדות מאושרות בלבד", desc: "רק עמדות שאושרו ע\"י העירייה",
-    icon: ShieldCheck, intersect: "אישור עירייה", intersectDir: "left", highlight: true,
-  },
-  { id: "r5", label: "פרטי עמדה ותפריט", desc: "מחירים, מגוון, תמונות האוכל", icon: FileText },
-  { id: "r6", label: "שעות פעילות ומיקום", desc: "כתובת מדויקת, ימי פעילות", icon: Calendar },
-  {
-    id: "r7", label: "אירועים ומבצעים", desc: "עדכונים שמפרסם בעל העמדה",
-    icon: Megaphone, intersect: "פרסום בעל עסק", intersectDir: "left", highlight: true,
-  },
-  { id: "r8", label: "פרסומות ומיתוג", desc: "מודעות ממוקדות לפי אזור", icon: Star, to: "/advertisement" },
-];
-
-/* ─── Arrow component ─────────────────────────────────── */
-function DownArrow({ color }: { color: string }) {
+/* ─── Step Card ────────────────────────────────────────── */
+function StepCard({
+  step, role, index, isActive, onClick,
+}: {
+  step: Step;
+  role: typeof ROLES[RoleKey];
+  index: number;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const Icon = step.icon;
   return (
-    <div className={`flex justify-center my-1 ${color}`}>
-      <ChevronDown className="w-5 h-5 opacity-60" />
-    </div>
-  );
-}
+    <div
+      className={`
+        group relative rounded-2xl border-2 p-4 cursor-pointer
+        transition-all duration-200
+        ${isActive
+          ? `${role.bg} ${role.border} shadow-lg ring-2 ${role.ring}`
+          : "bg-white border-gray-100 hover:border-gray-200 hover:shadow-md"
+        }
+        ${step.highlight && !isActive ? "border-dashed" : ""}
+      `}
+      onClick={onClick}
+    >
+      <div className="flex items-start gap-3">
+        {/* Step Number */}
+        <div className={`
+          flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center
+          text-xs font-bold text-white transition-colors
+          ${isActive ? role.step : "bg-gray-300 group-hover:bg-gray-400"}
+        `}>
+          {index + 1}
+        </div>
 
-/* ─── Intersection Badge ──────────────────────────────── */
-function IntersectBadge({ label, dir }: { label: string; dir?: "right" | "left" | "both" }) {
-  return (
-    <div className="absolute top-1/2 -translate-y-1/2 z-10 hidden lg:flex items-center gap-1"
-      style={{ [dir === "left" ? "right" : "left"]: "-6.5rem" }}>
-      <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 text-[10px] font-semibold px-2 py-1 rounded-full flex items-center gap-1 whitespace-nowrap shadow-sm">
-        <ArrowLeftRight className="w-3 h-3" />
-        {label}
+        {/* Icon */}
+        <div className={`
+          flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors
+          ${isActive ? `${role.step} text-white` : "bg-gray-100 text-gray-400 group-hover:bg-gray-200"}
+        `}>
+          <Icon className="w-5 h-5" />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-sm font-semibold ${isActive ? "text-gray-900" : "text-gray-600"}`}>
+              {step.label}
+            </span>
+            {step.highlight && (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${role.badge}`}>
+                שלב מפתח
+              </span>
+            )}
+          </div>
+
+          {isActive && (
+            <div className="mt-2">
+              <p className="text-sm text-gray-600 leading-relaxed">{step.desc}</p>
+
+              {step.intersect && (
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5">
+                  <ArrowLeftRight className="w-3 h-3 flex-shrink-0" />
+                  <span>{step.intersect}</span>
+                </div>
+              )}
+
+              {step.cta && (
+                <Link
+                  to={step.cta.to}
+                  onClick={e => e.stopPropagation()}
+                  className={`
+                    mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium
+                    text-white transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5
+                    bg-gradient-to-l ${role.gradient}
+                  `}
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  {step.cta.label}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Expand icon */}
+        <ChevronDown className={`
+          flex-shrink-0 w-4 h-4 transition-transform duration-200
+          ${isActive ? `rotate-180 ${role.text}` : "text-gray-300"}
+        `} />
       </div>
     </div>
   );
 }
 
-/* ─── Single Step Card ───────────────────────────────── */
-function StepCard({ step, role, index }: { step: Step; role: typeof ROLES[RoleKey]; index: number }) {
-  const Icon = step.icon;
+/* ─── Journey Panel ────────────────────────────────────── */
+function JourneyPanel({ roleKey }: { roleKey: RoleKey }) {
+  const [activeStep, setActiveStep] = useState(0);
+  const role = ROLES[roleKey];
+  const steps = STEPS[roleKey];
+
   return (
-    <div className="relative">
-      {step.intersect && (
-        <IntersectBadge label={step.intersect} dir={step.intersectDir} />
-      )}
-      <div className={`
-        relative rounded-xl border p-3.5 transition-all duration-200
-        ${role.bg} ${role.border}
-        ${step.highlight ? `ring-2 ${role.ring} shadow-md` : "shadow-sm"}
-        ${step.to ? "hover:shadow-md cursor-pointer" : ""}
-      `}>
-        <div className="flex items-start gap-3">
-          {/* Step number */}
-          <div className={`
-            flex-shrink-0 w-6 h-6 rounded-full text-xs font-bold
-            flex items-center justify-center text-white
-            ${role.header}
-          `}>
-            {index + 1}
-          </div>
-          {/* Icon */}
-          <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${role.header} bg-opacity-15`}>
-            <Icon className={`w-4 h-4 text-white opacity-90`} />
-          </div>
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold leading-tight">{step.label}</p>
-            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{step.desc}</p>
-          </div>
-          {/* Intersection indicator */}
-          {step.intersect && (
-            <AlertCircle className="flex-shrink-0 w-4 h-4 text-yellow-500 mt-0.5" />
-          )}
+    <div className="max-w-xl mx-auto">
+      {/* Progress */}
+      <div className="flex items-center gap-2 mb-6 px-1">
+        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full bg-gradient-to-l ${role.gradient} transition-all duration-500`}
+            style={{ width: `${((activeStep + 1) / steps.length) * 100}%` }}
+          />
         </div>
-        {step.to && (
-          <Link to={step.to} className={`
-            mt-2.5 w-full flex items-center justify-center gap-1.5
-            text-xs font-medium py-1.5 px-3 rounded-lg border
-            ${role.badge} hover:opacity-80 transition-opacity
-          `}>
-            כניסה לדף ←
-          </Link>
+        <span className="text-xs text-gray-400 font-medium flex-shrink-0">
+          {activeStep + 1} / {steps.length}
+        </span>
+      </div>
+
+      {/* Steps */}
+      <div className="space-y-2">
+        {steps.map((step, i) => (
+          <StepCard
+            key={step.id}
+            step={step}
+            role={role}
+            index={i}
+            isActive={activeStep === i}
+            onClick={() => setActiveStep(i === activeStep ? i : i)}
+          />
+        ))}
+      </div>
+
+      {/* Next / Prev navigation */}
+      <div className="flex gap-3 mt-6">
+        {activeStep > 0 && (
+          <button
+            onClick={() => setActiveStep(s => s - 1)}
+            className="flex-1 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            ← שלב קודם
+          </button>
+        )}
+        {activeStep < steps.length - 1 && (
+          <button
+            onClick={() => setActiveStep(s => s + 1)}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium text-white transition-all
+              bg-gradient-to-l ${role.gradient} hover:shadow-md hover:-translate-y-0.5`}
+          >
+            השלב הבא ←
+          </button>
         )}
       </div>
     </div>
   );
 }
 
-/* ─── Lane Component ──────────────────────────────────── */
-function Lane({ role, steps, active, onClick }: {
-  role: typeof ROLES[RoleKey];
-  steps: Step[];
-  active: boolean;
-  onClick: () => void;
-}) {
-  const Icon = role.icon;
+/* ─── Role Selector Card ───────────────────────────────── */
+function RoleCard({ roleKey, onClick }: { roleKey: RoleKey; onClick: () => void }) {
+  const r = ROLES[roleKey];
+  const RIcon = r.icon;
   return (
-    <div className={`flex flex-col gap-0 transition-all duration-300 ${active ? "opacity-100" : "opacity-40 hover:opacity-60"}`}>
-      {/* Header button */}
-      <button
-        onClick={onClick}
-        className={`
-          ${role.header} text-white rounded-2xl p-4 text-center mb-4
-          shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95
-          ${active ? "ring-4 ring-white/30 shadow-xl" : ""}
-        `}
-      >
-        <Icon className="w-8 h-8 mx-auto mb-2 opacity-90" />
-        <p className="text-lg font-bold">{role.label}</p>
-        <p className="text-xs opacity-80 mt-0.5">{role.sub}</p>
-        <div className={`mt-3 inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs font-medium`}>
-          {active ? "✓ מסלול פעיל" : "לחץ להפעלה"}
+    <button
+      onClick={onClick}
+      className={`
+        group relative w-full text-right rounded-3xl border-2 p-6
+        bg-white border-gray-100 hover:border-transparent
+        hover:shadow-2xl hover:-translate-y-1
+        transition-all duration-300 overflow-hidden
+      `}
+    >
+      {/* Gradient blob on hover */}
+      <div className={`
+        absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-0
+        group-hover:opacity-5 transition-opacity duration-300 rounded-3xl
+      `} />
+
+      <div className="relative flex flex-col items-center gap-4">
+        {/* Icon circle */}
+        <div className={`
+          w-20 h-20 rounded-2xl flex items-center justify-center text-3xl
+          ${r.light} transition-all duration-300
+          group-hover:scale-110 group-hover:shadow-lg
+        `}>
+          {r.emoji}
         </div>
-      </button>
 
-      {/* Steps */}
-      <div className="flex flex-col gap-1.5">
-        {steps.map((step, i) => (
-          <div key={step.id}>
-            <StepCard step={step} role={role} index={i} />
-            {i < steps.length - 1 && <DownArrow color={role.arrow} />}
-          </div>
-        ))}
+        {/* Label */}
+        <div className="text-center">
+          <p className="text-xl font-bold text-gray-900 mb-1">{r.label}</p>
+          <p className={`text-sm font-medium ${r.text} mb-2`}>{r.sub}</p>
+          <p className="text-xs text-gray-400 leading-relaxed max-w-[180px]">{r.desc}</p>
+        </div>
+
+        {/* Start button */}
+        <div className={`
+          flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium text-white
+          bg-gradient-to-l ${r.gradient} shadow-md
+          group-hover:shadow-lg transition-all
+        `}>
+          <Sparkles className="w-4 h-4" />
+          התחל מסלול
+          <ChevronRight className="w-4 h-4" />
+        </div>
       </div>
-    </div>
+    </button>
   );
 }
 
-/* ─── Legend ──────────────────────────────────────────── */
-function Legend() {
-  return (
-    <div className="flex flex-wrap gap-4 justify-center text-xs text-gray-600 mt-6 px-4">
-      <div className="flex items-center gap-1.5">
-        <div className="w-3 h-3 rounded-sm ring-2 ring-yellow-400 bg-yellow-50" />
-        <span>נקודת חיבור בין גורמים</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <div className="w-3 h-3 rounded-sm bg-orange-100 border border-orange-300" />
-        <span>צעד בעל עסק</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <div className="w-3 h-3 rounded-sm bg-teal-100 border border-teal-300" />
-        <span>צעד עירייה</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <div className="w-3 h-3 rounded-sm bg-violet-100 border border-violet-300" />
-        <span>צעד תושב</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <ArrowLeftRight className="w-3 h-3 text-yellow-500" />
-        <span>קשר בין מסלולים</span>
-      </div>
-    </div>
-  );
-}
-
-/* ─── Main Page ───────────────────────────────────────── */
+/* ─── Main Page ────────────────────────────────────────── */
 export default function UserJourneyMap() {
-  const [activeRoles, setActiveRoles] = useState<Set<RoleKey>>(new Set(["owner", "city", "resident"]));
-
-  function toggle(key: RoleKey) {
-    setActiveRoles(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        if (next.size > 1) next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    });
-  }
-
-  const allActive = activeRoles.size === 3;
+  const [selectedRole, setSelectedRole] = useState<RoleKey | null>(null);
 
   return (
     <div dir="rtl" className="min-h-screen bg-gray-50">
+
       {/* Hero */}
       <section className="bg-primary text-primary-foreground py-10">
-        <div className="container mx-auto px-4 text-center max-w-3xl">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">מפת מסלולי משתמשים</h1>
-          <p className="text-sm opacity-80 leading-relaxed">
-            תרשים זרימה מלא של שלושת הגורמים במערכת — בעל עסק, עירייה ותושב — וחיבורי הגומלין ביניהם
+        <div className="container mx-auto px-4 text-center max-w-2xl">
+          <p className="text-xs uppercase tracking-widest opacity-60 mb-2">מערכת ניהול פודטראקס · אשדוד</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-3">מי אתה במערכת?</h1>
+          <p className="text-sm opacity-75 leading-relaxed">
+            בחר את התפקיד שלך — נציג לך את מסלול הפעולות המותאם אישית
           </p>
         </div>
       </section>
 
-      {/* Controls */}
-      <div className="container mx-auto px-4 pt-6 max-w-6xl">
-        <div className="bg-white rounded-2xl border shadow-sm p-4 mb-6">
-          <p className="text-sm font-semibold text-center mb-3 text-gray-700">בחר מסלולים להצגה</p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            {(Object.keys(ROLES) as RoleKey[]).map(key => {
-              const r = ROLES[key];
-              const RIcon = r.icon;
-              const active = activeRoles.has(key);
-              return (
-                <button
-                  key={key}
-                  onClick={() => toggle(key)}
-                  className={`
-                    flex items-center gap-2 px-4 py-2 rounded-full border-2 text-sm font-medium transition-all
-                    ${active ? `${r.header} text-white border-transparent shadow-md` : "bg-white text-gray-500 border-gray-200 hover:border-gray-300"}
-                  `}
-                >
-                  <RIcon className="w-4 h-4" />
-                  {r.label}
-                  {active && <span className="text-xs opacity-80">✓</span>}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setActiveRoles(new Set(["owner", "city", "resident"]))}
-              className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
-            >
-              הצג הכל
-            </button>
-          </div>
-        </div>
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
 
-        {/* Summary cards */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          {(Object.keys(ROLES) as RoleKey[]).map(key => {
-            const r = ROLES[key];
-            const RIcon = r.icon;
-            return (
-              <div key={key} className={`${r.bg} ${r.border} border rounded-xl p-3 text-center`}>
-                <RIcon className={`w-5 h-5 mx-auto mb-1 ${r.header} text-white p-0.5 rounded`} />
-                <p className="text-xs font-bold">{r.label}</p>
-                <p className="text-[10px] text-gray-500">
-                  {key === "owner" ? "10 שלבים" : key === "city" ? "10 שלבים" : "8 שלבים"}
-                </p>
+        {/* Role selection */}
+        {!selectedRole ? (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+              {(["owner", "city", "resident"] as RoleKey[]).map(key => (
+                <RoleCard key={key} roleKey={key} onClick={() => setSelectedRole(key)} />
+              ))}
+            </div>
+
+            {/* Intersections preview */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-gray-700">
+                <ArrowLeftRight className="w-4 h-4 text-amber-500" />
+                איך שלושת המסלולים מתחברים
+              </h3>
+              <div className="grid sm:grid-cols-3 gap-3">
+                {INTERSECTIONS.map((c, i) => {
+                  const IIcon = c.icon;
+                  return (
+                    <div key={i} className={`bg-gradient-to-l ${c.color} rounded-xl p-3.5`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <IIcon className="w-4 h-4 text-gray-500" />
+                        <span className="text-xs font-bold text-gray-700">{c.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">{c.from}</span>
+                        <ArrowLeftRight className="w-3 h-3 text-gray-300" />
+                        <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">{c.to}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed">{c.desc}</p>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Flow Chart */}
-      <div className="container mx-auto px-4 pb-12 max-w-6xl">
-        <div className={`grid gap-6 ${
-          allActive || activeRoles.size === 3
-            ? "grid-cols-1 lg:grid-cols-3"
-            : activeRoles.size === 2
-            ? "grid-cols-1 md:grid-cols-2"
-            : "grid-cols-1 max-w-md mx-auto"
-        }`}>
-          {activeRoles.has("owner") && (
-            <Lane role={ROLES.owner} steps={ownerSteps} active={activeRoles.has("owner")} onClick={() => toggle("owner")} />
-          )}
-          {activeRoles.has("city") && (
-            <Lane role={ROLES.city} steps={citySteps} active={activeRoles.has("city")} onClick={() => toggle("city")} />
-          )}
-          {activeRoles.has("resident") && (
-            <Lane role={ROLES.resident} steps={residentSteps} active={activeRoles.has("resident")} onClick={() => toggle("resident")} />
-          )}
-        </div>
-
-        <Legend />
-
-        {/* Cross-flow summary */}
-        <div className="mt-8 bg-white rounded-2xl border shadow-sm p-5">
-          <h3 className="text-base font-bold mb-4 flex items-center gap-2">
-            <ArrowLeftRight className="w-5 h-5 text-yellow-500" />
-            נקודות חיבור בין מסלולים
-          </h3>
-          <div className="grid sm:grid-cols-3 gap-3">
-            {[
-              {
-                from: "בעל עסק",
-                to: "עירייה",
-                event: "הגשת בקשה",
-                desc: "כשבעל העסק מגיש בקשה, העירייה מקבלת התראה ומתחילה תהליך בדיקה",
-                color: "from-orange-100 to-teal-100 border-orange-200",
-              },
-              {
-                from: "עירייה",
-                to: "בעל עסק",
-                event: "אישור / דחייה",
-                desc: "החלטת העירייה מועברת אוטומטית לבעל העסק עם פירוט ותנאים",
-                color: "from-teal-100 to-orange-100 border-teal-200",
-              },
-              {
-                from: "בעל עסק",
-                to: "תושב",
-                event: "פרסום עמדה",
-                desc: "לאחר אישור, פרופיל העמדה עם תפריט ואירועים נראה לתושבים במפה",
-                color: "from-orange-100 to-violet-100 border-violet-200",
-              },
-            ].map((c, i) => (
-              <div key={i} className={`bg-gradient-to-l ${c.color} border rounded-xl p-3.5`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-bold bg-white rounded-full px-2 py-0.5 border">{c.from}</span>
-                  <ArrowLeftRight className="w-3 h-3 text-gray-400" />
-                  <span className="text-xs font-bold bg-white rounded-full px-2 py-0.5 border">{c.to}</span>
+            </div>
+          </>
+        ) : (
+          /* Journey wizard */
+          <>
+            {/* Role header */}
+            <div className={`
+              rounded-2xl p-5 mb-6 text-white
+              bg-gradient-to-l ${ROLES[selectedRole].gradient} shadow-lg
+            `}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{ROLES[selectedRole].emoji}</span>
+                  <div>
+                    <p className="text-lg font-bold">{ROLES[selectedRole].label}</p>
+                    <p className="text-sm opacity-80">{ROLES[selectedRole].sub}</p>
+                  </div>
                 </div>
-                <p className="text-sm font-semibold mb-1">{c.event}</p>
-                <p className="text-xs text-gray-600 leading-relaxed">{c.desc}</p>
+                <button
+                  onClick={() => setSelectedRole(null)}
+                  className="text-xs opacity-80 hover:opacity-100 bg-white/20 rounded-xl px-3 py-1.5 transition-all hover:bg-white/30"
+                >
+                  ← החלף תפקיד
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+
+            {/* Journey steps */}
+            <JourneyPanel roleKey={selectedRole} />
+
+            {/* Other roles teasers */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <p className="text-xs text-gray-400 text-center mb-4">עניין אותך לראות גם את המסלולים האחרים?</p>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {(["owner", "city", "resident"] as RoleKey[]).filter(k => k !== selectedRole).map(key => {
+                  const r = ROLES[key];
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedRole(key)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all
+                        ${r.badge} ${r.border} hover:shadow-md`}
+                    >
+                      <span>{r.emoji}</span>
+                      {r.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
