@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileText, ClipboardList, PenLine, Map, Search, ChevronLeft } from "lucide-react";
+import { FileText, ClipboardList, PenLine, Map, ChevronLeft, GitBranch } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Index() {
@@ -57,6 +57,31 @@ export default function Index() {
             >
               <Map className="h-4 w-4" />
               מפת עמדות האוכל
+              <ChevronLeft className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Journey Map CTA */}
+      <section className="bg-gradient-to-l from-orange-50 via-teal-50 to-violet-50 border-b">
+        <div className="container mx-auto px-4 py-5 max-w-4xl">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold flex items-center gap-2">
+                <GitBranch className="h-5 w-5 text-teal-600" />
+                מפת מסלולי המשתמשים
+              </h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                תרשים זרימה לבעל עסק, עירייה ותושב — ראה מה כל גורם עושה ואיפה הם מתחברים
+              </p>
+            </div>
+            <Link
+              to="/journey"
+              className="flex items-center gap-2 bg-teal-600 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-teal-700 transition-colors whitespace-nowrap"
+            >
+              <GitBranch className="h-4 w-4" />
+              צפה במפת הדרכים
               <ChevronLeft className="h-4 w-4" />
             </Link>
           </div>
