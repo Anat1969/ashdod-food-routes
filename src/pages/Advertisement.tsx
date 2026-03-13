@@ -10,6 +10,8 @@ import TruckMap from "@/components/TruckMap";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import type { FoodTruck, Location } from "@/lib/types";
+import PageNavigation from "@/components/PageNavigation";
+import { useRegisterList } from "@/hooks/useListNavigation";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
 
