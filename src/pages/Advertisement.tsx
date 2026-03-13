@@ -49,7 +49,8 @@ export default function Advertisement() {
     fetchTrucks();
   }, []);
 
-  const canEditMenu = (truck: TruckWithLocation) => {
+  const canEditMenu = (truck: TruckWithLocation | null) => {
+    if (!truck) return false;
     return isAdmin || truck.operator_id === user?.id;
   };
 
