@@ -44,6 +44,12 @@ export default function Advertisement() {
         .from("food_trucks")
         .select("*, locations(*)");
       const result = (data as TruckWithLocation[]) || [];
+      // Sort by address (street from location)
+      result.sort((a, b) => {
+        const streetA = a.locations?.street || a.locations?.name || "";
+        const streetB = b.locations?.street || b.locations?.name || "";
+        return streetA.localeCompare(streetB, "he");
+      });
       setTrucks(result);
       if (result.length > 0) setSelectedTruck(result[0]);
       setLoading(false);
