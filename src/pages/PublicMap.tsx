@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import TruckMap from "@/components/TruckMap";
 import { Search, Clock, Utensils, MapPin } from "lucide-react";
+import PageNavigation from "@/components/PageNavigation";
+import { useRegisterList } from "@/hooks/useListNavigation";
 import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
