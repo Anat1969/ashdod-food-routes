@@ -72,6 +72,10 @@ export default function PublicMap() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]" dir="rtl">
+      {/* Navigation */}
+      <div className="px-4 pt-2">
+        <PageNavigation />
+      </div>
       {/* Top bar */}
       <div className="bg-background border-b px-4 py-3 flex flex-col sm:flex-row gap-2 z-10">
         <div className="relative flex-1 max-w-sm">
