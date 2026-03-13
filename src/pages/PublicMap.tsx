@@ -99,7 +99,7 @@ export default function PublicMap() {
           </SelectContent>
         </Select>
         <span className="text-sm text-muted-foreground self-center">
-          {filtered.length} עמדות פעילות
+          {sortedFiltered.length} עמדות פעילות
         </span>
       </div>
 
