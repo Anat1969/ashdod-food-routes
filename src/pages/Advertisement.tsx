@@ -111,9 +111,20 @@ export default function Advertisement() {
     );
   }
 
+  // Register list for record navigation
+  useRegisterList(
+    trucks.map((t) => ({ id: t.id, label: t.truck_name })),
+    "/advertisement",
+    "/truck/",
+    "address"
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero */}
+      {/* Navigation + Hero */}
+      <div className="container mx-auto px-4 pt-4" dir="rtl">
+        <PageNavigation />
+      </div>
       <section className="bg-primary text-primary-foreground py-6">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-bold">
