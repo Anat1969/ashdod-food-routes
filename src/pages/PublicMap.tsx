@@ -128,13 +128,13 @@ export default function PublicMap() {
 
           {loading ? (
             <div className="p-4 text-sm text-muted-foreground text-center">טוען...</div>
-          ) : filtered.length === 0 ? (
+          ) : sortedFiltered.length === 0 ? (
             <div className="p-4 text-sm text-muted-foreground text-center">
               לא נמצאו עמדות
             </div>
           ) : (
             <div className="divide-y">
-              {filtered.map((truck) => (
+              {sortedFiltered.map((truck) => (
                 <TruckSideCard
                   key={truck.id}
                   truck={truck}
