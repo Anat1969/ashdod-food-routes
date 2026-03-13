@@ -10,6 +10,8 @@ import TruckMap from "@/components/TruckMap";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import type { FoodTruck, Location } from "@/lib/types";
+import PageNavigation from "@/components/PageNavigation";
+import { useRegisterList } from "@/hooks/useListNavigation";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
 
@@ -42,6 +44,12 @@ export default function Advertisement() {
         .from("food_trucks")
         .select("*, locations(*)");
       const result = (data as TruckWithLocation[]) || [];
+      // Sort by address (street from location)
+      result.sort((a, b) => {
+        const streetA = a.locations?.street || a.locations?.name || "";
+        const streetB = b.locations?.street || b.locations?.name || "";
+        return streetA.localeCompare(streetB, "he");
+      });
       setTrucks(result);
       if (result.length > 0) setSelectedTruck(result[0]);
       setLoading(false);
@@ -103,9 +111,20 @@ export default function Advertisement() {
     );
   }
 
+  // Register list for record navigation
+  useRegisterList(
+    trucks.map((t) => ({ id: t.id, label: t.truck_name })),
+    "/advertisement",
+    "/truck/",
+    "address"
+  );
+
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero */}
+      {/* Navigation + Hero */}
+      <div className="container mx-auto px-4 pt-4" dir="rtl">
+        <PageNavigation />
+      </div>
       <section className="bg-primary text-primary-foreground py-6">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-bold">

@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import TruckMap from "@/components/TruckMap";
 import { Search, Clock, Utensils, MapPin } from "lucide-react";
+import PageNavigation from "@/components/PageNavigation";
+import { useRegisterList } from "@/hooks/useListNavigation";
 import type { FoodTruck, Location } from "@/lib/types";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
@@ -51,10 +53,29 @@ export default function PublicMap() {
     return matchSearch && matchCat;
   });
 
-  const selectedTruck = filtered.find((t) => t.id === selectedId) ?? null;
+  // Sort filtered by address
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    const streetA = a.locations?.street || a.locations?.name || "";
+    const streetB = b.locations?.street || b.locations?.name || "";
+    return streetA.localeCompare(streetB, "he");
+  });
+
+  // Register list for record navigation
+  useRegisterList(
+    sortedFiltered.map((t) => ({ id: t.id, label: t.truck_name })),
+    "/map",
+    "/truck/",
+    "address"
+  );
+
+  const selectedTruck = sortedFiltered.find((t) => t.id === selectedId) ?? null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]" dir="rtl">
+      {/* Navigation */}
+      <div className="px-4 pt-2">
+        <PageNavigation />
+      </div>
       {/* Top bar */}
       <div className="bg-background border-b px-4 py-3 flex flex-col sm:flex-row gap-2 z-10">
         <div className="relative flex-1 max-w-sm">
@@ -78,7 +99,7 @@ export default function PublicMap() {
           </SelectContent>
         </Select>
         <span className="text-sm text-muted-foreground self-center">
-          {filtered.length} עמדות פעילות
+          {sortedFiltered.length} עמדות פעילות
         </span>
       </div>
 
@@ -92,7 +113,7 @@ export default function PublicMap() {
             </div>
           ) : (
             <TruckMap
-              trucks={filtered}
+              trucks={sortedFiltered}
               selectedTruckId={selectedId}
               onSelectTruck={(t) => setSelectedId(t.id)}
             />
@@ -107,13 +128,13 @@ export default function PublicMap() {
 
           {loading ? (
             <div className="p-4 text-sm text-muted-foreground text-center">טוען...</div>
-          ) : filtered.length === 0 ? (
+          ) : sortedFiltered.length === 0 ? (
             <div className="p-4 text-sm text-muted-foreground text-center">
               לא נמצאו עמדות
             </div>
           ) : (
             <div className="divide-y">
-              {filtered.map((truck) => (
+              {sortedFiltered.map((truck) => (
                 <TruckSideCard
                   key={truck.id}
                   truck={truck}
