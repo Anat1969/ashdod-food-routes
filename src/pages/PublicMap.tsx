@@ -53,7 +53,22 @@ export default function PublicMap() {
     return matchSearch && matchCat;
   });
 
-  const selectedTruck = filtered.find((t) => t.id === selectedId) ?? null;
+  // Sort filtered by address
+  const sortedFiltered = [...filtered].sort((a, b) => {
+    const streetA = a.locations?.street || a.locations?.name || "";
+    const streetB = b.locations?.street || b.locations?.name || "";
+    return streetA.localeCompare(streetB, "he");
+  });
+
+  // Register list for record navigation
+  useRegisterList(
+    sortedFiltered.map((t) => ({ id: t.id, label: t.truck_name })),
+    "/map",
+    "/truck/",
+    "address"
+  );
+
+  const selectedTruck = sortedFiltered.find((t) => t.id === selectedId) ?? null;
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]" dir="rtl">
