@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Building2, User, Users, ChevronRight, ChevronDown,
   ArrowLeftRight, FileText, Upload, CheckCircle2, XCircle,
@@ -475,7 +475,10 @@ function RoleCard({ roleKey, onClick }: { roleKey: RoleKey; onClick: () => void 
 
 /* ─── Main Page ────────────────────────────────────────── */
 export default function UserJourneyMap() {
-  const [selectedRole, setSelectedRole] = useState<RoleKey | null>(null);
+  const [searchParams] = useSearchParams();
+  const paramRole = searchParams.get("role") as RoleKey | null;
+  const validRole = paramRole && (["owner", "city", "resident"] as RoleKey[]).includes(paramRole) ? paramRole : null;
+  const [selectedRole, setSelectedRole] = useState<RoleKey | null>(validRole);
 
   return (
     <div dir="rtl" className="min-h-screen bg-gray-50">

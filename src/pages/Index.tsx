@@ -1,123 +1,192 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileText, ClipboardList, PenLine, Map, ChevronLeft, GitBranch } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import {
+  Building2, User, Users, Map, ChevronLeft,
+  Sparkles, ArrowLeftRight, Bell, CheckCircle2, Eye,
+} from "lucide-react";
 
 export default function Index() {
-  const { user } = useAuth();
-
-  const businessActions = [
-    {
-      icon: FileText,
-      title: "מדיניות והנחיות",
-      description: "קרא את דרישות העירייה לפני הגשת הבקשה",
-      to: "/policy",
-    },
-    {
-      icon: PenLine,
-      title: "הגש בקשה להעמדה",
-      description: "הגשת בקשה חדשה להצבת פודטראק במרחב הציבורי",
-      to: "/apply",
-    },
-    {
-      icon: ClipboardList,
-      title: user ? "הבקשות שלי" : "כניסה למערכת",
-      description: user ? "מעקב אחרי סטטוס הבקשות שהגשת" : "התחבר/י כדי לנהל את הבקשות שלך",
-      to: user ? "/dashboard" : "/login",
-    },
-  ];
-
   return (
-    <div dir="rtl">
+    <div dir="rtl" className="min-h-screen bg-gray-50">
+
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-14 md:py-20">
-        <div className="container mx-auto px-4 text-center">
+      <section className="bg-primary text-primary-foreground py-14">
+        <div className="container mx-auto px-4 text-center max-w-2xl">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">
             מערכת ניהול פודטראקס
           </h1>
-          <p className="text-lg opacity-80 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base opacity-80 leading-relaxed">
             עיריית אשדוד – מחלקת הנדסה ותכנון עירוני
           </p>
+          <p className="text-sm opacity-60 mt-2">בחר את תפקידך כדי להתחיל</p>
         </div>
       </section>
 
-      {/* Resident CTA */}
-      <section className="bg-accent/10 border-b">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-bold">מחפש מקום לאכול?</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                גלה את כל עמדות האוכל הפעילות בעיר — תפריט, מחירים ומיקום
+      <div className="container mx-auto px-4 py-10 max-w-5xl">
+
+        {/* 3 Role Cards — strategic entry */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+
+          {/* Business Owner */}
+          <Link
+            to="/journey?role=owner"
+            className="group relative rounded-3xl border-2 border-gray-100 bg-white p-6
+              hover:border-orange-200 hover:shadow-2xl hover:-translate-y-1
+              transition-all duration-300 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-amber-500
+              opacity-0 group-hover:opacity-5 transition-opacity rounded-3xl" />
+            <div className="relative flex flex-col items-center gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-orange-100 flex items-center justify-center
+                text-3xl group-hover:scale-110 group-hover:shadow-lg transition-all">
+                🚚
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
+                  <User className="w-4 h-4 text-orange-500" />
+                  בעל עסק
+                </p>
+                <p className="text-sm font-medium text-orange-600 mb-2">הגש בקשה לפודטראק</p>
+                <p className="text-xs text-gray-400 leading-relaxed max-w-[190px]">
+                  קרא את המדיניות, הגש בקשה, קבל אישור ופרסם את הפרופיל שלך
+                </p>
+              </div>
+              <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium
+                text-white bg-gradient-to-l from-orange-500 to-amber-500 shadow-md
+                group-hover:shadow-lg transition-all">
+                <Sparkles className="w-4 h-4" />
+                התחל מסלול
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Municipality */}
+          <Link
+            to="/journey?role=city"
+            className="group relative rounded-3xl border-2 border-gray-100 bg-white p-6
+              hover:border-teal-200 hover:shadow-2xl hover:-translate-y-1
+              transition-all duration-300 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-600 to-cyan-500
+              opacity-0 group-hover:opacity-5 transition-opacity rounded-3xl" />
+            <div className="relative flex flex-col items-center gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-teal-100 flex items-center justify-center
+                text-3xl group-hover:scale-110 group-hover:shadow-lg transition-all">
+                🏛️
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
+                  <Building2 className="w-4 h-4 text-teal-600" />
+                  עירייה
+                </p>
+                <p className="text-sm font-medium text-teal-600 mb-2">נהל בקשות ומדיניות</p>
+                <p className="text-xs text-gray-400 leading-relaxed max-w-[190px]">
+                  קבע מדיניות, בדוק בקשות, אשר עמדות ועקוב אחר הפעילות בעיר
+                </p>
+              </div>
+              <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium
+                text-white bg-gradient-to-l from-teal-600 to-cyan-500 shadow-md
+                group-hover:shadow-lg transition-all">
+                <Sparkles className="w-4 h-4" />
+                התחל מסלול
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Resident */}
+          <Link
+            to="/map"
+            className="group relative rounded-3xl border-2 border-gray-100 bg-white p-6
+              hover:border-violet-200 hover:shadow-2xl hover:-translate-y-1
+              transition-all duration-300 overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-purple-500
+              opacity-0 group-hover:opacity-5 transition-opacity rounded-3xl" />
+            <div className="relative flex flex-col items-center gap-4">
+              <div className="w-20 h-20 rounded-2xl bg-violet-100 flex items-center justify-center
+                text-3xl group-hover:scale-110 group-hover:shadow-lg transition-all">
+                👥
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
+                  <Users className="w-4 h-4 text-violet-600" />
+                  תושב
+                </p>
+                <p className="text-sm font-medium text-violet-600 mb-2">מצא מקום לאכול</p>
+                <p className="text-xs text-gray-400 leading-relaxed max-w-[190px]">
+                  גלה עמדות אוכל פעילות בעיר, ראה תפריטים, שעות ואירועים מיוחדים
+                </p>
+              </div>
+              <div className="flex items-center gap-2 px-5 py-2 rounded-full text-sm font-medium
+                text-white bg-gradient-to-l from-violet-600 to-purple-500 shadow-md
+                group-hover:shadow-lg transition-all">
+                <Map className="w-4 h-4" />
+                פתח מפה
+                <ChevronLeft className="w-4 h-4" />
+              </div>
+            </div>
+          </Link>
+
+        </div>
+
+        {/* How the 3 flows connect */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+          <h3 className="text-sm font-bold mb-4 flex items-center gap-2 text-gray-700">
+            <ArrowLeftRight className="w-4 h-4 text-amber-500" />
+            איך שלושת המסלולים מתחברים
+          </h3>
+          <div className="grid sm:grid-cols-3 gap-3">
+
+            <div className="bg-gradient-to-l from-orange-100 to-teal-100 border-l-4 border-teal-400 rounded-xl p-3.5">
+              <div className="flex items-center gap-2 mb-2">
+                <Bell className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-bold text-gray-700">הגשת בקשה</span>
+              </div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">בעל עסק</span>
+                <ArrowLeftRight className="w-3 h-3 text-gray-300" />
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">עירייה</span>
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                ברגע שבעל העסק מגיש — העירייה מקבלת התראה ומתחילה תהליך בדיקה אוטומטי
               </p>
             </div>
-            <Link
-              to="/map"
-              className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors whitespace-nowrap"
-            >
-              <Map className="h-4 w-4" />
-              מפת עמדות האוכל
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
 
-      {/* Journey Map CTA */}
-      <section className="bg-gradient-to-l from-orange-50 via-teal-50 to-violet-50 border-b">
-        <div className="container mx-auto px-4 py-5 max-w-4xl">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-bold flex items-center gap-2">
-                <GitBranch className="h-5 w-5 text-teal-600" />
-                מפת מסלולי המשתמשים
-              </h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                תרשים זרימה לבעל עסק, עירייה ותושב — ראה מה כל גורם עושה ואיפה הם מתחברים
+            <div className="bg-gradient-to-l from-teal-100 to-orange-100 border-l-4 border-orange-400 rounded-xl p-3.5">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-bold text-gray-700">החלטת אישור/דחייה</span>
+              </div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">עירייה</span>
+                <ArrowLeftRight className="w-3 h-3 text-gray-300" />
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">בעל עסק</span>
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                החלטת העירייה מועברת מיידית לבעל העסק עם נימוקים ותנאים
               </p>
             </div>
-            <Link
-              to="/journey"
-              className="flex items-center gap-2 bg-teal-600 text-white px-5 py-2.5 rounded-lg font-medium text-sm hover:bg-teal-700 transition-colors whitespace-nowrap"
-            >
-              <GitBranch className="h-4 w-4" />
-              צפה במפת הדרכים
-              <ChevronLeft className="h-4 w-4" />
-            </Link>
+
+            <div className="bg-gradient-to-l from-orange-100 to-violet-100 border-l-4 border-violet-400 rounded-xl p-3.5">
+              <div className="flex items-center gap-2 mb-2">
+                <Eye className="w-4 h-4 text-gray-500" />
+                <span className="text-xs font-bold text-gray-700">פרסום ציבורי</span>
+              </div>
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">אישור + בעל עסק</span>
+                <ArrowLeftRight className="w-3 h-3 text-gray-300" />
+                <span className="text-[10px] bg-white rounded-full px-2 py-0.5 border font-medium">תושבים</span>
+              </div>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                לאחר אישור הבקשה ועדכון הפרופיל — העמדה מופיעה למפה הציבורית בזמן אמת
+              </p>
+            </div>
+
           </div>
         </div>
-      </section>
 
-      {/* Business owner section */}
-      <section className="container mx-auto px-4 py-10 max-w-4xl">
-        <div className="mb-6">
-          <h2 className="text-xl font-bold">בעל עסק? הגש בקשה להעמדת פודטראק</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            תהליך הגשת הבקשה, בדיקת הציות ומעקב סטטוס — הכל במקום אחד
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-3 gap-5">
-          {businessActions.map((action, i) => (
-            <Link key={action.to} to={action.to}>
-              <Card className="municipal-shadow hover:municipal-shadow-lg transition-shadow cursor-pointer h-full group">
-                <CardContent className="pt-7 pb-6 text-center">
-                  <div className="relative">
-                    <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
-                      {i + 1}
-                    </div>
-                    <div className="bg-accent/10 w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-accent/20 transition-colors">
-                      <action.icon className="h-6 w-6 text-accent" />
-                    </div>
-                  </div>
-                  <h3 className="text-base font-semibold mb-1.5">{action.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{action.description}</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
