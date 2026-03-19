@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const LIST_KEY = "nav_list";
