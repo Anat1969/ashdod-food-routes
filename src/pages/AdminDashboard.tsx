@@ -55,25 +55,28 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
     <div className="container mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-2xl font-bold mb-6">לוח בקרה – אדריכל העיר</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold">לוח בקרה</h1>
+        <p className="text-sm text-muted-foreground mt-1">מחלקת הנדסה ותכנון עירוני</p>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={BarChart3} label="סה״כ פודטראקים" value={stats.total} color="text-primary" />
-        <StatCard icon={Clock} label="ממתינים לבדיקה" value={stats.pending} color="text-accent" />
-        <StatCard icon={CheckCircle} label="מאושרים" value={stats.approved} color="text-success" />
-        <StatCard icon={XCircle} label="נדחו" value={stats.rejected} color="text-destructive" />
+        <StatCard icon={BarChart3} label="סה״כ עמדות" value={stats.total} bgClass="bg-primary/5" iconClass="text-primary" />
+        <StatCard icon={Clock} label="ממתינות לבדיקה" value={stats.pending} bgClass="bg-accent/10" iconClass="text-accent" />
+        <StatCard icon={CheckCircle} label="מאושרות" value={stats.approved} bgClass="bg-success/10" iconClass="text-success" />
+        <StatCard icon={XCircle} label="נדחו" value={stats.rejected} bgClass="bg-destructive/10" iconClass="text-destructive" />
       </div>
 
       <Card className="municipal-shadow">
-        <CardHeader>
-          <CardTitle className="text-lg">ניהול פודטראקים</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base font-semibold">רשימת בקשות</CardTitle>
           <div className="flex flex-col sm:flex-row gap-3 mt-3">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="חיפוש..." value={search} onChange={(e) => setSearch(e.target.value)} className="pr-9" />
+              <Input placeholder="חיפוש לפי שם..." value={search} onChange={(e) => setSearch(e.target.value)} className="pr-9" />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[160px]">
                 <SelectValue placeholder="סטטוס" />
               </SelectTrigger>
               <SelectContent>
@@ -87,27 +90,26 @@ export default function AdminDashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-muted-foreground text-sm">טוען...</p>
+            <p className="text-muted-foreground text-sm py-6 text-center">טוען...</p>
           ) : filteredTrucks.length === 0 ? (
-            <p className="text-muted-foreground text-sm">אין פודטראקים</p>
+            <p className="text-muted-foreground text-sm py-6 text-center">אין בקשות תואמות</p>
           ) : (
-            <div className="space-y-2">
-              {filteredTrucks.map((truck) => (
+            <div className="space-y-1">
+              {filteredTrucks.map((truck, idx) => (
                 <div
                   key={truck.id}
                   onClick={() => navigate(`/truck/${truck.id}`)}
-                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer"
+                  className={`flex items-center justify-between p-3.5 rounded-lg
+                    hover:bg-muted/60 transition-colors cursor-pointer
+                    ${idx % 2 === 0 ? "bg-muted/20" : ""}`}
                 >
                   <div>
-                    <p className="font-medium text-sm">{truck.truck_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {truck.vehicle_type || "ללא סוג"}
+                    <p className="font-medium text-sm text-foreground">{truck.truck_name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {truck.food_category || "ללא קטגוריה"} · {new Date(truck.created_at).toLocaleDateString("he-IL")}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-muted-foreground">{new Date(truck.created_at).toLocaleDateString("he-IL")}</span>
-                    <StatusBadge status={truck.status} />
-                  </div>
+                  <StatusBadge status={truck.status} />
                 </div>
               ))}
             </div>
@@ -119,16 +121,20 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, color }: {
-  icon: React.ElementType; label: string; value: number; color: string;
+function StatCard({ icon: Icon, label, value, bgClass, iconClass }: {
+  icon: React.ElementType; label: string; value: number; bgClass: string; iconClass: string;
 }) {
   return (
-    <Card className="municipal-shadow">
-      <CardContent className="pt-6 flex items-center gap-3">
-        <Icon className={`h-8 w-8 ${color} flex-shrink-0`} />
-        <div>
-          <p className="text-2xl font-bold">{value}</p>
-          <p className="text-xs text-muted-foreground">{label}</p>
+    <Card className="municipal-shadow border">
+      <CardContent className="pt-5 pb-4 px-4">
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl ${bgClass} flex items-center justify-center flex-shrink-0`}>
+            <Icon className={`h-5 w-5 ${iconClass}`} />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{value}</p>
+            <p className="text-xs text-muted-foreground">{label}</p>
+          </div>
         </div>
       </CardContent>
     </Card>
