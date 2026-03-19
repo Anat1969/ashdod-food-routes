@@ -26,12 +26,14 @@ export function useRegisterList(
   detailPrefix: string = "/truck/",
   sortKey: string = "default"
 ) {
+  const serialized = JSON.stringify(items);
+
   useEffect(() => {
     if (items.length > 0) {
       const data: StoredList = { items, basePath, detailPrefix, sortKey };
       sessionStorage.setItem(LIST_KEY, JSON.stringify(data));
     }
-  }, [items, basePath, detailPrefix, sortKey]);
+  }, [serialized, basePath, detailPrefix, sortKey]);
 }
 
 /**
