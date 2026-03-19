@@ -38,6 +38,14 @@ export default function Advertisement() {
   const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
   const { isAdmin, user } = useAuth();
 
+  // Register list for record navigation — must be before any early return
+  useRegisterList(
+    trucks.map((t) => ({ id: t.id, label: t.truck_name })),
+    "/advertisement",
+    "/truck/",
+    "address"
+  );
+
   useEffect(() => {
     const fetchTrucks = async () => {
       const { data } = await supabase
