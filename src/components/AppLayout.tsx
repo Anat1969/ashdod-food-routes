@@ -19,7 +19,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const navLinks = [
   { to: "/", label: "ראשי" },
   { to: "/map", label: "מפת עמדות" },
-  { to: "/journey", label: "מסלולי משתמשים" },
+  { to: "/journey", label: "מסלולים" },
   { to: "/policy", label: "מדיניות" },
   { to: "/apply", label: "הגשת בקשה" }];
 
@@ -27,30 +27,30 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
     navLinks.push({ to: "/dashboard", label: "הבקשות שלי" });
   }
   if (isAdmin) {
-    navLinks.push({ to: "/directory", label: "מאגר פודטראקים" });
+    navLinks.push({ to: "/directory", label: "מאגר עמדות" });
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
-  navLinks.push({ to: "/advertisement", label: "פרסומת" });
+  navLinks.push({ to: "/advertisement", label: "גלו עמדות" });
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-primary text-primary-foreground municipal-shadow sticky top-0 z-50">
+      <header className="premium-hero text-primary-foreground municipal-shadow sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center">
             <img alt="סמל עיריית אשדוד" className="h-14 w-auto" src={ashdodEmblem} />
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-0.5">
             {navLinks.map((link) =>
             <Link
               key={link.to}
               to={link.to}
               className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               location.pathname === link.to ?
-              "bg-primary-foreground/20" :
-              "hover:bg-primary-foreground/10"}`
+              "bg-primary-foreground/15 text-primary-foreground" :
+              "text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/8"}`
               }>
 
                 {link.label}
@@ -61,14 +61,14 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="text-primary-foreground hover:bg-primary-foreground/10 mr-2">
+              className="text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/10 mr-2">
 
                 <LogOut className="h-4 w-4 ml-1" />
                 יציאה
               </Button> :
 
             <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 mr-2">
+                <Button variant="ghost" size="sm" className="text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/10 mr-2">
                   התחברות
                 </Button>
               </Link>
@@ -86,25 +86,25 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
 
         {/* Mobile Nav */}
         {mobileMenuOpen &&
-        <nav className="md:hidden border-t border-primary-foreground/20 pb-4">
+        <nav className="md:hidden border-t border-primary-foreground/10 pb-4">
             {navLinks.map((link) =>
           <Link
             key={link.to}
             to={link.to}
             onClick={() => setMobileMenuOpen(false)}
             className={`block px-6 py-3 text-sm font-medium ${
-            location.pathname === link.to ? "bg-primary-foreground/20" : ""}`
+            location.pathname === link.to ? "bg-primary-foreground/15" : "text-primary-foreground/75"}`
             }>
 
                 {link.label}
               </Link>
           )}
             {user ?
-          <button onClick={() => {handleSignOut();setMobileMenuOpen(false);}} className="block px-6 py-3 text-sm font-medium w-full text-start">
+          <button onClick={() => {handleSignOut();setMobileMenuOpen(false);}} className="block px-6 py-3 text-sm font-medium w-full text-start text-primary-foreground/75">
                 יציאה
               </button> :
 
-          <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-3 text-sm font-medium">
+          <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block px-6 py-3 text-sm font-medium text-primary-foreground/75">
                 התחברות
               </Link>
           }
@@ -116,10 +116,10 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground/70 py-6">
+      <footer className="bg-primary text-primary-foreground/60 py-6">
         <div className="container mx-auto px-4 text-center text-sm">
-          <p>© {new Date().getFullYear()} עיריית אשדוד – מחלקת הנדסה ותכנון עירוני</p>
-          <p className="mt-1">מערכת ניהול פודטראקס במרחב הציבורי</p>
+          <p>© {new Date().getFullYear()} עיריית אשדוד — מחלקת הנדסה ותכנון עירוני</p>
+          <p className="mt-1 text-xs">מערכת ניהול עמדות מזון במרחב הציבורי</p>
         </div>
       </footer>
     </div>);

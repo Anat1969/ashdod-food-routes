@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/admin", label: "לוח בקרה", icon: BarChart3, end: true },
-  { to: "/admin/add", label: "הוספת פודטראקים", icon: PlusCircle },
+  { to: "/admin/add", label: "הוספת עמדות", icon: PlusCircle },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -28,12 +28,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside
         className={cn(
-          "bg-card border-l w-56 shrink-0 p-4 space-y-1 transition-transform duration-200 z-40",
+          "bg-card border-l w-56 shrink-0 p-5 space-y-1 transition-transform duration-200 z-40",
           "md:relative md:translate-x-0",
           open ? "fixed inset-y-0 right-0 top-16 translate-x-0 shadow-lg" : "fixed -translate-x-full md:translate-x-0 md:relative"
         )}
       >
-        <h2 className="text-sm font-semibold text-muted-foreground mb-4 px-2">פאנל ניהול</h2>
+        <p className="text-xs font-medium text-muted-foreground mb-4 px-2 tracking-wide">ניהול</p>
         {navItems.map((item) => {
           const isActive = item.end
             ? location.pathname === item.to
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary/10 text-primary"
+                  ? "bg-primary/8 text-primary"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
@@ -58,15 +58,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         })}
       </aside>
 
-      {/* Overlay for mobile */}
+      {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/30 z-30 md:hidden"
+          className="fixed inset-0 bg-black/20 z-30 md:hidden"
           onClick={() => setOpen(false)}
         />
       )}
 
-      {/* Main content */}
       <main className="flex-1 min-w-0">{children}</main>
     </div>
   );

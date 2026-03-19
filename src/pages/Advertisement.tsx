@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Truck, UtensilsCrossed, Plus, Trash2, Pencil } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MapPin, Clock, Truck, UtensilsCrossed, Plus, Trash2 } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -44,7 +44,6 @@ export default function Advertisement() {
         .from("food_trucks")
         .select("*, locations(*)");
       const result = (data as TruckWithLocation[]) || [];
-      // Sort by address (street from location)
       result.sort((a, b) => {
         const streetA = a.locations?.street || a.locations?.name || "";
         const streetB = b.locations?.street || b.locations?.name || "";
@@ -121,31 +120,31 @@ export default function Advertisement() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation + Hero */}
-      <div className="container mx-auto px-4 pt-4" dir="rtl">
-        <PageNavigation />
-      </div>
-      <section className="bg-primary text-primary-foreground py-6">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold">
-            <UtensilsCrossed className="inline-block h-7 w-7 ml-2 mb-1" />
-            פודטראקים באשדוד
-          </h1>
-          <p className="text-sm opacity-80 mt-1">לחצו על פודטראק כדי לראות את המיקום והתפריט</p>
+      {/* Hero */}
+      <section className="premium-hero text-primary-foreground py-8">
+        <div className="container mx-auto px-4" dir="rtl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">עמדות אוכל באשדוד</h1>
+              <p className="text-sm opacity-70 mt-1">גלו את מגוון העמדות ברחבי העיר — מיקומים, תפריטים ושעות פעילות</p>
+            </div>
+            <PageNavigation />
+          </div>
         </div>
       </section>
 
       {trucks.length === 0 ? (
         <div className="flex-1 flex items-center justify-center text-muted-foreground">
           <div className="text-center">
-            <Truck className="h-16 w-16 mx-auto mb-4 opacity-40" />
-            <p className="text-lg">אין פודטראקים מאושרים כרגע</p>
+            <Truck className="h-16 w-16 mx-auto mb-4 opacity-30" />
+            <p className="text-lg font-medium">אין עמדות פעילות כרגע</p>
+            <p className="text-sm mt-1">עמדות מאושרות יופיעו כאן באופן אוטומטי</p>
           </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 180px)" }}>
-          {/* Right sidebar – truck cards */}
-          <aside className="md:w-[380px] lg:w-[420px] overflow-y-auto border-s bg-muted/30 flex-shrink-0">
+          {/* Right sidebar */}
+          <aside className="md:w-[360px] lg:w-[400px] overflow-y-auto border-s bg-card flex-shrink-0">
             <div className="flex flex-col gap-0">
               {trucks.map((truck) => (
                 <TruckSidebarCard
@@ -159,9 +158,8 @@ export default function Advertisement() {
             </div>
           </aside>
 
-          {/* Left – Dynamic Map + selected truck menu */}
+          {/* Left – Map + details */}
           <div className="flex-1 flex flex-col min-h-[300px]">
-            {/* Map */}
             <div className="flex-1 relative">
               <TruckMap
                 trucks={trucks}
@@ -170,11 +168,11 @@ export default function Advertisement() {
               />
             </div>
 
-            {/* Selected truck details bar */}
+            {/* Selected truck bar */}
             {selectedTruck && (
-              <div className="border-t bg-card p-4 space-y-3">
+              <div className="border-t bg-card p-4">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-lg font-bold">{selectedTruck.truck_name}</h2>
+                  <h2 className="text-lg font-bold text-foreground">{selectedTruck.truck_name}</h2>
                   {selectedTruck.food_category && (
                     <Badge variant="secondary" className="text-xs">{selectedTruck.food_category}</Badge>
                   )}
@@ -182,7 +180,7 @@ export default function Advertisement() {
                     <span className="flex items-center gap-1 text-sm text-muted-foreground">
                       <MapPin className="h-3.5 w-3.5" />
                       {selectedTruck.locations.name}
-                      {selectedTruck.locations.street && ` – ${selectedTruck.locations.street}`}
+                      {selectedTruck.locations.street && ` — ${selectedTruck.locations.street}`}
                     </span>
                   )}
                   {(selectedTruck.hours_from || selectedTruck.hours_to) && (
@@ -195,17 +193,15 @@ export default function Advertisement() {
                   )}
                 </div>
 
-                {/* Menu / Design mockup */}
                 {selectedTruck.design_mockup_url && (
-                  <div>
-                    <p className="text-sm font-medium mb-1">תפריט / הדמיה</p>
+                  <div className="mt-3">
                     <ImageLightbox src={selectedTruck.design_mockup_url} alt="תפריט">
                       {({ onClick }) => (
                         <img
                           onClick={onClick}
                           src={selectedTruck.design_mockup_url!}
                           alt="תפריט"
-                          className="max-h-40 rounded-md border cursor-zoom-in"
+                          className="max-h-36 rounded-md border cursor-zoom-in"
                         />
                       )}
                     </ImageLightbox>
@@ -217,11 +213,11 @@ export default function Advertisement() {
         </div>
       )}
 
-      {/* Menu Dialog – Catalog style */}
+      {/* Menu Dialog */}
       <Dialog open={!!menuDialogTruck} onOpenChange={(open) => { if (!open) { setMenuDialogTruck(null); setNewItem({ item_name: "", price: "" }); } }}>
         <DialogContent className="max-w-md p-0 overflow-hidden" dir="rtl">
-          {/* Header with truck photo */}
-          <div className="relative h-32 bg-muted">
+          {/* Header photo */}
+          <div className="relative h-36 bg-muted">
             {menuDialogTruck?.street_photo_1_url ? (
               <img src={menuDialogTruck.street_photo_1_url} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -246,14 +242,13 @@ export default function Advertisement() {
               <p className="text-sm text-muted-foreground text-center py-6">טוען תפריט...</p>
             ) : (
               <>
-                {/* Menu items list */}
                 <div className="space-y-0 max-h-[45vh] overflow-y-auto">
                   {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
                     <p className="text-sm text-muted-foreground text-center py-6">אין פריטים בתפריט</p>
                   )}
 
                   {menuItems.map((item, idx) => (
-                    <div key={item.id} className={`flex items-center gap-3 py-2.5 ${idx < menuItems.length - 1 ? 'border-b border-dashed' : ''}`}>
+                    <div key={item.id} className={`flex items-center gap-3 py-2.5 ${idx < menuItems.length - 1 ? 'border-b border-dashed border-border' : ''}`}>
                       {canEditMenu(menuDialogTruck!) ? (
                         <>
                           <Input
@@ -286,7 +281,6 @@ export default function Advertisement() {
                   ))}
                 </div>
 
-                {/* Inline new item row */}
                 {canEditMenu(menuDialogTruck!) && (
                   <div className="mt-3 pt-3 border-t">
                     <div className="flex items-center gap-2">
@@ -294,7 +288,7 @@ export default function Advertisement() {
                         className="flex-1 h-9 text-sm"
                         value={newItem.item_name}
                         onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
-                        placeholder="שם המנה החדשה..."
+                        placeholder="שם המנה..."
                         onKeyDown={(e) => e.key === "Enter" && addMenuItem()}
                       />
                       <Input
@@ -309,7 +303,7 @@ export default function Advertisement() {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-[10px] text-muted-foreground mt-1">הקלד שם ומחיר ולחץ Enter או + להוספה</p>
+                    <p className="text-[10px] text-muted-foreground mt-1.5">הקלידו שם ומחיר ולחצו Enter להוספה</p>
                   </div>
                 )}
               </>
@@ -321,8 +315,7 @@ export default function Advertisement() {
   );
 }
 
-/* ── Sidebar card component ── */
-
+/* ── Sidebar card ── */
 function TruckSidebarCard({
   truck,
   isSelected,
@@ -339,9 +332,8 @@ function TruckSidebarCard({
   return (
     <div
       className={`relative w-full text-start border-b last:border-b-0 transition-colors overflow-hidden
-        ${isSelected ? "bg-accent/20 ring-2 ring-inset ring-accent" : "hover:bg-muted/60"}`}
+        ${isSelected ? "bg-accent/10 ring-2 ring-inset ring-accent/40" : "hover:bg-muted/40"}`}
     >
-      {/* Truck photo – clickable for menu */}
       <div className="relative h-44 sm:h-48 cursor-pointer group" onClick={onPhotoClick}>
         {photoUrl ? (
           <img
@@ -351,26 +343,23 @@ function TruckSidebarCard({
           />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">
-            <Truck className="h-10 w-10 text-muted-foreground/40" />
+            <Truck className="h-10 w-10 text-muted-foreground/30" />
           </div>
         )}
 
-        {/* Hover overlay with menu icon */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 rounded-full p-2.5 shadow-lg">
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-card/90 rounded-full p-2.5 municipal-shadow">
             <UtensilsCrossed className="h-5 w-5 text-primary" />
           </div>
         </div>
 
-        {/* Status badge overlay */}
         {isSelected && (
           <div className="absolute top-2 left-2">
-            <Badge className="bg-accent text-accent-foreground text-xs shadow">נבחר</Badge>
+            <Badge className="bg-accent text-accent-foreground text-[10px] shadow-sm">נבחר</Badge>
           </div>
         )}
       </div>
 
-      {/* Name + location – clickable to select on map */}
       <button onClick={onSelect} className="w-full text-start">
         <div className="bg-gradient-to-t from-black/70 to-transparent p-3 pt-2 -mt-12 relative z-10">
           <div className="flex items-center gap-2">
@@ -382,7 +371,7 @@ function TruckSidebarCard({
             )}
           </div>
           {truck.locations && (
-            <p className="text-xs text-white/80 flex items-center gap-1 mt-0.5">
+            <p className="text-xs text-white/75 flex items-center gap-1 mt-0.5">
               <MapPin className="h-3 w-3" />
               {truck.locations.name}
               {truck.locations.neighborhood && `, ${truck.locations.neighborhood}`}
