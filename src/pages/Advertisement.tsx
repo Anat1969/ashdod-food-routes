@@ -118,14 +118,6 @@ export default function Advertisement() {
     );
   }
 
-  // Register list for record navigation
-  useRegisterList(
-    trucks.map((t) => ({ id: t.id, label: t.truck_name })),
-    "/advertisement",
-    "/truck/",
-    "address"
-  );
-
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero */}
