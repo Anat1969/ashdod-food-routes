@@ -446,7 +446,7 @@ export default function Directory() {
                           }
                         }}
                       />
-                      {(truck as any).has_operator && (
+                      {(truck as any).has_operator ? (
                         <Input
                           className="h-8 text-xs w-[120px]"
                           placeholder="שם המפעיל"
@@ -459,6 +459,8 @@ export default function Directory() {
                             }
                           }}
                         />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">אין</span>
                       )}
                     </div>
                   </TableCell>
