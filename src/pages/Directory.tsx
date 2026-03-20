@@ -380,14 +380,32 @@ export default function Directory() {
                       {truck.truck_name}
                     </Link>
                   </TableCell>
-                  {/* פודטראק */}
+                  {/* מבנה קיים בפועל */}
                   <TableCell>
-                    <Checkbox
-                      checked={!!truck.vehicle_type}
-                      onCheckedChange={(checked) =>
-                        updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
-                      }
-                    />
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={!!truck.vehicle_type}
+                        onCheckedChange={(checked) =>
+                          updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
+                        }
+                      />
+                      {truck.vehicle_type ? (
+                        <Input
+                          className="h-8 text-xs w-[120px]"
+                          placeholder="שם העסק"
+                          value={truck.vehicle_type === "פודטראק" ? "" : truck.vehicle_type}
+                          onChange={(e) => {
+                            const val = e.target.value || "פודטראק";
+                            setTrucks((prev) => prev.map((t) => t.id === truck.id ? { ...t, vehicle_type: val } : t));
+                          }}
+                          onBlur={() => {
+                            updateField(truck.id, "vehicle_type", truck.vehicle_type || "פודטראק");
+                          }}
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">לא מאויש</span>
+                      )}
+                    </div>
                   </TableCell>
                   {/* תשתית */}
                   <TableCell>
