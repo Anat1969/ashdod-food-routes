@@ -263,11 +263,11 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           <CardContent className="space-y-2 text-sm pb-3">
             {isAdmin ? (
               <>
-                <EditableRow label="שם מיקום" value={locName} onChange={setLocName} />
-                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} />
-                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} />
-                <EditableRow label="גוש" value={locGush} onChange={setLocGush} />
-                <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} />
+                <EditableRow label="שם מיקום" value={locName} onChange={setLocName} onBlur={() => saveLocationField({ name: locName || "ללא שם" })} />
+                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
+                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} onBlur={() => saveLocationField({ neighborhood: locNeighborhood || null })} />
+                <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
+                <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
                 <div className="flex flex-wrap gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
                     <Checkbox checked={locDesired} onCheckedChange={(v) => setLocDesired(!!v)} />
