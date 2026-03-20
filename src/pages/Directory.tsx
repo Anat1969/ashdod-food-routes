@@ -437,17 +437,17 @@ export default function Directory() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {/* מבנה - תמונה */}
+                  {/* מיקום - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
+                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
                   </TableCell>
                   {/* סביבה - תמונה */}
                   <TableCell>
                     <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
                   </TableCell>
-                  {/* מיקום - תמונה */}
+                  {/* מבנה - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
+                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
