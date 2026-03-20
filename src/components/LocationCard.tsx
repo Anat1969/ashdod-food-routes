@@ -329,7 +329,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <div className="pt-2 border-t">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
               {isAdmin ? (
-                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} placeholder="ניתוח מצב השטח..." rows={3} />
+                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} onBlur={() => saveExpertField({ field_notes: fieldNotes })} placeholder="ניתוח מצב השטח..." rows={3} />
               ) : (
                 <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
               )}
