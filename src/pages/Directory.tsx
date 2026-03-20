@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2 } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2, ImagePlus } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
@@ -190,6 +190,24 @@ export default function Directory() {
     toast.success("הרשומה נמחקה בהצלחה");
   };
 
+  const handleImageUpload = async (truckId: string, file: File) => {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${truckId}/vehicle/${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("truck-photos")
+      .upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast.error("שגיאה בהעלאת תמונה");
+      return;
+    }
+    const { data: urlData } = supabase.storage
+      .from("truck-photos")
+      .getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await updateField(truckId, "vehicle_photo_url", url);
+    toast.success("התמונה נשמרה");
+  };
+
   const updateStatus = async (truckId: string, newStatus: string) => {
     const { error } = await supabase
       .from("food_trucks")
@@ -330,6 +348,7 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("station_type")}>
                   <span className="flex items-center gap-1">סוג עמדה <SortIcon col="station_type" /></span>
                 </TableHead>
+                <TableHead className="text-right">תמונה</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
@@ -373,6 +392,49 @@ export default function Directory() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </TableCell>
+                  {/* תמונה */}
+                  <TableCell>
+                    {truck.vehicle_photo_url ? (
+                      <div className="relative group w-[60px] h-[40px]">
+                        <img
+                          src={truck.vehicle_photo_url}
+                          alt={truck.truck_name}
+                          className="w-full h-full object-cover rounded"
+                        />
+                        <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded cursor-pointer">
+                          <ImagePlus className="h-4 w-4 text-white" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload(truck.id, file);
+                            }}
+                          />
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="flex items-center justify-center w-[60px] h-[40px] border-2 border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-primary/50 transition-colors"
+                        onPaste={(e) => {
+                          const file = e.clipboardData.files?.[0];
+                          if (file && file.type.startsWith("image/")) handleImageUpload(truck.id, file);
+                        }}
+                        tabIndex={0}
+                      >
+                        <ImagePlus className="h-4 w-4 text-muted-foreground" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(truck.id, file);
+                          }}
+                        />
+                      </label>
+                    )}
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
