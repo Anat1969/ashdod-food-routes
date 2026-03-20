@@ -223,12 +223,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <CardContent className="space-y-3 text-sm pb-3">
               {isAdmin ? (
                 <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                  <EditableRow label="שם" value={opName} onChange={setOpName} />
-                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} />
-                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} />
-                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
-                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
+                  <EditableRow label="שם" value={opName} onChange={setOpName} onBlur={() => saveTruckField({ operator_name: opName || null })} />
+                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} onBlur={() => saveProfileField({ phone: opPhone || null })} />
+                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} onBlur={() => saveTruckField({ operator_address: opAddress || null })} />
+                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} onBlur={() => saveTruckField({ operator_email: opEmail || null })} />
+                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
+                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-x-6 gap-y-1">
