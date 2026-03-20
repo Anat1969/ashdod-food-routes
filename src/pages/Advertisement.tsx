@@ -120,14 +120,14 @@ export default function Advertisement() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero — compact, branded */}
+      {/* Hero — discovery-focused, inviting */}
       <section className="premium-hero-deep text-primary-foreground">
-        <div className="container mx-auto px-4 py-5" dir="rtl">
+        <div className="container mx-auto px-4 py-6" dir="rtl">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight">גלו עמדות אוכל</h1>
-              <p className="text-sm text-primary-foreground/50 mt-1 leading-relaxed">
-                מיקומים, תפריטים ושעות פעילות ברחבי אשדוד
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">גלו, השוו ובחרו</h1>
+              <p className="text-sm text-primary-foreground/50 mt-1.5 leading-relaxed max-w-md">
+                עיינו בתפריטים, צפו בתמונות ובחרו את העמדה שמתאימה לכם — הכל במקום אחד
               </p>
             </div>
             <PageNavigation />
@@ -152,11 +152,12 @@ export default function Advertisement() {
       ) : (
         <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 140px)" }}>
           {/* Right sidebar */}
-          <aside className="md:w-[340px] lg:w-[380px] overflow-y-auto border-s bg-background flex-shrink-0">
+          <aside className="md:w-[370px] lg:w-[420px] overflow-y-auto border-s bg-background flex-shrink-0">
             <div className="p-3 border-b bg-card">
-              <p className="text-xs font-semibold text-muted-foreground/60 tracking-wide">
-                {trucks.length} עמדות זמינות
+              <p className="text-[11px] font-semibold text-muted-foreground/60 tracking-wide">
+                קטלוג · {trucks.length} עמדות
               </p>
+              <p className="text-[10px] text-muted-foreground/40 mt-0.5">לחצו על תמונה לצפייה בתפריט</p>
             </div>
             <div className="flex flex-col gap-0">
               {trucks.map((truck) => (
