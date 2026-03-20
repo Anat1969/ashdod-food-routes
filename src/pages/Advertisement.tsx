@@ -38,7 +38,6 @@ export default function Advertisement() {
   const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
   const { isAdmin, user } = useAuth();
 
-  // Register list for record navigation — must be before any early return
   useRegisterList(
     trucks.map((t) => ({ id: t.id, label: t.truck_name })),
     "/advertisement",
@@ -121,14 +120,14 @@ export default function Advertisement() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero — unified with primary brand */}
-      <section className="premium-hero-deep text-primary-foreground py-8">
-        <div className="container mx-auto px-4" dir="rtl">
+      {/* Hero — compact, branded */}
+      <section className="premium-hero-deep text-primary-foreground">
+        <div className="container mx-auto px-4 py-5" dir="rtl">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">עמדות אוכל באשדוד</h1>
-              <p className="text-sm text-primary-foreground/60 mt-1.5 leading-relaxed">
-                גלו את מגוון העמדות ברחבי העיר — מיקומים, תפריטים ושעות פעילות
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">גלו עמדות אוכל</h1>
+              <p className="text-sm text-primary-foreground/50 mt-1 leading-relaxed">
+                מיקומים, תפריטים ושעות פעילות ברחבי אשדוד
               </p>
             </div>
             <PageNavigation />
@@ -137,19 +136,28 @@ export default function Advertisement() {
       </section>
 
       {trucks.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center space-y-3">
-            <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto">
-              <Truck className="h-7 w-7 text-muted-foreground/40" />
+        <div className="flex-1 flex items-center justify-center bg-background">
+          <div className="text-center space-y-4 max-w-xs">
+            <div className="w-16 h-16 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto">
+              <UtensilsCrossed className="h-7 w-7 text-muted-foreground/30" />
             </div>
-            <p className="text-base font-semibold text-foreground">אין עמדות פעילות כרגע</p>
-            <p className="text-sm text-muted-foreground">עמדות מאושרות יופיעו כאן באופן אוטומטי</p>
+            <div>
+              <p className="text-base font-semibold text-foreground">אין עמדות פעילות כרגע</p>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                עמדות מאושרות יופיעו כאן באופן אוטומטי
+              </p>
+            </div>
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 180px)" }}>
+        <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 140px)" }}>
           {/* Right sidebar */}
-          <aside className="md:w-[360px] lg:w-[400px] overflow-y-auto border-s bg-card flex-shrink-0">
+          <aside className="md:w-[340px] lg:w-[380px] overflow-y-auto border-s bg-background flex-shrink-0">
+            <div className="p-3 border-b bg-card">
+              <p className="text-xs font-semibold text-muted-foreground/60 tracking-wide">
+                {trucks.length} עמדות זמינות
+              </p>
+            </div>
             <div className="flex flex-col gap-0">
               {trucks.map((truck) => (
                 <TruckSidebarCard
@@ -173,29 +181,43 @@ export default function Advertisement() {
               />
             </div>
 
-            {/* Selected truck bar */}
+            {/* Selected truck detail bar */}
             {selectedTruck && (
               <div className="border-t bg-card p-4">
-                <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-lg font-bold text-foreground">{selectedTruck.truck_name}</h2>
-                  {selectedTruck.food_category && (
-                    <Badge variant="secondary" className="text-xs">{selectedTruck.food_category}</Badge>
+                <div className="flex items-start gap-4">
+                  {/* Photo thumbnail */}
+                  {(selectedTruck.street_photo_1_url || selectedTruck.vehicle_photo_url) && (
+                    <img
+                      src={selectedTruck.street_photo_1_url || selectedTruck.vehicle_photo_url || ""}
+                      alt={selectedTruck.truck_name}
+                      className="w-16 h-16 rounded-xl object-cover border flex-shrink-0"
+                    />
                   )}
-                  {selectedTruck.locations && (
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {selectedTruck.locations.name}
-                      {selectedTruck.locations.street && ` — ${selectedTruck.locations.street}`}
-                    </span>
-                  )}
-                  {(selectedTruck.hours_from || selectedTruck.hours_to) && (
-                    <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="h-3.5 w-3.5" />
-                      {selectedTruck.hours_from && selectedTruck.hours_to
-                        ? `${selectedTruck.hours_from} – ${selectedTruck.hours_to}`
-                        : selectedTruck.hours_from || selectedTruck.hours_to}
-                    </span>
-                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-base font-bold text-foreground">{selectedTruck.truck_name}</h2>
+                      {selectedTruck.food_category && (
+                        <Badge variant="secondary" className="text-[11px]">{selectedTruck.food_category}</Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4 mt-1.5 flex-wrap">
+                      {selectedTruck.locations && (
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                          {selectedTruck.locations.name}
+                          {selectedTruck.locations.street && ` · ${selectedTruck.locations.street}`}
+                        </span>
+                      )}
+                      {(selectedTruck.hours_from || selectedTruck.hours_to) && (
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                          {selectedTruck.hours_from && selectedTruck.hours_to
+                            ? `${selectedTruck.hours_from} – ${selectedTruck.hours_to}`
+                            : selectedTruck.hours_from || selectedTruck.hours_to}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {selectedTruck.design_mockup_url && (
@@ -206,7 +228,7 @@ export default function Advertisement() {
                           onClick={onClick}
                           src={selectedTruck.design_mockup_url!}
                           alt="תפריט"
-                          className="max-h-36 rounded-md border cursor-zoom-in"
+                          className="max-h-32 rounded-lg border cursor-zoom-in"
                         />
                       )}
                     </ImageLightbox>
@@ -218,31 +240,34 @@ export default function Advertisement() {
         </div>
       )}
 
-      {/* Menu Dialog */}
+      {/* Menu Dialog — premium catalog style */}
       <Dialog open={!!menuDialogTruck} onOpenChange={(open) => { if (!open) { setMenuDialogTruck(null); setNewItem({ item_name: "", price: "" }); } }}>
-        <DialogContent className="max-w-md p-0 overflow-hidden" dir="rtl">
-          {/* Header photo */}
-          <div className="relative h-36 bg-muted">
+        <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl" dir="rtl">
+          {/* Header photo with overlay */}
+          <div className="relative h-40 bg-muted">
             {menuDialogTruck?.street_photo_1_url ? (
               <img src={menuDialogTruck.street_photo_1_url} alt="" className="w-full h-full object-cover" />
+            ) : menuDialogTruck?.vehicle_photo_url ? (
+              <img src={menuDialogTruck.vehicle_photo_url} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Truck className="h-10 w-10 text-muted-foreground/30" />
+              <div className="w-full h-full flex items-center justify-center bg-muted">
+                <UtensilsCrossed className="h-10 w-10 text-muted-foreground/20" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-            <div className="absolute bottom-3 right-4 left-4">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <UtensilsCrossed className="h-5 w-5" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            <div className="absolute bottom-4 right-5 left-5">
+              <h2 className="text-lg font-bold text-white tracking-tight">
                 {menuDialogTruck?.truck_name}
               </h2>
               {menuDialogTruck?.food_category && (
-                <p className="text-xs text-white/70 mt-0.5">{menuDialogTruck.food_category}</p>
+                <p className="text-[13px] text-white/60 mt-0.5">{menuDialogTruck.food_category}</p>
               )}
             </div>
           </div>
 
-          <div className="px-5 pb-5 pt-3">
+          <div className="px-5 pb-5 pt-4">
+            <p className="text-[11px] font-semibold text-muted-foreground/50 tracking-wide uppercase mb-3">תפריט</p>
+
             {menuLoading ? (
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <div className="w-6 h-6 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
@@ -252,11 +277,14 @@ export default function Advertisement() {
               <>
                 <div className="space-y-0 max-h-[45vh] overflow-y-auto">
                   {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
-                    <p className="text-sm text-muted-foreground text-center py-6">אין פריטים בתפריט</p>
+                    <div className="text-center py-8">
+                      <UtensilsCrossed className="h-6 w-6 text-muted-foreground/20 mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">התפריט טרם הוזן</p>
+                    </div>
                   )}
 
                   {menuItems.map((item, idx) => (
-                    <div key={item.id} className={`flex items-center gap-3 py-2.5 ${idx < menuItems.length - 1 ? 'border-b border-dashed border-border' : ''}`}>
+                    <div key={item.id} className={`flex items-center gap-3 py-3 ${idx < menuItems.length - 1 ? 'border-b border-border/50' : ''}`}>
                       {canEditMenu(menuDialogTruck!) ? (
                         <>
                           <Input
@@ -268,7 +296,7 @@ export default function Advertisement() {
                           <div className="flex items-center gap-1">
                             <span className="text-xs text-muted-foreground">₪</span>
                             <Input
-                              className="w-16 h-8 text-sm text-center border-0 border-b rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary font-medium"
+                              className="w-16 h-8 text-sm text-center border-0 border-b rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary font-semibold"
                               type="number"
                               value={item.price}
                               onChange={(e) => updateMenuItem(item.id, "price", parseFloat(e.target.value) || 0)}
@@ -282,7 +310,7 @@ export default function Advertisement() {
                       ) : (
                         <>
                           <span className="flex-1 text-sm">{item.item_name}</span>
-                          <span className="text-sm font-bold tabular-nums">₪{item.price}</span>
+                          <span className="text-sm font-bold tabular-nums text-foreground">₪{item.price}</span>
                         </>
                       )}
                     </div>
@@ -290,7 +318,7 @@ export default function Advertisement() {
                 </div>
 
                 {canEditMenu(menuDialogTruck!) && (
-                  <div className="mt-3 pt-3 border-t">
+                  <div className="mt-4 pt-3 border-t">
                     <div className="flex items-center gap-2">
                       <Input
                         className="flex-1 h-9 text-sm"
@@ -311,7 +339,7 @@ export default function Advertisement() {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-[11px] text-muted-foreground mt-1.5">הקלידו שם ומחיר ולחצו Enter להוספה</p>
+                    <p className="text-[11px] text-muted-foreground mt-1.5">הקלידו שם ומחיר ולחצו Enter</p>
                   </div>
                 )}
               </>
@@ -323,7 +351,7 @@ export default function Advertisement() {
   );
 }
 
-/* ── Sidebar card ── */
+/* ── Sidebar card — premium tile ── */
 function TruckSidebarCard({
   truck,
   isSelected,
@@ -339,10 +367,10 @@ function TruckSidebarCard({
 
   return (
     <div
-      className={`relative w-full text-start border-b last:border-b-0 transition-colors overflow-hidden
-        ${isSelected ? "bg-accent/10 ring-2 ring-inset ring-accent/40" : "hover:bg-muted/40"}`}
+      className={`relative w-full text-start border-b last:border-b-0 transition-all duration-200 overflow-hidden
+        ${isSelected ? "bg-accent/[0.06] border-s-[3px] border-s-accent" : "hover:bg-muted/30"}`}
     >
-      <div className="relative h-44 sm:h-48 cursor-pointer group" onClick={onPhotoClick}>
+      <div className="relative h-40 cursor-pointer group" onClick={onPhotoClick}>
         {photoUrl ? (
           <img
             src={photoUrl}
@@ -350,39 +378,39 @@ function TruckSidebarCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <Truck className="h-10 w-10 text-muted-foreground/30" />
+          <div className="w-full h-full bg-muted/50 flex items-center justify-center">
+            <UtensilsCrossed className="h-8 w-8 text-muted-foreground/20" />
           </div>
         )}
 
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-card/90 rounded-full p-2.5 municipal-shadow">
-            <UtensilsCrossed className="h-5 w-5 text-primary" />
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-card/90 backdrop-blur-sm rounded-full p-2.5 municipal-shadow">
+            <UtensilsCrossed className="h-4 w-4 text-accent" />
           </div>
         </div>
 
         {isSelected && (
           <div className="absolute top-2 left-2">
-            <Badge className="bg-accent text-accent-foreground text-[10px] shadow-sm">נבחר</Badge>
+            <Badge className="bg-accent text-accent-foreground text-[10px] shadow-sm font-semibold">נבחר</Badge>
           </div>
         )}
       </div>
 
       <button onClick={onSelect} className="w-full text-start">
-        <div className="bg-gradient-to-t from-black/70 to-transparent p-3 pt-2 -mt-12 relative z-10">
+        <div className="bg-gradient-to-t from-black/75 via-black/40 to-transparent p-3 pt-3 -mt-14 relative z-10">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-white">{truck.truck_name}</span>
+            <span className="text-sm font-bold text-white tracking-tight">{truck.truck_name}</span>
             {truck.food_category && (
-              <Badge variant="secondary" className="text-[10px] bg-white/20 text-white border-0">
+              <Badge variant="secondary" className="text-[10px] bg-white/15 text-white/80 border-0 font-medium">
                 {truck.food_category}
               </Badge>
             )}
           </div>
           {truck.locations && (
-            <p className="text-xs text-white/75 flex items-center gap-1 mt-0.5">
-              <MapPin className="h-3 w-3" />
+            <p className="text-[12px] text-white/60 flex items-center gap-1 mt-0.5">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
               {truck.locations.name}
-              {truck.locations.neighborhood && `, ${truck.locations.neighborhood}`}
+              {truck.locations.neighborhood && ` · ${truck.locations.neighborhood}`}
             </p>
           )}
         </div>
