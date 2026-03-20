@@ -221,16 +221,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             </CardHeader>
             <CardContent className="space-y-3 text-sm pb-3">
               {isAdmin ? (
-                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                   <EditableRow label="שם" value={opName} onChange={setOpName} onBlur={() => saveTruckField({ operator_name: opName || null })} />
                   <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} onBlur={() => saveProfileField({ phone: opPhone || null })} />
                   <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} onBlur={() => saveTruckField({ operator_address: opAddress || null })} />
                   <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} onBlur={() => saveTruckField({ operator_email: opEmail || null })} />
-                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
-                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                   <ReadOnlyRow label="שם" value={(truck as any).operator_name} />
                   <ReadOnlyRow label="נייד" value={operator?.phone} />
                   <ReadOnlyRow label="כתובת" value={(truck as any).operator_address} />
@@ -245,8 +243,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                       <span className="font-medium">—</span>
                     )}
                   </div>
-                  <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
-                  <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
                 </div>
               )}
             </CardContent>
