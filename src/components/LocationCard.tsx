@@ -263,8 +263,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             {isAdmin ? (
               <>
                 <EditableRow label="שם מיקום" value={locName} onChange={setLocName} onBlur={() => saveLocationField({ name: locName || "ללא שם" })} />
-                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
-                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} onBlur={() => saveLocationField({ neighborhood: locNeighborhood || null })} />
+                <EditableRow label="כתובת" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
               </>
