@@ -190,9 +190,9 @@ export default function Directory() {
     toast.success("הרשומה נמחקה בהצלחה");
   };
 
-  const handleImageUpload = async (truckId: string, file: File) => {
+  const handleImageUpload = async (truckId: string, file: File, field: "vehicle_photo_url" | "street_photo_1_url" | "aerial_photo_url", folder: string) => {
     const ext = file.name.split(".").pop() || "jpg";
-    const path = `${truckId}/vehicle/${Date.now()}.${ext}`;
+    const path = `${truckId}/${folder}/${Date.now()}.${ext}`;
     const { error: uploadError } = await supabase.storage
       .from("truck-photos")
       .upload(path, file, { upsert: true });
@@ -203,9 +203,42 @@ export default function Directory() {
     const { data: urlData } = supabase.storage
       .from("truck-photos")
       .getPublicUrl(path);
-    const url = urlData.publicUrl;
-    await updateField(truckId, "vehicle_photo_url", url);
+    await updateField(truckId, field, urlData.publicUrl);
     toast.success("התמונה נשמרה");
+  };
+
+  const ImageCell = ({ truck, field, folder }: { truck: TruckWithLocation; field: "vehicle_photo_url" | "street_photo_1_url" | "aerial_photo_url"; folder: string }) => {
+    const url = truck[field];
+    if (url) {
+      return (
+        <div className="relative group w-[60px] h-[40px]">
+          <img src={url} alt="" className="w-full h-full object-cover rounded" />
+          <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded cursor-pointer">
+            <ImagePlus className="h-4 w-4 text-white" />
+            <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageUpload(truck.id, file, field, folder);
+            }} />
+          </label>
+        </div>
+      );
+    }
+    return (
+      <label
+        className="flex items-center justify-center w-[60px] h-[40px] border-2 border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-primary/50 transition-colors"
+        onPaste={(e) => {
+          const file = e.clipboardData.files?.[0];
+          if (file && file.type.startsWith("image/")) handleImageUpload(truck.id, file, field, folder);
+        }}
+        tabIndex={0}
+      >
+        <ImagePlus className="h-4 w-4 text-muted-foreground" />
+        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleImageUpload(truck.id, file, field, folder);
+        }} />
+      </label>
+    );
   };
 
   const updateStatus = async (truckId: string, newStatus: string) => {
@@ -348,7 +381,9 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("station_type")}>
                   <span className="flex items-center gap-1">סוג עמדה <SortIcon col="station_type" /></span>
                 </TableHead>
-                <TableHead className="text-right">תמונה</TableHead>
+                <TableHead className="text-right">מבנה</TableHead>
+                <TableHead className="text-right">סביבה</TableHead>
+                <TableHead className="text-right">מיקום</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
@@ -357,10 +392,10 @@ export default function Directory() {
                 </TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
-                  <span className="flex items-center gap-1">מצב סביבה <SortIcon col="environment_ok" /></span>
+                  <span className="flex items-center gap-1">סביבה <SortIcon col="environment_ok" /></span>
                 </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
-                  <span className="flex items-center gap-1">מצב פודטראק <SortIcon col="truck_condition_ok" /></span>
+                  <span className="flex items-center gap-1">מבנה <SortIcon col="truck_condition_ok" /></span>
                 </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
                   <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
@@ -393,48 +428,17 @@ export default function Directory() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {/* תמונה */}
+                  {/* מבנה - תמונה */}
                   <TableCell>
-                    {truck.vehicle_photo_url ? (
-                      <div className="relative group w-[60px] h-[40px]">
-                        <img
-                          src={truck.vehicle_photo_url}
-                          alt={truck.truck_name}
-                          className="w-full h-full object-cover rounded"
-                        />
-                        <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded cursor-pointer">
-                          <ImagePlus className="h-4 w-4 text-white" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleImageUpload(truck.id, file);
-                            }}
-                          />
-                        </label>
-                      </div>
-                    ) : (
-                      <label className="flex items-center justify-center w-[60px] h-[40px] border-2 border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-primary/50 transition-colors"
-                        onPaste={(e) => {
-                          const file = e.clipboardData.files?.[0];
-                          if (file && file.type.startsWith("image/")) handleImageUpload(truck.id, file);
-                        }}
-                        tabIndex={0}
-                      >
-                        <ImagePlus className="h-4 w-4 text-muted-foreground" />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleImageUpload(truck.id, file);
-                          }}
-                        />
-                      </label>
-                    )}
+                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
+                  </TableCell>
+                  {/* סביבה - תמונה */}
+                  <TableCell>
+                    <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
+                  </TableCell>
+                  {/* מיקום - תמונה */}
+                  <TableCell>
+                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
@@ -495,14 +499,14 @@ export default function Directory() {
                       </div>
                     </div>
                   </TableCell>
-                  {/* מצב סביבה */}
+                  {/* סביבה */}
                   <TableCell>
                     <TriStateButtons
                       value={truck.environment_ok}
                       onChange={(val) => updateField(truck.id, "environment_ok", val)}
                     />
                   </TableCell>
-                  {/* מצב פודטראק */}
+                  {/* מבנה */}
                   <TableCell>
                     <TriStateButtons
                       value={truck.truck_condition_ok}
