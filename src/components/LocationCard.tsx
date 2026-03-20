@@ -153,13 +153,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
   const toggleExpertBool = async (field: string, current: boolean | null) => {
     if (!isAdmin) return;
+    const nextValue = current === null ? true : current === true ? false : null;
     if (expertOpinion?.id) {
-      await supabase.from("expert_opinions").update({ [field]: !current }).eq("id", expertOpinion.id);
+      await supabase.from("expert_opinions").update({ [field]: nextValue }).eq("id", expertOpinion.id);
     } else {
       await supabase.from("expert_opinions").insert({
         truck_id: truck.id,
         author_id: userId || null,
-        [field]: true,
+        [field]: nextValue,
       } as any);
     }
     onUpdate();
