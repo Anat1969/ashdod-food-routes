@@ -310,10 +310,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             />
             {isAdmin ? (
               <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-center gap-1">
-                  <Checkbox checked={locDesired} onCheckedChange={(v) => { setLocDesired(!!v); saveLocationField({ is_desired: !!v }); }} />
-                  <span className="text-xs font-medium">מיקום רצוי</span>
-                </div>
                 <p className="text-xs text-muted-foreground">תשתיות:</p>
                 <div className="flex items-center gap-1">
                   <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
@@ -327,17 +323,23 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   <Checkbox checked={locSewage} onCheckedChange={(v) => { setLocSewage(!!v); saveLocationField({ infra_sewage: !!v }); }} />
                   <CircleDot className="h-4 w-4" /><span className="text-xs">ביוב</span>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => { setLocDesired(!locDesired); saveLocationField({ is_desired: !locDesired }); }}
+                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"}`}
+                >
+                  {locDesired ? "✅ מיקום רצוי" : "מיקום רצוי"}
+                </button>
               </div>
             ) : (
               <div className="space-y-2 pt-2 border-t">
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground text-xs">מיקום רצוי:</span>
-                  {location?.is_desired ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-destructive" />}
-                </div>
                 <p className="text-xs text-muted-foreground">תשתיות:</p>
                 <InfraIcon label="חשמל" ok={location?.infra_electricity} icon={<Zap className="h-4 w-4" />} />
                 <InfraIcon label="מים" ok={location?.infra_water} icon={<Droplets className="h-4 w-4" />} />
                 <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
+                <div className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 text-center ${location?.is_desired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"}`}>
+                  {location?.is_desired ? "✅ מיקום רצוי" : "❌ לא מיקום רצוי"}
+                </div>
               </div>
             )}
           </CardContent>
