@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LogIn, Building2, ShieldCheck } from "lucide-react";
+import { LogIn, ShieldCheck } from "lucide-react";
+import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function Login() {
   const { signIn, user } = useAuth();
@@ -48,10 +49,10 @@ export default function Login() {
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
-        {/* Branding header */}
+        {/* Branding header — original logo */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-2">
-            <Building2 className="h-7 w-7 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/6 border border-border/60 mb-2 overflow-hidden">
+            <img src={ashdodLogo} alt="סמל עיריית אשדוד" className="h-14 w-14 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">
             מערכת ניהול עמדות מזון
@@ -117,7 +118,7 @@ export default function Login() {
                 disabled={loading}
               >
                 <LogIn className="h-4 w-4 ml-1" />
-                {loading ? "מתחבר..." : "כניסה למערכת"}
+                {loading ? "מתחבר…" : "כניסה למערכת"}
               </Button>
             </form>
 

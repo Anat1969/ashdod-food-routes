@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import ashdodEmblem from "@/assets/ashdod-emblem.png";
+import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const { user, isAdmin, signOut } = useAuth();
@@ -35,14 +35,18 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04] backdrop-blur-sm">
+      <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04]">
         <div className="container mx-auto px-4 h-[56px] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <img alt="סמל עיריית אשדוד" className="h-8 w-auto opacity-85 group-hover:opacity-100 transition-opacity" src={ashdodEmblem} style={{ filter: "brightness(0) invert(1)" }} />
-            <div className="hidden sm:block border-r border-primary-foreground/10 h-4 mr-1" />
-            <span className="hidden sm:block text-[10px] font-medium text-primary-foreground/35 tracking-[0.15em] uppercase">
-              עמדות מזון
-            </span>
+            <div className="h-9 w-9 rounded-lg overflow-hidden bg-primary-foreground/[0.06] border border-primary-foreground/[0.08] flex items-center justify-center">
+              <img alt="סמל עיריית אשדוד" className="h-8 w-8 object-contain" src={ashdodLogo} />
+            </div>
+            <div className="hidden sm:flex items-center gap-2">
+              <div className="border-r border-primary-foreground/10 h-4" />
+              <span className="text-[11px] font-medium text-primary-foreground/40 tracking-wide">
+                עמדות מזון · אשדוד
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
@@ -123,7 +127,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
       <footer className="bg-primary text-primary-foreground/60 py-6">
         <div className="container mx-auto px-4 text-center text-sm">
           <p>© {new Date().getFullYear()} עיריית אשדוד — מחלקת הנדסה ותכנון עירוני</p>
-          <p className="mt-1 text-xs">מערכת ניהול עמדות מזון במרחב הציבורי</p>
+          <p className="mt-1 text-xs text-primary-foreground/40">מערכת ניהול עמדות מזון במרחב הציבורי</p>
         </div>
       </footer>
     </div>);

@@ -112,21 +112,24 @@ export default function Advertisement() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
-        טוען...
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+        <p className="text-sm text-muted-foreground">טוען עמדות…</p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero */}
-      <section className="premium-hero text-primary-foreground py-8">
+      {/* Hero — unified with primary brand */}
+      <section className="premium-hero-deep text-primary-foreground py-8">
         <div className="container mx-auto px-4" dir="rtl">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">עמדות אוכל באשדוד</h1>
-              <p className="text-sm opacity-70 mt-1">גלו את מגוון העמדות ברחבי העיר — מיקומים, תפריטים ושעות פעילות</p>
+              <p className="text-sm text-primary-foreground/60 mt-1.5 leading-relaxed">
+                גלו את מגוון העמדות ברחבי העיר — מיקומים, תפריטים ושעות פעילות
+              </p>
             </div>
             <PageNavigation />
           </div>
@@ -134,11 +137,13 @@ export default function Advertisement() {
       </section>
 
       {trucks.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-muted-foreground">
-          <div className="text-center">
-            <Truck className="h-16 w-16 mx-auto mb-4 opacity-30" />
-            <p className="text-lg font-medium">אין עמדות פעילות כרגע</p>
-            <p className="text-sm mt-1">עמדות מאושרות יופיעו כאן באופן אוטומטי</p>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto">
+              <Truck className="h-7 w-7 text-muted-foreground/40" />
+            </div>
+            <p className="text-base font-semibold text-foreground">אין עמדות פעילות כרגע</p>
+            <p className="text-sm text-muted-foreground">עמדות מאושרות יופיעו כאן באופן אוטומטי</p>
           </div>
         </div>
       ) : (
@@ -239,7 +244,10 @@ export default function Advertisement() {
 
           <div className="px-5 pb-5 pt-3">
             {menuLoading ? (
-              <p className="text-sm text-muted-foreground text-center py-6">טוען תפריט...</p>
+              <div className="flex flex-col items-center justify-center py-8 gap-2">
+                <div className="w-6 h-6 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+                <p className="text-sm text-muted-foreground">טוען תפריט…</p>
+              </div>
             ) : (
               <>
                 <div className="space-y-0 max-h-[45vh] overflow-y-auto">
@@ -303,7 +311,7 @@ export default function Advertisement() {
                         <Plus className="h-4 w-4" />
                       </Button>
                     </div>
-                    <p className="text-[10px] text-muted-foreground mt-1.5">הקלידו שם ומחיר ולחצו Enter להוספה</p>
+                    <p className="text-[11px] text-muted-foreground mt-1.5">הקלידו שם ומחיר ולחצו Enter להוספה</p>
                   </div>
                 )}
               </>
