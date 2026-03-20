@@ -120,14 +120,14 @@ export default function Advertisement() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Hero — compact, branded */}
+      {/* Hero — discovery-focused, inviting */}
       <section className="premium-hero-deep text-primary-foreground">
-        <div className="container mx-auto px-4 py-5" dir="rtl">
+        <div className="container mx-auto px-4 py-6" dir="rtl">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight">גלו עמדות אוכל</h1>
-              <p className="text-sm text-primary-foreground/50 mt-1 leading-relaxed">
-                מיקומים, תפריטים ושעות פעילות ברחבי אשדוד
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight">גלו, השוו ובחרו</h1>
+              <p className="text-sm text-primary-foreground/50 mt-1.5 leading-relaxed max-w-md">
+                עיינו בתפריטים, צפו בתמונות ובחרו את העמדה שמתאימה לכם — הכל במקום אחד
               </p>
             </div>
             <PageNavigation />
