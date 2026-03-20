@@ -28,6 +28,14 @@ import {
 type SortDirection = "asc" | "desc" | null;
 type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | "environment_ok" | "truck_condition_ok" | null;
 
+const STATUS_COLORS: Record<string, string> = {
+  approved: "bg-green-500",
+  rejected: "bg-red-500",
+  under_review: "bg-orange-400",
+  submitted: "bg-blue-500",
+  draft: "bg-yellow-400",
+};
+
 const STATION_TYPES = [
   "חוף אקספנסיבי",
   "מרינה",
