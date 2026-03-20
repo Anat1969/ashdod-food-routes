@@ -59,8 +59,8 @@ export default function AdminDashboard() {
         {/* Executive header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-primary" />
+            <div className="w-11 h-11 rounded-xl bg-primary/6 border border-border/60 flex items-center justify-center overflow-hidden flex-shrink-0">
+              <img src={ashdodLogo} alt="סמל עיריית אשדוד" className="h-9 w-9 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground">לוח בקרה</h1>

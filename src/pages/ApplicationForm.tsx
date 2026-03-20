@@ -85,10 +85,10 @@ export default function ApplicationForm() {
     <div className="container mx-auto px-4 py-10 max-w-2xl" dir="rtl">
       <PageNavigation />
 
-      {/* Premium header */}
+      {/* Premium header — original logo */}
       <div className="mb-10 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/8 mb-4">
-          <Building2 className="h-6 w-6 text-primary" />
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/6 border border-border/60 mb-4 overflow-hidden">
+          <img src={ashdodLogo} alt="סמל עיריית אשדוד" className="h-12 w-12 object-contain" />
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
           הגשת בקשה להיתר הצבה
