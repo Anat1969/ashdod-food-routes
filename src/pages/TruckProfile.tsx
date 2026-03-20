@@ -16,7 +16,7 @@ import LocationEditor from "@/components/LocationEditor";
 import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Clock, Check, X, Trash2, Plus, MapPin, Utensils } from "lucide-react";
+import { Clock, Check, X, Minus, Trash2, Plus, MapPin, Utensils } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import PageNavigation from "@/components/PageNavigation";
@@ -101,8 +101,10 @@ export default function TruckProfile() {
 
   const toggleCompliance = async (field: string, currentValue: boolean | null) => {
     if (!truck || !isAdmin) return;
+    // Tri-state cycle: null → true → false → null
+    const nextValue = currentValue === null ? true : currentValue === true ? false : null;
     if (compliance) {
-      await supabase.from("compliance_checklist").update({ [field]: !currentValue }).eq("id", compliance.id);
+      await supabase.from("compliance_checklist").update({ [field]: nextValue }).eq("id", compliance.id);
     } else {
       await supabase.from("compliance_checklist").insert({
         truck_id: truck.id,
@@ -236,14 +238,18 @@ export default function TruckProfile() {
                 </CardHeader>
                 <CardContent className="space-y-1.5 max-h-[45vh] overflow-y-auto">
                   {DESIGN_ITEMS.map((item) => {
-                    const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                    const value = compliance ? (compliance as any)[item.key] ?? null : null;
                     return (
                       <div key={item.key} className="py-1.5 border-b last:border-b-0">
                         <div className="flex items-center gap-2">
                           {isAdmin ? (
-                            <Checkbox checked={!!value} onCheckedChange={() => toggleCompliance(item.key, value)} />
+                            <Checkbox
+                              checked={value === true ? true : value === false ? "indeterminate" : false}
+                              onCheckedChange={() => toggleCompliance(item.key, value)}
+                              className={value === false ? "border-destructive data-[state=indeterminate]:bg-destructive data-[state=indeterminate]:text-destructive-foreground" : ""}
+                            />
                           ) : (
-                            value ? <Check className="h-4 w-4 text-primary" /> : <X className="h-4 w-4 text-destructive" />
+                            value === true ? <Check className="h-4 w-4 text-primary" /> : value === false ? <X className="h-4 w-4 text-destructive" /> : <Minus className="h-4 w-4 text-muted-foreground" />
                           )}
                           <span className="text-sm font-medium">{item.label}</span>
                         </div>
@@ -262,20 +268,24 @@ export default function TruckProfile() {
                 </CardHeader>
                 <CardContent className="space-y-1.5 max-h-[45vh] overflow-y-auto">
                   {STRUCTURE_ENV_ITEMS.map((item) => {
-                    const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                    const value = compliance ? (compliance as any)[item.key] ?? null : null;
                     return (
                       <div key={item.key} className="py-1.5 border-b last:border-b-0">
                         <div className="flex items-center gap-2">
                           {isAdmin ? (
-                            <Checkbox checked={!!value} onCheckedChange={() => toggleCompliance(item.key, value)} />
+                            <Checkbox
+                              checked={value === true ? true : value === false ? "indeterminate" : false}
+                              onCheckedChange={() => toggleCompliance(item.key, value)}
+                              className={value === false ? "border-destructive data-[state=indeterminate]:bg-destructive data-[state=indeterminate]:text-destructive-foreground" : ""}
+                            />
                           ) : (
-                            value ? <Check className="h-4 w-4 text-primary" /> : <X className="h-4 w-4 text-destructive" />
+                            value === true ? <Check className="h-4 w-4 text-primary" /> : value === false ? <X className="h-4 w-4 text-destructive" /> : <Minus className="h-4 w-4 text-muted-foreground" />
                           )}
                           <span className="text-sm font-medium">{item.label}</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-0.5 mr-7 whitespace-pre-line leading-tight">{item.description}</p>
                       </div>
-                   );
+                    );
                   })}
                 </CardContent>
               </Card>
