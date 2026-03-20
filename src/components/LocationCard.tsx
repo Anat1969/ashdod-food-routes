@@ -267,24 +267,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} onBlur={() => saveLocationField({ neighborhood: locNeighborhood || null })} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
-                <div className="flex flex-wrap gap-4 pt-2 border-t">
-                  <div className="flex items-center gap-1">
-                    <Checkbox checked={locDesired} onCheckedChange={(v) => { setLocDesired(!!v); saveLocationField({ is_desired: !!v }); }} />
-                    <span className="text-xs">מיקום רצוי</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
-                    <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Checkbox checked={locWater} onCheckedChange={(v) => { setLocWater(!!v); saveLocationField({ infra_water: !!v }); }} />
-                    <Droplets className="h-4 w-4" /><span className="text-xs">מים</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Checkbox checked={locSewage} onCheckedChange={(v) => { setLocSewage(!!v); saveLocationField({ infra_sewage: !!v }); }} />
-                    <CircleDot className="h-4 w-4" /><span className="text-xs">ביוב</span>
-                  </div>
-                </div>
               </>
             ) : (
               <>
