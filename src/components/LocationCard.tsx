@@ -276,8 +276,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
 
       {/* === ROW 3: מיקום | מצב בשטח | הערות ותנאים === */}
       <div className="grid grid-cols-3 gap-3">
