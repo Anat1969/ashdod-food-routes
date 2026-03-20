@@ -57,7 +57,7 @@ function FlyToSelected({ truck }: { truck: TruckWithLocation | undefined }) {
 
 export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: TruckMapProps) {
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
-  const trucksWithCoords = trucks.filter((t) => t.locations?.lat && t.locations?.lng);
+  const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
 
   return (
     <MapContainer
