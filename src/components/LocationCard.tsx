@@ -275,15 +275,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <ReadOnlyRow label="שכונה" value={location?.neighborhood} />
                 <ReadOnlyRow label="גוש" value={location?.gush} />
                 <ReadOnlyRow label="חלקה" value={location?.chelka} />
-                <div className="flex items-center gap-2 pt-1">
-                  <span className="text-muted-foreground">מיקום רצוי:</span>
-                  {location?.is_desired ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-destructive" />}
-                </div>
-                <div className="flex gap-4 pt-2 border-t">
-                  <InfraIcon label="חשמל" ok={location?.infra_electricity} icon={<Zap className="h-4 w-4" />} />
-                  <InfraIcon label="מים" ok={location?.infra_water} icon={<Droplets className="h-4 w-4" />} />
-                  <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
-                </div>
               </>
             )}
           </CardContent>
