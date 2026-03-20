@@ -121,10 +121,11 @@ export default function PublicMap() {
           )}
         </div>
 
-        {/* Side list */}
-        <div className="w-80 hidden md:flex flex-col border-r bg-card overflow-y-auto">
-          <div className="p-3 border-b">
-            <h2 className="font-bold text-sm text-foreground">עמדות אוכל פעילות</h2>
+        {/* Narrow side list — secondary to the map */}
+        <div className="w-72 hidden md:flex flex-col border-r bg-card overflow-y-auto">
+          <div className="p-2.5 border-b">
+            <h2 className="font-bold text-xs text-foreground">מה פתוח עכשיו?</h2>
+            <p className="text-[10px] text-muted-foreground/50 mt-0.5">לחצו על עמדה לצפייה במפה</p>
           </div>
 
           {loading ? (

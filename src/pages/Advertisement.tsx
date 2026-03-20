@@ -152,11 +152,12 @@ export default function Advertisement() {
       ) : (
         <div className="flex-1 flex flex-col md:flex-row-reverse" style={{ height: "calc(100vh - 140px)" }}>
           {/* Right sidebar */}
-          <aside className="md:w-[340px] lg:w-[380px] overflow-y-auto border-s bg-background flex-shrink-0">
+          <aside className="md:w-[370px] lg:w-[420px] overflow-y-auto border-s bg-background flex-shrink-0">
             <div className="p-3 border-b bg-card">
-              <p className="text-xs font-semibold text-muted-foreground/60 tracking-wide">
-                {trucks.length} עמדות זמינות
+              <p className="text-[11px] font-semibold text-muted-foreground/60 tracking-wide">
+                קטלוג · {trucks.length} עמדות
               </p>
+              <p className="text-[10px] text-muted-foreground/40 mt-0.5">לחצו על תמונה לצפייה בתפריט</p>
             </div>
             <div className="flex flex-col gap-0">
               {trucks.map((truck) => (
