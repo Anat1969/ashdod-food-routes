@@ -190,7 +190,7 @@ export default function Directory() {
     toast.success("הרשומה נמחקה בהצלחה");
   };
 
-  const handleImageUpload = async (truckId: string, file: File, field: "vehicle_photo_url" | "street_photo_1_url" | "aerial_photo_url", folder: string) => {
+  const handleImageUpload = async (truckId: string, file: File, field: "vehicle_photo_url" | "street_photo_1_url" | "street_photo_2_url" | "aerial_photo_url", folder: string) => {
     const ext = file.name.split(".").pop() || "jpg";
     const path = `${truckId}/${folder}/${Date.now()}.${ext}`;
     const { error: uploadError } = await supabase.storage
@@ -207,7 +207,7 @@ export default function Directory() {
     toast.success("התמונה נשמרה");
   };
 
-  const ImageCell = ({ truck, field, folder }: { truck: TruckWithLocation; field: "vehicle_photo_url" | "street_photo_1_url" | "aerial_photo_url"; folder: string }) => {
+  const ImageCell = ({ truck, field, folder }: { truck: TruckWithLocation; field: "vehicle_photo_url" | "street_photo_1_url" | "street_photo_2_url" | "aerial_photo_url"; folder: string }) => {
     const url = truck[field];
     if (url) {
       return (
@@ -443,7 +443,7 @@ export default function Directory() {
                   </TableCell>
                   {/* סביבה - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
+                    <ImageCell truck={truck} field="street_photo_2_url" folder="street2" />
                   </TableCell>
                   {/* מבנה - תמונה */}
                   <TableCell>
