@@ -189,12 +189,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   await supabase.from("food_trucks").update({ street_photo_1_url: null }).eq("id", truck.id);
                   onUpdate();
                 }}
-                label="מיקום עירוני"
+                label="מיקום"
                 accept="image/*"
                 className="h-full"
               />
             ) : (
-              <PhotoSlot label="מיקום עירוני" url={truck.street_photo_1_url} className="h-full aspect-square" />
+              <PhotoSlot label="מיקום" url={truck.street_photo_1_url} className="h-full aspect-square" />
             )}
           </div>
           <div className="aspect-square">
@@ -211,12 +211,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
                   onUpdate();
                 }}
-                label="מיקום סביבה"
+                label="סביבה"
                 accept="image/*"
                 className="h-full"
               />
             ) : (
-              <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
+              <PhotoSlot label="סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
             )}
           </div>
         </div>
@@ -237,12 +237,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
                   onUpdate();
                 }}
-                label="הפודטראק"
+                label="מבנה"
                 accept="image/*"
                 className="h-full"
               />
             ) : (
-              <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
+              <PhotoSlot label="מבנה" url={truck.vehicle_photo_url} className="h-full" />
             )}
           </div>
           {/* מפעיל - fills remaining space */}
