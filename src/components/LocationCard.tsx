@@ -350,13 +350,13 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               label="מצב סביבה תקין"
               value={expertOpinion?.environment_ok ?? null}
               isAdmin={isAdmin}
-              onChange={() => toggleExpertBool("environment_ok", expertOpinion?.environment_ok ?? null)}
+              onChange={(v) => setExpertBool("environment_ok", v)}
             />
             <BoolField
               label="מצב מבנה תקין"
               value={expertOpinion?.structure_ok ?? null}
               isAdmin={isAdmin}
-              onChange={() => toggleExpertBool("structure_ok", expertOpinion?.structure_ok ?? null)}
+              onChange={(v) => setExpertBool("structure_ok", v)}
             />
             <div className="pt-2 border-t">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
