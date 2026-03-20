@@ -201,15 +201,26 @@ export default function TruckProfile() {
         </TabsContent>
 
         <TabsContent value="location_card">
-          <LocationCard
-            truck={truck}
-            location={location}
-            operator={operator}
-            expertOpinion={expertOpinion}
-            isAdmin={isAdmin}
-            userId={user?.id}
-            onUpdate={fetchData}
-          />
+          <div className="space-y-4">
+            <LocationCard
+              truck={truck}
+              location={location}
+              operator={operator}
+              expertOpinion={expertOpinion}
+              isAdmin={isAdmin}
+              userId={user?.id}
+              onUpdate={fetchData}
+            />
+            {isAdmin && location && (
+              <LocationEditor
+                locationId={location.id}
+                currentLat={location.lat}
+                currentLng={location.lng}
+                locationName={location.name}
+                onSaved={fetchData}
+              />
+            )}
+          </div>
         </TabsContent>
 
         {/* Combined: compliance on the left, documents on the right */}
