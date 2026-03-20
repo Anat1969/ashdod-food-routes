@@ -16,7 +16,7 @@ import LocationEditor from "@/components/LocationEditor";
 import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { Clock, Check, X, Trash2, Plus, MapPin, Utensils } from "lucide-react";
+import { Clock, Check, X, Minus, Trash2, Plus, MapPin, Utensils } from "lucide-react";
 import ImageLightbox from "@/components/ImageLightbox";
 import { toast } from "sonner";
 import PageNavigation from "@/components/PageNavigation";
