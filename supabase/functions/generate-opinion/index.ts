@@ -20,6 +20,7 @@ serve(async (req) => {
       infra_water,
       infra_sewage,
       environment_ok,
+      existing_building_approval,
       operator_name,
       location_name,
     } = await req.json();
@@ -36,7 +37,8 @@ Part 2 (המלצה): Open with **אישור** or **דחייה** in bold, followe
 Hierarchy Rule — evaluate in this exact order, stop at first failure:
 1. Desired Location — if not desired, immediately recommend rejection
 2. Physical Conditions — structure, infrastructure, environment
-3. Operator — relevant only if 1 and 2 pass
+3. Official Approvals — existing building approval; if missing or not approved, recommend rejection
+4. Operator — relevant only if steps 1, 2, and 3 pass
 
 Never rely on existing status. Do not repeat info between parts.`;
 
@@ -49,6 +51,7 @@ Never rely on existing status. Do not repeat info between parts.`;
 - מים: ${infra_water ? "קיים" : "לא קיים"}
 - ביוב: ${infra_sewage ? "קיים" : "לא קיים"}
 - מצב סביבה תקין: ${environment_ok === true ? "כן" : environment_ok === false ? "לא" : "לא נבדק"}
+- אישור בנייה קיים: ${existing_building_approval === true ? "כן" : existing_building_approval === false ? "לא" : "לא נבדק"}
 - שם מפעיל: ${operator_name || "לא צוין"}`;
 
     const response = await fetch(

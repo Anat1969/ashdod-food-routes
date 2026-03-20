@@ -48,6 +48,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [locElectricity, setLocElectricity] = useState(location?.infra_electricity ?? false);
   const [locWater, setLocWater] = useState(location?.infra_water ?? false);
   const [locSewage, setLocSewage] = useState(location?.infra_sewage ?? false);
+  const [locBuildingApproval, setLocBuildingApproval] = useState<boolean | null>((location as any)?.existing_building_approval ?? null);
 
   const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
@@ -75,6 +76,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setLocElectricity(location?.infra_electricity ?? false);
     setLocWater(location?.infra_water ?? false);
     setLocSewage(location?.infra_sewage ?? false);
+    setLocBuildingApproval((location as any)?.existing_building_approval ?? null);
   }, [location]);
 
   useEffect(() => {
@@ -141,12 +143,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     onUpdate();
   };
 
-  const generateOpinion = useCallback(async () => {
+  const generateOpinion = useCallback(async (isDesiredOverride?: boolean) => {
     if (!isAdmin) return;
     setGeneratingOpinion(true);
     try {
       const payload = {
-        is_desired: true,
+        is_desired: isDesiredOverride !== undefined ? isDesiredOverride : locDesired,
         location_name: locName || location?.name || "",
         vehicle_type: truck.vehicle_type || "",
         structure_ok: expertOpinion?.structure_ok ?? (truck as any).truck_condition_ok ?? null,
@@ -154,6 +156,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         infra_water: locWater,
         infra_sewage: locSewage,
         environment_ok: expertOpinion?.environment_ok ?? (truck as any).environment_ok ?? null,
+        existing_building_approval: locBuildingApproval,
         operator_name: opName || (truck as any).operator_name || "",
       };
 
@@ -195,7 +198,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     } finally {
       setGeneratingOpinion(false);
     }
-  }, [isAdmin, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
+  }, [isAdmin, locDesired, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, locBuildingApproval, opName, userId, onUpdate]);
 
   const isApproved = truck.status === "approved";
 
@@ -376,6 +379,15 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   <Checkbox checked={locSewage} onCheckedChange={(v) => { setLocSewage(!!v); saveLocationField({ infra_sewage: !!v }); }} />
                   <CircleDot className="h-4 w-4" /><span className="text-xs">ביוב</span>
                 </div>
+                <BoolField
+                  label="אישור בנייה קיים"
+                  value={locBuildingApproval}
+                  isAdmin={isAdmin}
+                  onChange={(v) => {
+                    setLocBuildingApproval(v);
+                    saveLocationField({ existing_building_approval: v });
+                  }}
+                />
                 <button
                   type="button"
                   disabled={generatingOpinion}
@@ -383,9 +395,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                     const newDesired = !locDesired;
                     setLocDesired(newDesired);
                     await saveLocationField({ is_desired: newDesired });
-                    if (newDesired) {
-                      await generateOpinion();
-                    }
+                    await generateOpinion(newDesired);
                   }}
                   className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"} ${generatingOpinion ? "opacity-60 cursor-wait" : ""}`}
                 >
@@ -398,6 +408,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <InfraIcon label="חשמל" ok={location?.infra_electricity} icon={<Zap className="h-4 w-4" />} />
                 <InfraIcon label="מים" ok={location?.infra_water} icon={<Droplets className="h-4 w-4" />} />
                 <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
+                <BoolField
+                  label="אישור בנייה קיים"
+                  value={(location as any)?.existing_building_approval ?? null}
+                  isAdmin={false}
+                  onChange={() => {}}
+                />
                 <div className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 text-center ${location?.is_desired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"}`}>
                   {location?.is_desired ? "✅ מיקום רצוי" : "❌ לא מיקום רצוי"}
                 </div>
