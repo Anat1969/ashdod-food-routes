@@ -375,11 +375,11 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   );
 }
 
-function EditableRow({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function EditableRow({ label, value, onChange, onBlur, type = "text" }: { label: string; value: string; onChange: (v: string) => void; onBlur?: () => void; type?: string }) {
   return (
     <div className="space-y-1">
       <label className="text-xs text-muted-foreground">{label}</label>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} type={type} className="h-8 text-sm" />
+      <Input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} type={type} className="h-8 text-sm" />
     </div>
   );
 }
