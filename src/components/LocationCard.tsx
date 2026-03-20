@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Check, X, Zap, Droplets, CircleDot, Mail } from "lucide-react";
+import { Check, X, Zap, Droplets, CircleDot, Mail, Minus } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import ImageLightbox from "@/components/ImageLightbox";
 
@@ -153,13 +153,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
 
   const toggleExpertBool = async (field: string, current: boolean | null) => {
     if (!isAdmin) return;
+    const nextValue = current === null ? true : current === true ? false : null;
     if (expertOpinion?.id) {
-      await supabase.from("expert_opinions").update({ [field]: !current }).eq("id", expertOpinion.id);
+      await supabase.from("expert_opinions").update({ [field]: nextValue }).eq("id", expertOpinion.id);
     } else {
       await supabase.from("expert_opinions").insert({
         truck_id: truck.id,
         author_id: userId || null,
-        [field]: true,
+        [field]: nextValue,
       } as any);
     }
     onUpdate();
@@ -456,9 +457,13 @@ function BoolField({ label, value, isAdmin, onChange }: { label: string; value: 
   return (
     <div className="flex items-center gap-3">
       {isAdmin ? (
-        <Checkbox checked={!!value} onCheckedChange={onChange} />
+        <Checkbox
+          checked={value === true ? true : value === false ? "indeterminate" : false}
+          onCheckedChange={onChange}
+          className={value === false ? "border-destructive bg-destructive text-destructive-foreground" : ""}
+        />
       ) : (
-        value ? <Check className="h-5 w-5 text-green-600" /> : <X className="h-5 w-5 text-destructive" />
+        value === true ? <Check className="h-5 w-5 text-green-600" /> : value === false ? <X className="h-5 w-5 text-destructive" /> : <Minus className="h-5 w-5 text-muted-foreground" />
       )}
       <span>{label}</span>
     </div>
