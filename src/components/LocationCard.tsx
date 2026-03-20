@@ -84,70 +84,46 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setOpAddress((truck as any).operator_address || "");
   }, [operator, (truck as any).operator_name, (truck as any).operator_email, (truck as any).operator_address]);
 
-  const saveAll = async () => {
+  // Auto-save helpers
+  const saveLocationField = async (fields: Partial<Record<string, unknown>>) => {
     if (!isAdmin) return;
-    setSaving(true);
-
     if (location?.id) {
-      await supabase.from("locations").update({
-        name: locName || "ללא שם",
-        street: locStreet || null,
-        neighborhood: locNeighborhood || null,
-        gush: locGush || null,
-        chelka: locChelka || null,
-        location_type: locType || null,
-        building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null,
-        surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null,
-        is_desired: locDesired,
-        infra_electricity: locElectricity,
-        infra_water: locWater,
-        infra_sewage: locSewage,
-      }).eq("id", location.id);
+      await supabase.from("locations").update(fields).eq("id", location.id);
     } else {
       const { data: newLoc } = await supabase.from("locations").insert({
         name: locName || "מיקום חדש",
-        street: locStreet || null,
-        neighborhood: locNeighborhood || null,
-        gush: locGush || null,
-        chelka: locChelka || null,
-        location_type: locType || null,
-        building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null,
-        surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null,
-        is_desired: locDesired,
-        infra_electricity: locElectricity,
-        infra_water: locWater,
-        infra_sewage: locSewage,
-      }).select("id").single();
+        ...fields,
+      } as any).select("id").single();
       if (newLoc) {
         await supabase.from("food_trucks").update({ location_id: newLoc.id }).eq("id", truck.id);
       }
     }
+    onUpdate();
+  };
 
-    await supabase.from("food_trucks").update({
-      operator_name: opName || null,
-      operator_email: opEmail || null,
-      operator_address: opAddress || null,
-    } as any).eq("id", truck.id);
+  const saveTruckField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin) return;
+    await supabase.from("food_trucks").update(fields as any).eq("id", truck.id);
+    onUpdate();
+  };
 
-    if (operator?.id) {
-      await supabase.from("profiles").update({
-        phone: opPhone || null,
-      }).eq("id", operator.id);
-    }
+  const saveProfileField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin || !operator?.id) return;
+    await supabase.from("profiles").update(fields).eq("id", operator.id);
+    onUpdate();
+  };
 
+  const saveExpertField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin) return;
     if (expertOpinion?.id) {
-      await supabase.from("expert_opinions").update({ field_notes: fieldNotes, conditions }).eq("id", expertOpinion.id);
+      await supabase.from("expert_opinions").update(fields).eq("id", expertOpinion.id);
     } else {
       await supabase.from("expert_opinions").insert({
         truck_id: truck.id,
         author_id: userId || null,
-        field_notes: fieldNotes,
-        conditions,
+        ...fields,
       } as any);
     }
-
-    setSaving(false);
-    toast.success("כרטיס המיקום נשמר בהצלחה");
     onUpdate();
   };
 
