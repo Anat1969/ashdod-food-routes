@@ -344,25 +344,21 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-base">הערות ותנאים</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm pb-3">
+          <CardContent className="text-sm pb-3 space-y-3">
             {isAdmin ? (
               <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={6} />
             ) : (
               <p>{expertOpinion?.conditions || "—"}</p>
             )}
+            <div className={`rounded-md border-2 py-2 text-center ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
+              <p className="text-xs font-medium text-muted-foreground mb-0.5">סטטוס</p>
+              <p className="text-base font-bold">
+                {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* === ROW 4: סטטוס === */}
-      <Card className={`border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
-        <CardContent className="py-3 text-center">
-          <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
-          <p className="text-lg font-bold">
-            {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 }
