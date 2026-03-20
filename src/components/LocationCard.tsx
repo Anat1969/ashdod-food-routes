@@ -340,14 +340,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
               </div>
             )}
-            <div className="pt-2 border-t">
-              <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
-              {isAdmin ? (
-                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} onBlur={() => saveExpertField({ field_notes: fieldNotes })} placeholder="ניתוח מצב השטח..." rows={3} />
-              ) : (
-                <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
-              )}
-            </div>
           </CardContent>
         </Card>
 
@@ -357,8 +349,16 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <CardTitle className="text-base">הערות ותנאים</CardTitle>
           </CardHeader>
           <CardContent className="text-sm pb-3 space-y-3">
+            <div>
+              <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
+              {isAdmin ? (
+                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} onBlur={() => saveExpertField({ field_notes: fieldNotes })} placeholder="ניתוח מצב השטח..." rows={3} />
+              ) : (
+                <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
+              )}
+            </div>
             {isAdmin ? (
-              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={6} />
+              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={4} />
             ) : (
               <p>{expertOpinion?.conditions || "—"}</p>
             )}
