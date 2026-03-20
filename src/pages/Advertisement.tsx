@@ -36,10 +36,10 @@ function hasValidCoords(truck: TruckWithLocation | null | undefined): boolean {
   return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
 }
 
-/** Get the best available photo URL for a truck */
+/** Get the best available photo URL for a truck — vehicle photo first for catalog feel */
 function getTruckPhoto(truck: TruckWithLocation | null | undefined): string | null {
   if (!truck) return null;
-  return truck.street_photo_1_url || truck.vehicle_photo_url || null;
+  return truck.vehicle_photo_url || truck.street_photo_1_url || null;
 }
 
 export default function Advertisement() {
