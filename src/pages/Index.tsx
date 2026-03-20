@@ -22,35 +22,35 @@ export default function Index() {
           />
         </div>
 
-        <div className="relative container mx-auto px-4 pt-10 pb-14 md:pt-14 md:pb-20 text-center max-w-3xl">
+        <div className="relative container mx-auto px-4 pt-8 pb-12 md:pt-10 md:pb-16 text-center max-w-3xl">
           {/* Kicker */}
-          <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-4 uppercase font-medium">
+          <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-3 uppercase font-medium">
             עיריית אשדוד · הנדסה ותכנון עירוני
           </p>
 
           {/* Main headline */}
-          <h1 className="text-[2.25rem] md:text-[3.5rem] font-extrabold mb-3 leading-[1.08] tracking-tight">
+          <h1 className="text-[2rem] md:text-[3rem] font-extrabold mb-2.5 leading-[1.08] tracking-tight">
             ניהול עמדות מזון
           </h1>
 
           {/* Gold accent divider */}
-          <div className="flex justify-center mb-4">
-            <div className="h-[2px] w-12 rounded-full" style={{ background: "hsl(39 75% 55% / 0.5)" }} />
+          <div className="flex justify-center mb-3">
+            <div className="h-[2px] w-10 rounded-full" style={{ background: "hsl(39 75% 55% / 0.5)" }} />
           </div>
 
-          <p className="text-[1.05rem] md:text-[1.25rem] font-light text-primary-foreground/50 mb-2 tracking-wide">
+          <p className="text-base md:text-lg font-light text-primary-foreground/45 mb-1.5 tracking-wide">
             במרחב הציבורי של אשדוד
           </p>
 
-          <p className="text-[13px] text-primary-foreground/35 leading-relaxed max-w-sm mx-auto">
+          <p className="text-[13px] text-primary-foreground/30 leading-relaxed max-w-sm mx-auto">
             רישוי, פיקוח ומיפוי — במערכת אחת מתקדמת
           </p>
 
           {/* Hero CTA zone */}
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/apply"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-accent text-accent-foreground text-sm font-bold
+              className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-bold
                 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02]
                 transition-all duration-200"
             >
@@ -59,7 +59,7 @@ export default function Index() {
             </Link>
             <Link
               to="/map"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl bg-primary-foreground/[0.08] text-primary-foreground/80
+              className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-primary-foreground/[0.08] text-primary-foreground/75
                 border border-primary-foreground/[0.1] text-sm font-medium
                 hover:bg-primary-foreground/[0.14] hover:text-primary-foreground transition-all duration-200"
             >
@@ -69,11 +69,11 @@ export default function Index() {
         </div>
 
         {/* Bottom fade to page */}
-        <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-10 bg-gradient-to-t from-background to-transparent" />
       </section>
 
       {/* ── Role Cards Section ── */}
-      <div className="container mx-auto px-4 pt-10 pb-16 md:pt-14 md:pb-20 max-w-5xl">
+      <div className="container mx-auto px-4 -mt-4 pb-16 md:pb-20 max-w-5xl relative z-10">
 
         {/* Section label */}
         <div className="text-center mb-10 md:mb-12">
