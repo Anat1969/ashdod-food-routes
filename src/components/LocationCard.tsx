@@ -270,7 +270,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
                 <div className="flex flex-wrap gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locDesired} onCheckedChange={(v) => setLocDesired(!!v)} />
+                    <Checkbox checked={locDesired} onCheckedChange={(v) => { setLocDesired(!!v); saveLocationField({ is_desired: !!v }); }} />
                     <span className="text-xs">מיקום רצוי</span>
                   </div>
                   <div className="flex items-center gap-1">
