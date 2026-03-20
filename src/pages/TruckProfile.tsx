@@ -178,12 +178,12 @@ export default function TruckProfile() {
 
       <Tabs defaultValue={truck.status === "approved" ? "menu" : "location_card"} className="space-y-4">
         <TabsList className="w-full justify-start flex-wrap">
+          <TabsTrigger value="location_card">עמדה</TabsTrigger>
+          <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
+          <TabsTrigger value="history">היסטוריה</TabsTrigger>
           {truck.status === "approved" && (
             <TabsTrigger value="menu">תפריט ומחירים</TabsTrigger>
           )}
-          <TabsTrigger value="location_card">כרטיס מיקום</TabsTrigger>
-          <TabsTrigger value="review">מסמכים ועמידה בהנחיות</TabsTrigger>
-          <TabsTrigger value="history">היסטוריה</TabsTrigger>
         </TabsList>
 
         {/* תפריט ומחירים - ציבורי לכולם */}
