@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import StatusBadge from "@/components/StatusBadge";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
-import { BarChart3, Clock, CheckCircle, XCircle, Search, Building2, Inbox } from "lucide-react";
+import { BarChart3, Clock, CheckCircle, XCircle, Search, Inbox } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
+import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function AdminDashboard() {
   const { isAdmin, loading: authLoading } = useAuth();
