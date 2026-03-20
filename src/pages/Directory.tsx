@@ -208,7 +208,7 @@ export default function Directory() {
     toast.success("התמונה נשמרה");
   };
 
-
+  const updateStatus = async (truckId: string, newStatus: string) => {
     const { error } = await supabase
       .from("food_trucks")
       .update({ status: newStatus })
