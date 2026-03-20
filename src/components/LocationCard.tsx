@@ -141,6 +141,62 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     onUpdate();
   };
 
+  const generateOpinion = useCallback(async () => {
+    if (!isAdmin) return;
+    setGeneratingOpinion(true);
+    try {
+      const payload = {
+        is_desired: true,
+        location_name: locName || location?.name || "",
+        vehicle_type: truck.vehicle_type || "",
+        structure_ok: expertOpinion?.structure_ok ?? (truck as any).truck_condition_ok ?? null,
+        infra_electricity: locElectricity,
+        infra_water: locWater,
+        infra_sewage: locSewage,
+        environment_ok: expertOpinion?.environment_ok ?? (truck as any).environment_ok ?? null,
+        operator_name: opName || (truck as any).operator_name || "",
+      };
+
+      const res = await supabase.functions.invoke("generate-opinion", { body: payload });
+
+      if (res.error) {
+        toast.error("שגיאה ביצירת חוות דעת");
+        console.error(res.error);
+        return;
+      }
+
+      const { field_notes: newNotes, conditions: newConditions } = res.data;
+
+      if (newNotes) setFieldNotes(newNotes);
+      if (newConditions) setConditions(newConditions);
+
+      // Save to DB
+      const updates: Record<string, unknown> = {};
+      if (newNotes) updates.field_notes = newNotes;
+      if (newConditions) updates.conditions = newConditions;
+
+      if (Object.keys(updates).length > 0) {
+        if (expertOpinion?.id) {
+          await supabase.from("expert_opinions").update(updates).eq("id", expertOpinion.id);
+        } else {
+          await supabase.from("expert_opinions").insert({
+            truck_id: truck.id,
+            author_id: userId || null,
+            ...updates,
+          } as any);
+        }
+        onUpdate();
+      }
+
+      toast.success("חוות דעת נוצרה בהצלחה");
+    } catch (err) {
+      console.error(err);
+      toast.error("שגיאה ביצירת חוות דעת");
+    } finally {
+      setGeneratingOpinion(false);
+    }
+  }, [isAdmin, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
+
   const isApproved = truck.status === "approved";
 
   return (
