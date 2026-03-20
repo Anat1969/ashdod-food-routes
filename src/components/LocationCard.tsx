@@ -378,8 +378,16 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setLocDesired(!locDesired); saveLocationField({ is_desired: !locDesired }); }}
-                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"}`}
+                  disabled={generatingOpinion}
+                  onClick={async () => {
+                    const newDesired = !locDesired;
+                    setLocDesired(newDesired);
+                    await saveLocationField({ is_desired: newDesired });
+                    if (newDesired) {
+                      await generateOpinion();
+                    }
+                  }}
+                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"} ${generatingOpinion ? "opacity-60 cursor-wait" : ""}`}
                 >
                   {locDesired ? "✅ מיקום רצוי" : "מיקום רצוי"}
                 </button>
