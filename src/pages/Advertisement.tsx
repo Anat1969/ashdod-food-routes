@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Clock, Truck, UtensilsCrossed, Plus, Trash2 } from "lucide-react";
+import { MapPin, Clock, UtensilsCrossed, Plus, Trash2, MapPinOff, ImageOff } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -28,15 +28,34 @@ interface MenuItem {
   sort_order: number;
 }
 
+/** Check if a truck has usable map coordinates */
+function hasValidCoords(truck: TruckWithLocation | null | undefined): boolean {
+  if (!truck?.locations) return false;
+  const lat = Number(truck.locations.lat);
+  const lng = Number(truck.locations.lng);
+  return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
+}
+
+/** Get the best available photo URL for a truck */
+function getTruckPhoto(truck: TruckWithLocation | null | undefined): string | null {
+  if (!truck) return null;
+  return truck.street_photo_1_url || truck.vehicle_photo_url || null;
+}
+
 export default function Advertisement() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedTruck, setSelectedTruck] = useState<TruckWithLocation | null>(null);
-  const [menuDialogTruck, setMenuDialogTruck] = useState<TruckWithLocation | null>(null);
+  const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
+  const [menuDialogTruckId, setMenuDialogTruckId] = useState<string | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
   const { isAdmin, user } = useAuth();
+
+  // Derive selected truck from ID — single source of truth
+  const selectedTruck = trucks.find((t) => t.id === selectedTruckId) ?? null;
+  const menuDialogTruck = trucks.find((t) => t.id === menuDialogTruckId) ?? null;
 
   useRegisterList(
     trucks.map((t) => ({ id: t.id, label: t.truck_name })),
@@ -57,7 +76,7 @@ export default function Advertisement() {
         return streetA.localeCompare(streetB, "he");
       });
       setTrucks(result);
-      if (result.length > 0) setSelectedTruck(result[0]);
+      if (result.length > 0) setSelectedTruckId(result[0].id);
       setLoading(false);
     };
     fetchTrucks();
@@ -68,8 +87,13 @@ export default function Advertisement() {
     return isAdmin || truck.operator_id === user?.id;
   };
 
-  const openMenuDialog = async (truck: TruckWithLocation) => {
-    setMenuDialogTruck(truck);
+  const handleSelectTruck = useCallback((truckOrId: TruckWithLocation | string) => {
+    const id = typeof truckOrId === "string" ? truckOrId : truckOrId.id;
+    setSelectedTruckId(id);
+  }, []);
+
+  const openMenuDialog = useCallback(async (truck: TruckWithLocation) => {
+    setMenuDialogTruckId(truck.id);
     setMenuLoading(true);
     const { data } = await supabase
       .from("menu_items")
@@ -78,7 +102,13 @@ export default function Advertisement() {
       .order("sort_order", { ascending: true });
     setMenuItems((data as MenuItem[]) || []);
     setMenuLoading(false);
-  };
+  }, []);
+
+  const closeMenuDialog = useCallback(() => {
+    setMenuDialogTruckId(null);
+    setMenuItems([]);
+    setNewItem({ item_name: "", price: "" });
+  }, []);
 
   const addMenuItem = async () => {
     if (!menuDialogTruck || !newItem.item_name.trim()) return;
@@ -108,6 +138,15 @@ export default function Advertisement() {
     setMenuItems(menuItems.filter(item => item.id !== id));
     toast.success("פריט נמחק");
   };
+
+  const handleImgError = useCallback((url: string) => {
+    setImgErrors((prev) => new Set(prev).add(url));
+  }, []);
+
+  /** Check if a photo URL is usable (exists and hasn't errored) */
+  const isPhotoUsable = useCallback((url: string | null | undefined): url is string => {
+    return !!url && !imgErrors.has(url);
+  }, [imgErrors]);
 
   if (loading) {
     return (
@@ -164,9 +203,11 @@ export default function Advertisement() {
                 <TruckSidebarCard
                   key={truck.id}
                   truck={truck}
-                  isSelected={selectedTruck?.id === truck.id}
-                  onSelect={() => setSelectedTruck(truck)}
+                  isSelected={selectedTruckId === truck.id}
+                  onSelect={() => handleSelectTruck(truck.id)}
                   onPhotoClick={() => openMenuDialog(truck)}
+                  isPhotoUsable={isPhotoUsable}
+                  onImgError={handleImgError}
                 />
               ))}
             </div>
@@ -177,23 +218,34 @@ export default function Advertisement() {
             <div className="flex-1 relative">
               <TruckMap
                 trucks={trucks}
-                selectedTruckId={selectedTruck?.id || null}
-                onSelectTruck={(truck) => setSelectedTruck(truck)}
+                selectedTruckId={selectedTruckId}
+                onSelectTruck={(truck) => handleSelectTruck(truck.id)}
               />
             </div>
 
             {/* Selected truck detail bar */}
             {selectedTruck && (
-              <div className="border-t bg-card p-4">
+              <div className="border-t bg-card p-4" dir="rtl">
                 <div className="flex items-start gap-4">
-                  {/* Photo thumbnail */}
-                  {(selectedTruck.street_photo_1_url || selectedTruck.vehicle_photo_url) && (
-                    <img
-                      src={selectedTruck.street_photo_1_url || selectedTruck.vehicle_photo_url || ""}
-                      alt={selectedTruck.truck_name}
-                      className="w-16 h-16 rounded-xl object-cover border flex-shrink-0"
-                    />
-                  )}
+                  {/* Photo thumbnail with error handling */}
+                  {(() => {
+                    const photoUrl = getTruckPhoto(selectedTruck);
+                    if (photoUrl && isPhotoUsable(photoUrl)) {
+                      return (
+                        <img
+                          src={photoUrl}
+                          alt={selectedTruck.truck_name}
+                          className="w-16 h-16 rounded-xl object-cover border flex-shrink-0"
+                          onError={() => handleImgError(photoUrl)}
+                        />
+                      );
+                    }
+                    return (
+                      <div className="w-16 h-16 rounded-xl border bg-muted/40 flex items-center justify-center flex-shrink-0">
+                        <ImageOff className="h-5 w-5 text-muted-foreground/25" />
+                      </div>
+                    );
+                  })()}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="text-base font-bold text-foreground">{selectedTruck.truck_name}</h2>
@@ -202,11 +254,23 @@ export default function Advertisement() {
                       )}
                     </div>
                     <div className="flex items-center gap-4 mt-1.5 flex-wrap">
-                      {selectedTruck.locations && (
+                      {selectedTruck.locations ? (
                         <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                          {hasValidCoords(selectedTruck) ? (
+                            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                          ) : (
+                            <MapPinOff className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground/50" />
+                          )}
                           {selectedTruck.locations.name}
                           {selectedTruck.locations.street && ` · ${selectedTruck.locations.street}`}
+                          {!hasValidCoords(selectedTruck) && (
+                            <span className="text-xs text-muted-foreground/50 mr-1">(מיקום לא נקבע)</span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground/50">
+                          <MapPinOff className="h-3.5 w-3.5 flex-shrink-0" />
+                          מיקום לא הוגדר
                         </span>
                       )}
                       {(selectedTruck.hours_from || selectedTruck.hours_to) && (
@@ -221,7 +285,7 @@ export default function Advertisement() {
                   </div>
                 </div>
 
-                {selectedTruck.design_mockup_url && (
+                {selectedTruck.design_mockup_url && isPhotoUsable(selectedTruck.design_mockup_url) && (
                   <div className="mt-3">
                     <ImageLightbox src={selectedTruck.design_mockup_url} alt="תפריט">
                       {({ onClick }) => (
@@ -230,6 +294,7 @@ export default function Advertisement() {
                           src={selectedTruck.design_mockup_url!}
                           alt="תפריט"
                           className="max-h-32 rounded-lg border cursor-zoom-in"
+                          onError={() => handleImgError(selectedTruck.design_mockup_url!)}
                         />
                       )}
                     </ImageLightbox>
@@ -242,19 +307,28 @@ export default function Advertisement() {
       )}
 
       {/* Menu Dialog — premium catalog style */}
-      <Dialog open={!!menuDialogTruck} onOpenChange={(open) => { if (!open) { setMenuDialogTruck(null); setNewItem({ item_name: "", price: "" }); } }}>
+      <Dialog open={!!menuDialogTruck} onOpenChange={(open) => { if (!open) closeMenuDialog(); }}>
         <DialogContent className="max-w-md p-0 overflow-hidden rounded-2xl" dir="rtl">
           {/* Header photo with overlay */}
           <div className="relative h-40 bg-muted">
-            {menuDialogTruck?.street_photo_1_url ? (
-              <img src={menuDialogTruck.street_photo_1_url} alt="" className="w-full h-full object-cover" />
-            ) : menuDialogTruck?.vehicle_photo_url ? (
-              <img src={menuDialogTruck.vehicle_photo_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <UtensilsCrossed className="h-10 w-10 text-muted-foreground/20" />
-              </div>
-            )}
+            {(() => {
+              const photoUrl = getTruckPhoto(menuDialogTruck);
+              if (photoUrl && isPhotoUsable(photoUrl)) {
+                return (
+                  <img
+                    src={photoUrl}
+                    alt={menuDialogTruck?.truck_name || ""}
+                    className="w-full h-full object-cover"
+                    onError={() => handleImgError(photoUrl)}
+                  />
+                );
+              }
+              return (
+                <div className="w-full h-full flex items-center justify-center bg-muted">
+                  <UtensilsCrossed className="h-10 w-10 text-muted-foreground/20" />
+                </div>
+              );
+            })()}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
             <div className="absolute bottom-4 right-5 left-5">
               <h2 className="text-lg font-bold text-white tracking-tight">
@@ -277,7 +351,7 @@ export default function Advertisement() {
             ) : (
               <>
                 <div className="space-y-0 max-h-[45vh] overflow-y-auto">
-                  {menuItems.length === 0 && !canEditMenu(menuDialogTruck!) && (
+                  {menuItems.length === 0 && !canEditMenu(menuDialogTruck) && (
                     <div className="text-center py-8">
                       <UtensilsCrossed className="h-6 w-6 text-muted-foreground/20 mx-auto mb-2" />
                       <p className="text-sm text-muted-foreground">התפריט טרם הוזן</p>
@@ -286,7 +360,7 @@ export default function Advertisement() {
 
                   {menuItems.map((item, idx) => (
                     <div key={item.id} className={`flex items-center gap-3 py-3 ${idx < menuItems.length - 1 ? 'border-b border-border/50' : ''}`}>
-                      {canEditMenu(menuDialogTruck!) ? (
+                      {canEditMenu(menuDialogTruck) ? (
                         <>
                           <Input
                             className="flex-1 h-8 text-sm border-0 border-b rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-primary"
@@ -318,7 +392,7 @@ export default function Advertisement() {
                   ))}
                 </div>
 
-                {canEditMenu(menuDialogTruck!) && (
+                {canEditMenu(menuDialogTruck) && (
                   <div className="mt-4 pt-3 border-t">
                     <div className="flex items-center gap-2">
                       <Input
@@ -358,13 +432,18 @@ function TruckSidebarCard({
   isSelected,
   onSelect,
   onPhotoClick,
+  isPhotoUsable,
+  onImgError,
 }: {
   truck: TruckWithLocation;
   isSelected: boolean;
   onSelect: () => void;
   onPhotoClick: () => void;
+  isPhotoUsable: (url: string | null | undefined) => url is string;
+  onImgError: (url: string) => void;
 }) {
-  const photoUrl = truck.street_photo_1_url || truck.vehicle_photo_url;
+  const photoUrl = getTruckPhoto(truck);
+  const showPhoto = isPhotoUsable(photoUrl);
 
   return (
     <div
@@ -372,15 +451,16 @@ function TruckSidebarCard({
         ${isSelected ? "bg-accent/[0.06] border-s-[3px] border-s-accent" : "hover:bg-muted/30"}`}
     >
       <div className="relative h-40 cursor-pointer group" onClick={onPhotoClick}>
-        {photoUrl ? (
+        {showPhoto ? (
           <img
             src={photoUrl}
             alt={truck.truck_name}
             className="w-full h-full object-cover"
+            onError={() => onImgError(photoUrl)}
           />
         ) : (
           <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-            <UtensilsCrossed className="h-8 w-8 text-muted-foreground/20" />
+            <ImageOff className="h-8 w-8 text-muted-foreground/20" />
           </div>
         )}
 
@@ -407,11 +487,20 @@ function TruckSidebarCard({
               </Badge>
             )}
           </div>
-          {truck.locations && (
+          {truck.locations ? (
             <p className="text-[12px] text-white/60 flex items-center gap-1 mt-0.5">
-              <MapPin className="h-3 w-3 flex-shrink-0" />
+              {hasValidCoords(truck) ? (
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+              ) : (
+                <MapPinOff className="h-3 w-3 flex-shrink-0 opacity-50" />
+              )}
               {truck.locations.name}
               {truck.locations.neighborhood && ` · ${truck.locations.neighborhood}`}
+            </p>
+          ) : (
+            <p className="text-[12px] text-white/40 flex items-center gap-1 mt-0.5">
+              <MapPinOff className="h-3 w-3 flex-shrink-0" />
+              מיקום לא הוגדר
             </p>
           )}
         </div>
