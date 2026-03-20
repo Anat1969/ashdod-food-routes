@@ -49,9 +49,6 @@ interface LocationData {
 
 interface TruckWithLocation extends FoodTruck {
   location?: LocationData | null;
-  environment_ok?: boolean | null;
-  truck_condition_ok?: boolean | null;
-  has_operator?: boolean;
 }
 
 function TriStateButtons({
