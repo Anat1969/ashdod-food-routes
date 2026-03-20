@@ -151,16 +151,15 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     onUpdate();
   };
 
-  const toggleExpertBool = async (field: string, current: boolean | null) => {
+  const setExpertBool = async (field: string, newValue: boolean | null) => {
     if (!isAdmin) return;
-    const nextValue = current === null ? true : current === true ? false : null;
     if (expertOpinion?.id) {
-      await supabase.from("expert_opinions").update({ [field]: nextValue }).eq("id", expertOpinion.id);
+      await supabase.from("expert_opinions").update({ [field]: newValue }).eq("id", expertOpinion.id);
     } else {
       await supabase.from("expert_opinions").insert({
         truck_id: truck.id,
         author_id: userId || null,
-        [field]: nextValue,
+        [field]: newValue,
       } as any);
     }
     onUpdate();
@@ -351,13 +350,13 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               label="מצב סביבה תקין"
               value={expertOpinion?.environment_ok ?? null}
               isAdmin={isAdmin}
-              onChange={() => toggleExpertBool("environment_ok", expertOpinion?.environment_ok ?? null)}
+              onChange={(v) => setExpertBool("environment_ok", v)}
             />
             <BoolField
               label="מצב מבנה תקין"
               value={expertOpinion?.structure_ok ?? null}
               isAdmin={isAdmin}
-              onChange={() => toggleExpertBool("structure_ok", expertOpinion?.structure_ok ?? null)}
+              onChange={(v) => setExpertBool("structure_ok", v)}
             />
             <div className="pt-2 border-t">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
@@ -453,15 +452,26 @@ function InfraIcon({ label, ok, icon }: { label: string; ok?: boolean; icon: Rea
   );
 }
 
-function BoolField({ label, value, isAdmin, onChange }: { label: string; value: boolean | null; isAdmin: boolean; onChange: () => void }) {
+function BoolField({ label, value, isAdmin, onChange }: { label: string; value: boolean | null; isAdmin: boolean; onChange: (newValue: boolean | null) => void }) {
   return (
     <div className="flex items-center gap-3">
       {isAdmin ? (
-        <Checkbox
-          checked={value === true ? true : value === false ? "indeterminate" : false}
-          onCheckedChange={onChange}
-          className={value === false ? "border-destructive bg-destructive text-destructive-foreground" : ""}
-        />
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onChange(value === true ? null : true)}
+            className={`rounded p-1 transition-colors ${value === true ? "bg-green-100 text-green-700 ring-1 ring-green-400" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            <Check className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange(value === false ? null : false)}
+            className={`rounded p-1 transition-colors ${value === false ? "bg-red-100 text-destructive ring-1 ring-red-400" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       ) : (
         value === true ? <Check className="h-5 w-5 text-green-600" /> : value === false ? <X className="h-5 w-5 text-destructive" /> : <Minus className="h-5 w-5 text-muted-foreground" />
       )}
