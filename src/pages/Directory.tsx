@@ -381,9 +381,9 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("station_type")}>
                   <span className="flex items-center gap-1">סוג עמדה <SortIcon col="station_type" /></span>
                 </TableHead>
-                <TableHead className="text-right">מבנה</TableHead>
-                <TableHead className="text-right">סביבה</TableHead>
                 <TableHead className="text-right">מיקום</TableHead>
+                <TableHead className="text-right">סביבה</TableHead>
+                <TableHead className="text-right">מבנה</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
@@ -437,17 +437,17 @@ export default function Directory() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {/* מבנה - תמונה */}
+                  {/* מיקום - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
+                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
                   </TableCell>
                   {/* סביבה - תמונה */}
                   <TableCell>
                     <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
                   </TableCell>
-                  {/* מיקום - תמונה */}
+                  {/* מבנה - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
+                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
