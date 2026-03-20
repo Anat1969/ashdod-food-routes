@@ -268,20 +268,24 @@ export default function TruckProfile() {
                 </CardHeader>
                 <CardContent className="space-y-1.5 max-h-[45vh] overflow-y-auto">
                   {STRUCTURE_ENV_ITEMS.map((item) => {
-                    const value = compliance ? (compliance as any)[item.key] ?? false : false;
+                    const value = compliance ? (compliance as any)[item.key] ?? null : null;
                     return (
                       <div key={item.key} className="py-1.5 border-b last:border-b-0">
                         <div className="flex items-center gap-2">
                           {isAdmin ? (
-                            <Checkbox checked={!!value} onCheckedChange={() => toggleCompliance(item.key, value)} />
+                            <Checkbox
+                              checked={value === true ? true : value === false ? "indeterminate" : false}
+                              onCheckedChange={() => toggleCompliance(item.key, value)}
+                              className={value === false ? "border-destructive data-[state=indeterminate]:bg-destructive data-[state=indeterminate]:text-destructive-foreground" : ""}
+                            />
                           ) : (
-                            value ? <Check className="h-4 w-4 text-primary" /> : <X className="h-4 w-4 text-destructive" />
+                            value === true ? <Check className="h-4 w-4 text-primary" /> : value === false ? <X className="h-4 w-4 text-destructive" /> : <Minus className="h-4 w-4 text-muted-foreground" />
                           )}
                           <span className="text-sm font-medium">{item.label}</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-0.5 mr-7 whitespace-pre-line leading-tight">{item.description}</p>
                       </div>
-                   );
+                    );
                   })}
                 </CardContent>
               </Card>
