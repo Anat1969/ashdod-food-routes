@@ -299,11 +299,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               onChange={(v) => setExpertBool("structure_ok", v)}
             />
             {isAdmin ? (
-              <div className="flex flex-wrap gap-4 pt-2 border-t">
+              <div className="space-y-2 pt-2 border-t">
                 <div className="flex items-center gap-1">
                   <Checkbox checked={locDesired} onCheckedChange={(v) => { setLocDesired(!!v); saveLocationField({ is_desired: !!v }); }} />
-                  <span className="text-xs">מיקום רצוי</span>
+                  <span className="text-xs font-medium">מיקום רצוי</span>
                 </div>
+                <p className="text-xs text-muted-foreground">תשתיות:</p>
                 <div className="flex items-center gap-1">
                   <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
                   <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
@@ -318,17 +319,16 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 </div>
               </div>
             ) : (
-              <>
-                <div className="flex items-center gap-2 pt-2 border-t">
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center gap-2">
                   <span className="text-muted-foreground text-xs">מיקום רצוי:</span>
                   {location?.is_desired ? <Check className="h-4 w-4 text-green-600" /> : <X className="h-4 w-4 text-destructive" />}
                 </div>
-                <div className="flex gap-4 pt-1">
-                  <InfraIcon label="חשמל" ok={location?.infra_electricity} icon={<Zap className="h-4 w-4" />} />
-                  <InfraIcon label="מים" ok={location?.infra_water} icon={<Droplets className="h-4 w-4" />} />
-                  <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
-                </div>
-              </>
+                <p className="text-xs text-muted-foreground">תשתיות:</p>
+                <InfraIcon label="חשמל" ok={location?.infra_electricity} icon={<Zap className="h-4 w-4" />} />
+                <InfraIcon label="מים" ok={location?.infra_water} icon={<Droplets className="h-4 w-4" />} />
+                <InfraIcon label="ביוב" ok={location?.infra_sewage} icon={<CircleDot className="h-4 w-4" />} />
+              </div>
             )}
             <div className="pt-2 border-t">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
