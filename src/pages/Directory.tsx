@@ -6,15 +6,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2 } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
 import ashdodMap from "@/assets/ashdod-map.jpeg";
 import PageNavigation from "@/components/PageNavigation";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type SortDirection = "asc" | "desc" | null;
-type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | null;
+type SortColumn = "station_type" | "truck_name" | "has_truck" | "operator_name" | "status" | "submitted_at" | "environment_ok" | "truck_condition_ok" | null;
 
 const STATION_TYPES = [
   "חוף אקספנסיבי",
@@ -39,6 +51,43 @@ interface TruckWithLocation extends FoodTruck {
   location?: LocationData | null;
 }
 
+function TriStateButtons({
+  value,
+  onChange,
+}: {
+  value: boolean | null | undefined;
+  onChange: (val: boolean | null) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => onChange(value === true ? null : true)}
+        className={`p-1 rounded transition-colors ${
+          value === true
+            ? "bg-green-100 text-green-700 ring-1 ring-green-400"
+            : "text-muted-foreground hover:bg-muted"
+        }`}
+        title="תקין"
+      >
+        <Check className="h-4 w-4" />
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange(value === false ? null : false)}
+        className={`p-1 rounded transition-colors ${
+          value === false
+            ? "bg-red-100 text-red-700 ring-1 ring-red-400"
+            : "text-muted-foreground hover:bg-muted"
+        }`}
+        title="לא תקין"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
 export default function Directory() {
   const [trucks, setTrucks] = useState<TruckWithLocation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +96,7 @@ export default function Directory() {
   const [zoneFilter, setZoneFilter] = useState<string>("all");
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
 
   const fetchTrucks = async () => {
     const { data, error } = await supabase
@@ -62,16 +112,28 @@ export default function Directory() {
 
   useEffect(() => {
     fetchTrucks();
-
     const channel = supabase
       .channel("food_trucks_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "food_trucks" }, () => {
         fetchTrucks();
       })
       .subscribe();
-
     return () => { supabase.removeChannel(channel); };
   }, []);
+
+  const updateField = async (truckId: string, field: string, value: any) => {
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ [field]: value } as any)
+      .eq("id", truckId);
+    if (error) {
+      toast.error("שגיאה בעדכון");
+      return;
+    }
+    setTrucks((prev) =>
+      prev.map((t) => (t.id === truckId ? { ...t, [field]: value } : t))
+    );
+  };
 
   const updateLocationType = async (truck: TruckWithLocation, value: string) => {
     if (!truck.location_id || !truck.location) return;
@@ -107,42 +169,35 @@ export default function Directory() {
     );
   };
 
-  const updateHasTruck = async (truck: TruckWithLocation, checked: boolean) => {
+  const deleteTruck = async (truckId: string) => {
     const { error } = await supabase
       .from("food_trucks")
-      .update({ vehicle_type: checked ? "פודטראק" : null })
-      .eq("id", truck.id);
-    if (error) {
-      toast.error("שגיאה בעדכון פודטראק");
-      return;
-    }
-    setTrucks((prev) =>
-      prev.map((t) =>
-        t.id === truck.id ? { ...t, vehicle_type: checked ? "פודטראק" : null } : t
-      )
-    );
-  };
-
-  const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
-
-  const updateOperatorName = async (truckId: string, value: string) => {
-    const { error } = await supabase
-      .from("food_trucks")
-      .update({ operator_name: value || null } as any)
+      .delete()
       .eq("id", truckId);
     if (error) {
-      toast.error("שגיאה בעדכון שם המפעיל");
+      toast.error("שגיאה במחיקת רשומה");
+      return;
+    }
+    setTrucks((prev) => prev.filter((t) => t.id !== truckId));
+    toast.success("הרשומה נמחקה בהצלחה");
+  };
+
+  const updateStatus = async (truckId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from("food_trucks")
+      .update({ status: newStatus })
+      .eq("id", truckId);
+    if (error) {
+      toast.error("שגיאה בעדכון סטטוס");
       return;
     }
     setTrucks((prev) =>
-      prev.map((t) =>
-        t.id === truckId ? { ...t, operator_name: value || null } : t
-      )
+      prev.map((t) => (t.id === truckId ? { ...t, status: newStatus } : t))
     );
   };
 
   const filtered = trucks.filter((t) => {
-    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search) || ((t as any).operator_name || "").includes(search);
+    const matchesSearch = !search || t.truck_name.includes(search) || (t.food_category || "").includes(search) || (t.location?.name || "").includes(search) || (t.operator_name || "").includes(search);
     const matchesStatus = statusFilter === "all" || t.status === statusFilter;
     const matchesZone = zoneFilter === "all" || (t.location?.location_type || "") === zoneFilter;
     return matchesSearch && matchesStatus && matchesZone;
@@ -179,8 +234,8 @@ export default function Directory() {
           valB = b.vehicle_type ? "1" : "0";
           break;
         case "operator_name":
-          valA = (a as any).operator_name || "";
-          valB = (b as any).operator_name || "";
+          valA = a.operator_name || "";
+          valB = b.operator_name || "";
           break;
         case "status":
           valA = STATUS_LABELS[a.status as TruckStatus] || a.status;
@@ -189,6 +244,14 @@ export default function Directory() {
         case "submitted_at":
           valA = a.submitted_at || "";
           valB = b.submitted_at || "";
+          break;
+        case "environment_ok":
+          valA = a.environment_ok === true ? "1" : a.environment_ok === false ? "0" : "";
+          valB = b.environment_ok === true ? "1" : b.environment_ok === false ? "0" : "";
+          break;
+        case "truck_condition_ok":
+          valA = a.truck_condition_ok === true ? "1" : a.truck_condition_ok === false ? "0" : "";
+          valB = b.truck_condition_ok === true ? "1" : b.truck_condition_ok === false ? "0" : "";
           break;
       }
       return valA.localeCompare(valB, "he") * dir;
@@ -266,8 +329,14 @@ export default function Directory() {
                   <span className="flex items-center gap-1">פודטראק <SortIcon col="has_truck" /></span>
                 </TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
+                  <span className="flex items-center gap-1">מצב סביבה <SortIcon col="environment_ok" /></span>
+                </TableHead>
+                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
+                  <span className="flex items-center gap-1">מצב פודטראק <SortIcon col="truck_condition_ok" /></span>
+                </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
-                  <span className="flex items-center gap-1">שם המפעיל <SortIcon col="operator_name" /></span>
+                  <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
                 </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("status")}>
                   <span className="flex items-center gap-1">סטטוס <SortIcon col="status" /></span>
@@ -275,12 +344,13 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("submitted_at")}>
                   <span className="flex items-center gap-1">תאריך הגשה <SortIcon col="submitted_at" /></span>
                 </TableHead>
+                <TableHead className="text-right w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sorted.map((truck) => (
-                <TableRow key={truck.id} className="cursor-pointer hover:bg-muted/50">
-                  {/* סוג עמדה - dropdown */}
+                <TableRow key={truck.id} className="hover:bg-muted/50">
+                  {/* סוג עמדה */}
                   <TableCell>
                     <Select
                       value={truck.location?.location_type || ""}
@@ -302,14 +372,16 @@ export default function Directory() {
                       {truck.truck_name}
                     </Link>
                   </TableCell>
-                  {/* פודטראק - checkbox */}
+                  {/* פודטראק */}
                   <TableCell>
                     <Checkbox
                       checked={!!truck.vehicle_type}
-                      onCheckedChange={(checked) => updateHasTruck(truck, !!checked)}
+                      onCheckedChange={(checked) =>
+                        updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
+                      }
                     />
                   </TableCell>
-                  {/* תשתית - 3 checkboxes */}
+                  {/* תשתית */}
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-1" title="חשמל">
@@ -335,30 +407,101 @@ export default function Directory() {
                       </div>
                     </div>
                   </TableCell>
-                  {/* שם המפעיל */}
+                  {/* מצב סביבה */}
                   <TableCell>
-                    <Input
-                      className={`h-8 text-xs w-[140px] ${(truck as any).operator_name ? "border-green-500" : "border-destructive"}`}
-                      placeholder="שם המפעיל"
-                      value={operatorEdits[truck.id] ?? (truck as any).operator_name ?? ""}
-                      onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
-                      onBlur={() => {
-                        const val = operatorEdits[truck.id];
-                        if (val !== undefined && val !== ((truck as any).operator_name ?? "")) {
-                          updateOperatorName(truck.id, val);
-                        }
-                      }}
+                    <TriStateButtons
+                      value={truck.environment_ok}
+                      onChange={(val) => updateField(truck.id, "environment_ok", val)}
                     />
+                  </TableCell>
+                  {/* מצב פודטראק */}
+                  <TableCell>
+                    <TriStateButtons
+                      value={truck.truck_condition_ok}
+                      onChange={(val) => updateField(truck.id, "truck_condition_ok", val)}
+                    />
+                  </TableCell>
+                  {/* מפעיל */}
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        checked={!!(truck as any).has_operator}
+                        onCheckedChange={(checked) => {
+                          updateField(truck.id, "has_operator", !!checked);
+                          if (!checked) {
+                            updateField(truck.id, "operator_name", null);
+                            setOperatorEdits((prev) => {
+                              const next = { ...prev };
+                              delete next[truck.id];
+                              return next;
+                            });
+                          }
+                        }}
+                      />
+                      {(truck as any).has_operator && (
+                        <Input
+                          className="h-8 text-xs w-[120px]"
+                          placeholder="שם המפעיל"
+                          value={operatorEdits[truck.id] ?? truck.operator_name ?? ""}
+                          onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
+                          onBlur={() => {
+                            const val = operatorEdits[truck.id];
+                            if (val !== undefined && val !== (truck.operator_name ?? "")) {
+                              updateField(truck.id, "operator_name", val || null);
+                            }
+                          }}
+                        />
+                      )}
+                    </div>
                   </TableCell>
                   {/* סטטוס */}
                   <TableCell>
-                    <StatusBadge status={truck.status} />
+                    <Select
+                      value={truck.status}
+                      onValueChange={(val) => updateStatus(truck.id, val)}
+                    >
+                      <SelectTrigger className="w-[120px] h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </TableCell>
                   {/* תאריך הגשה */}
                   <TableCell>
                     {truck.submitted_at
                       ? new Date(truck.submitted_at).toLocaleDateString("he-IL")
                       : "—"}
+                  </TableCell>
+                  {/* מחיקה */}
+                  <TableCell>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent dir="rtl">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>מחיקת רשומה</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            האם למחוק את "{truck.truck_name}"? פעולה זו אינה ניתנת לביטול.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="flex-row-reverse gap-2">
+                          <AlertDialogCancel>ביטול</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteTruck(truck.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            מחק
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))}

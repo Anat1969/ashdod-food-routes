@@ -209,7 +209,9 @@ export type Database = {
           business_license_url: string | null
           created_at: string
           design_mockup_url: string | null
+          environment_ok: boolean | null
           food_category: string | null
+          has_operator: boolean | null
           hours_from: string | null
           hours_to: string | null
           id: string
@@ -222,6 +224,7 @@ export type Database = {
           street_photo_1_url: string | null
           street_photo_2_url: string | null
           submitted_at: string | null
+          truck_condition_ok: boolean | null
           truck_name: string
           updated_at: string
           vehicle_photo_url: string | null
@@ -232,7 +235,9 @@ export type Database = {
           business_license_url?: string | null
           created_at?: string
           design_mockup_url?: string | null
+          environment_ok?: boolean | null
           food_category?: string | null
+          has_operator?: boolean | null
           hours_from?: string | null
           hours_to?: string | null
           id?: string
@@ -245,6 +250,7 @@ export type Database = {
           street_photo_1_url?: string | null
           street_photo_2_url?: string | null
           submitted_at?: string | null
+          truck_condition_ok?: boolean | null
           truck_name: string
           updated_at?: string
           vehicle_photo_url?: string | null
@@ -255,7 +261,9 @@ export type Database = {
           business_license_url?: string | null
           created_at?: string
           design_mockup_url?: string | null
+          environment_ok?: boolean | null
           food_category?: string | null
+          has_operator?: boolean | null
           hours_from?: string | null
           hours_to?: string | null
           id?: string
@@ -268,6 +276,7 @@ export type Database = {
           street_photo_1_url?: string | null
           street_photo_2_url?: string | null
           submitted_at?: string | null
+          truck_condition_ok?: boolean | null
           truck_name?: string
           updated_at?: string
           vehicle_photo_url?: string | null
