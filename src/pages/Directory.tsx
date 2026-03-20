@@ -443,7 +443,7 @@ export default function Directory() {
                   </TableCell>
                   {/* סביבה - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
+                    <ImageCell truck={truck} field="street_photo_2_url" folder="street2" />
                   </TableCell>
                   {/* מבנה - תמונה */}
                   <TableCell>
