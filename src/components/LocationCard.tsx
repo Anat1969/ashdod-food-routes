@@ -54,7 +54,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [opEmail, setOpEmail] = useState((truck as any).operator_email || "");
   const [opAddress, setOpAddress] = useState((truck as any).operator_address || "");
 
-  
+  const [generatingOpinion, setGeneratingOpinion] = useState(false);
+
 
   useEffect(() => {
     setFieldNotes(expertOpinion?.field_notes || "");
