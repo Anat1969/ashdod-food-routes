@@ -439,7 +439,7 @@ export default function Directory() {
                   </TableCell>
                   {/* מיקום - תמונה */}
                   <TableCell>
-                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
+                    <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
                   </TableCell>
                   {/* סביבה - תמונה */}
                   <TableCell>
