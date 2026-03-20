@@ -211,12 +211,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   await supabase.from("food_trucks").update({ street_photo_2_url: null }).eq("id", truck.id);
                   onUpdate();
                 }}
-                label="מיקום סביבה"
+                label="סביבה"
                 accept="image/*"
                 className="h-full"
               />
             ) : (
-              <PhotoSlot label="מיקום סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
+              <PhotoSlot label="סביבה" url={truck.street_photo_2_url} className="h-full aspect-square" />
             )}
           </div>
         </div>
