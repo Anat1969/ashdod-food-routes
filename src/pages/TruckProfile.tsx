@@ -101,8 +101,10 @@ export default function TruckProfile() {
 
   const toggleCompliance = async (field: string, currentValue: boolean | null) => {
     if (!truck || !isAdmin) return;
+    // Tri-state cycle: null → true → false → null
+    const nextValue = currentValue === null ? true : currentValue === true ? false : null;
     if (compliance) {
-      await supabase.from("compliance_checklist").update({ [field]: !currentValue }).eq("id", compliance.id);
+      await supabase.from("compliance_checklist").update({ [field]: nextValue }).eq("id", compliance.id);
     } else {
       await supabase.from("compliance_checklist").insert({
         truck_id: truck.id,
