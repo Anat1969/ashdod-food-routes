@@ -37,17 +37,9 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
       {/* Header */}
       <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04]">
         <div className="container mx-auto px-4 h-[56px] flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="h-11 w-11 rounded-xl overflow-hidden bg-primary-foreground/[0.08] border border-primary-foreground/[0.1] flex items-center justify-center shadow-sm shadow-black/10">
-              <img alt="סמל עיריית אשדוד" className="h-10 w-10 object-contain" src={ashdodLogo} />
-            </div>
-            <div className="hidden sm:flex flex-col leading-tight">
-              <span className="text-[13px] font-bold text-primary-foreground/90 tracking-tight">
-                עמדות מזון
-              </span>
-              <span className="text-[10px] font-medium text-primary-foreground/35 tracking-wide">
-                עיריית אשדוד
-              </span>
+          <Link to="/" className="flex items-center group">
+            <div className="h-[46px] w-[46px] rounded-xl overflow-hidden bg-primary-foreground/[0.08] border border-primary-foreground/[0.1] flex items-center justify-center shadow-sm shadow-black/10">
+              <img alt="סמל עיריית אשדוד" className="h-[42px] w-[42px] object-contain" src={ashdodLogo} />
             </div>
           </Link>
 
