@@ -344,7 +344,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           </CardHeader>
           <CardContent className="text-sm pb-3">
             {isAdmin ? (
-              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="הערות ותנאים..." rows={6} />
+              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={6} />
             ) : (
               <p>{expertOpinion?.conditions || "—"}</p>
             )}
