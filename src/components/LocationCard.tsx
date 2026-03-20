@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Check, X, Zap, Droplets, CircleDot, Mail, Minus } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import ImageLightbox from "@/components/ImageLightbox";
@@ -55,7 +54,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [opEmail, setOpEmail] = useState((truck as any).operator_email || "");
   const [opAddress, setOpAddress] = useState((truck as any).operator_address || "");
 
-  const [saving, setSaving] = useState(false);
+  
 
   useEffect(() => {
     setFieldNotes(expertOpinion?.field_notes || "");
@@ -84,70 +83,46 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setOpAddress((truck as any).operator_address || "");
   }, [operator, (truck as any).operator_name, (truck as any).operator_email, (truck as any).operator_address]);
 
-  const saveAll = async () => {
+  // Auto-save helpers
+  const saveLocationField = async (fields: Partial<Record<string, unknown>>) => {
     if (!isAdmin) return;
-    setSaving(true);
-
     if (location?.id) {
-      await supabase.from("locations").update({
-        name: locName || "ללא שם",
-        street: locStreet || null,
-        neighborhood: locNeighborhood || null,
-        gush: locGush || null,
-        chelka: locChelka || null,
-        location_type: locType || null,
-        building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null,
-        surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null,
-        is_desired: locDesired,
-        infra_electricity: locElectricity,
-        infra_water: locWater,
-        infra_sewage: locSewage,
-      }).eq("id", location.id);
+      await supabase.from("locations").update(fields).eq("id", location.id);
     } else {
       const { data: newLoc } = await supabase.from("locations").insert({
         name: locName || "מיקום חדש",
-        street: locStreet || null,
-        neighborhood: locNeighborhood || null,
-        gush: locGush || null,
-        chelka: locChelka || null,
-        location_type: locType || null,
-        building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null,
-        surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null,
-        is_desired: locDesired,
-        infra_electricity: locElectricity,
-        infra_water: locWater,
-        infra_sewage: locSewage,
-      }).select("id").single();
+        ...fields,
+      } as any).select("id").single();
       if (newLoc) {
         await supabase.from("food_trucks").update({ location_id: newLoc.id }).eq("id", truck.id);
       }
     }
+    onUpdate();
+  };
 
-    await supabase.from("food_trucks").update({
-      operator_name: opName || null,
-      operator_email: opEmail || null,
-      operator_address: opAddress || null,
-    } as any).eq("id", truck.id);
+  const saveTruckField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin) return;
+    await supabase.from("food_trucks").update(fields as any).eq("id", truck.id);
+    onUpdate();
+  };
 
-    if (operator?.id) {
-      await supabase.from("profiles").update({
-        phone: opPhone || null,
-      }).eq("id", operator.id);
-    }
+  const saveProfileField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin || !operator?.id) return;
+    await supabase.from("profiles").update(fields).eq("id", operator.id);
+    onUpdate();
+  };
 
+  const saveExpertField = async (fields: Record<string, unknown>) => {
+    if (!isAdmin) return;
     if (expertOpinion?.id) {
-      await supabase.from("expert_opinions").update({ field_notes: fieldNotes, conditions }).eq("id", expertOpinion.id);
+      await supabase.from("expert_opinions").update(fields).eq("id", expertOpinion.id);
     } else {
       await supabase.from("expert_opinions").insert({
         truck_id: truck.id,
         author_id: userId || null,
-        field_notes: fieldNotes,
-        conditions,
+        ...fields,
       } as any);
     }
-
-    setSaving(false);
-    toast.success("כרטיס המיקום נשמר בהצלחה");
     onUpdate();
   };
 
@@ -247,12 +222,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <CardContent className="space-y-3 text-sm pb-3">
               {isAdmin ? (
                 <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                  <EditableRow label="שם" value={opName} onChange={setOpName} />
-                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} />
-                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} />
-                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} />
-                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} type="number" />
-                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} type="number" />
+                  <EditableRow label="שם" value={opName} onChange={setOpName} onBlur={() => saveTruckField({ operator_name: opName || null })} />
+                  <EditableRow label="נייד" value={opPhone} onChange={setOpPhone} onBlur={() => saveProfileField({ phone: opPhone || null })} />
+                  <EditableRow label="כתובת" value={opAddress} onChange={setOpAddress} onBlur={() => saveTruckField({ operator_address: opAddress || null })} />
+                  <EditableRow label="מייל" value={opEmail} onChange={setOpEmail} onBlur={() => saveTruckField({ operator_email: opEmail || null })} />
+                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
+                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-x-6 gap-y-1">
@@ -287,26 +262,26 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           <CardContent className="space-y-2 text-sm pb-3">
             {isAdmin ? (
               <>
-                <EditableRow label="שם מיקום" value={locName} onChange={setLocName} />
-                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} />
-                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} />
-                <EditableRow label="גוש" value={locGush} onChange={setLocGush} />
-                <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} />
+                <EditableRow label="שם מיקום" value={locName} onChange={setLocName} onBlur={() => saveLocationField({ name: locName || "ללא שם" })} />
+                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
+                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} onBlur={() => saveLocationField({ neighborhood: locNeighborhood || null })} />
+                <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
+                <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
                 <div className="flex flex-wrap gap-4 pt-2 border-t">
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locDesired} onCheckedChange={(v) => setLocDesired(!!v)} />
+                    <Checkbox checked={locDesired} onCheckedChange={(v) => { setLocDesired(!!v); saveLocationField({ is_desired: !!v }); }} />
                     <span className="text-xs">מיקום רצוי</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
+                    <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
                     <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locWater} onCheckedChange={(v) => setLocWater(!!v)} />
+                    <Checkbox checked={locWater} onCheckedChange={(v) => { setLocWater(!!v); saveLocationField({ infra_water: !!v }); }} />
                     <Droplets className="h-4 w-4" /><span className="text-xs">מים</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locSewage} onCheckedChange={(v) => setLocSewage(!!v)} />
+                    <Checkbox checked={locSewage} onCheckedChange={(v) => { setLocSewage(!!v); saveLocationField({ infra_sewage: !!v }); }} />
                     <CircleDot className="h-4 w-4" /><span className="text-xs">ביוב</span>
                   </div>
                 </div>
@@ -353,7 +328,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             <div className="pt-2 border-t">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
               {isAdmin ? (
-                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} placeholder="ניתוח מצב השטח..." rows={3} />
+                <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} onBlur={() => saveExpertField({ field_notes: fieldNotes })} placeholder="ניתוח מצב השטח..." rows={3} />
               ) : (
                 <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
               )}
@@ -368,7 +343,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
           </CardHeader>
           <CardContent className="text-sm pb-3">
             {isAdmin ? (
-              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} placeholder="הערות ותנאים..." rows={6} />
+              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={6} />
             ) : (
               <p>{expertOpinion?.conditions || "—"}</p>
             )}
@@ -376,34 +351,24 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         </Card>
       </div>
 
-      {/* === ROW 4: סטטוס + שמור שינויים === */}
-      <div className="grid grid-cols-3 gap-3">
-        {isAdmin ? (
-          <Button onClick={saveAll} disabled={saving} className="h-full text-lg font-bold">
-            {saving ? "שומר..." : "שמור שינויים"}
-          </Button>
-        ) : (
-          <div />
-        )}
-
-        <Card className={`col-span-2 border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
-          <CardContent className="py-3 text-center">
-            <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
-            <p className="text-lg font-bold">
-              {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* === ROW 4: סטטוס === */}
+      <Card className={`border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
+        <CardContent className="py-3 text-center">
+          <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
+          <p className="text-lg font-bold">
+            {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function EditableRow({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
+function EditableRow({ label, value, onChange, onBlur, type = "text" }: { label: string; value: string; onChange: (v: string) => void; onBlur?: () => void; type?: string }) {
   return (
     <div className="space-y-1">
       <label className="text-xs text-muted-foreground">{label}</label>
-      <Input value={value} onChange={(e) => onChange(e.target.value)} type={type} className="h-8 text-sm" />
+      <Input value={value} onChange={(e) => onChange(e.target.value)} onBlur={onBlur} type={type} className="h-8 text-sm" />
     </div>
   );
 }
