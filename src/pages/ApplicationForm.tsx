@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Send, ExternalLink, CheckCircle2, FileText, ClipboardList, SendHorizonal, Building2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, ExternalLink, CheckCircle2, FileText, ClipboardList, SendHorizonal } from "lucide-react";
 import PageNavigation from "@/components/PageNavigation";
+import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 interface FormData {
   truck_name: string;
