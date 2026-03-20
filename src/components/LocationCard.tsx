@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -54,7 +54,8 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [opEmail, setOpEmail] = useState((truck as any).operator_email || "");
   const [opAddress, setOpAddress] = useState((truck as any).operator_address || "");
 
-  
+  const [generatingOpinion, setGeneratingOpinion] = useState(false);
+
 
   useEffect(() => {
     setFieldNotes(expertOpinion?.field_notes || "");
@@ -139,6 +140,62 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     }
     onUpdate();
   };
+
+  const generateOpinion = useCallback(async () => {
+    if (!isAdmin) return;
+    setGeneratingOpinion(true);
+    try {
+      const payload = {
+        is_desired: true,
+        location_name: locName || location?.name || "",
+        vehicle_type: truck.vehicle_type || "",
+        structure_ok: expertOpinion?.structure_ok ?? (truck as any).truck_condition_ok ?? null,
+        infra_electricity: locElectricity,
+        infra_water: locWater,
+        infra_sewage: locSewage,
+        environment_ok: expertOpinion?.environment_ok ?? (truck as any).environment_ok ?? null,
+        operator_name: opName || (truck as any).operator_name || "",
+      };
+
+      const res = await supabase.functions.invoke("generate-opinion", { body: payload });
+
+      if (res.error) {
+        toast.error("שגיאה ביצירת חוות דעת");
+        console.error(res.error);
+        return;
+      }
+
+      const { field_notes: newNotes, conditions: newConditions } = res.data;
+
+      if (newNotes) setFieldNotes(newNotes);
+      if (newConditions) setConditions(newConditions);
+
+      // Save to DB
+      const updates: Record<string, unknown> = {};
+      if (newNotes) updates.field_notes = newNotes;
+      if (newConditions) updates.conditions = newConditions;
+
+      if (Object.keys(updates).length > 0) {
+        if (expertOpinion?.id) {
+          await supabase.from("expert_opinions").update(updates).eq("id", expertOpinion.id);
+        } else {
+          await supabase.from("expert_opinions").insert({
+            truck_id: truck.id,
+            author_id: userId || null,
+            ...updates,
+          } as any);
+        }
+        onUpdate();
+      }
+
+      toast.success("חוות דעת נוצרה בהצלחה");
+    } catch (err) {
+      console.error(err);
+      toast.error("שגיאה ביצירת חוות דעת");
+    } finally {
+      setGeneratingOpinion(false);
+    }
+  }, [isAdmin, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
 
   const isApproved = truck.status === "approved";
 
@@ -321,10 +378,18 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setLocDesired(!locDesired); saveLocationField({ is_desired: !locDesired }); }}
-                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"}`}
+                  disabled={generatingOpinion}
+                  onClick={async () => {
+                    const newDesired = !locDesired;
+                    setLocDesired(newDesired);
+                    await saveLocationField({ is_desired: newDesired });
+                    if (newDesired) {
+                      await generateOpinion();
+                    }
+                  }}
+                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"} ${generatingOpinion ? "opacity-60 cursor-wait" : ""}`}
                 >
-                  {locDesired ? "✅ מיקום רצוי" : "מיקום רצוי"}
+                  {generatingOpinion ? "⏳ מייצר חוות דעת..." : locDesired ? "✅ מיקום רצוי" : "מיקום רצוי"}
                 </button>
               </div>
             ) : (
