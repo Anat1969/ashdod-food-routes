@@ -190,7 +190,25 @@ export default function Directory() {
     toast.success("הרשומה נמחקה בהצלחה");
   };
 
-  const updateStatus = async (truckId: string, newStatus: string) => {
+  const handleImageUpload = async (truckId: string, file: File) => {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${truckId}/vehicle/${Date.now()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("truck-photos")
+      .upload(path, file, { upsert: true });
+    if (uploadError) {
+      toast.error("שגיאה בהעלאת תמונה");
+      return;
+    }
+    const { data: urlData } = supabase.storage
+      .from("truck-photos")
+      .getPublicUrl(path);
+    const url = urlData.publicUrl;
+    await updateField(truckId, "vehicle_photo_url", url);
+    toast.success("התמונה נשמרה");
+  };
+
+
     const { error } = await supabase
       .from("food_trucks")
       .update({ status: newStatus })
