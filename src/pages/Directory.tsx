@@ -428,48 +428,17 @@ export default function Directory() {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {/* תמונה */}
+                  {/* מבנה - תמונה */}
                   <TableCell>
-                    {truck.vehicle_photo_url ? (
-                      <div className="relative group w-[60px] h-[40px]">
-                        <img
-                          src={truck.vehicle_photo_url}
-                          alt={truck.truck_name}
-                          className="w-full h-full object-cover rounded"
-                        />
-                        <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded cursor-pointer">
-                          <ImagePlus className="h-4 w-4 text-white" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleImageUpload(truck.id, file);
-                            }}
-                          />
-                        </label>
-                      </div>
-                    ) : (
-                      <label className="flex items-center justify-center w-[60px] h-[40px] border-2 border-dashed border-muted-foreground/30 rounded cursor-pointer hover:border-primary/50 transition-colors"
-                        onPaste={(e) => {
-                          const file = e.clipboardData.files?.[0];
-                          if (file && file.type.startsWith("image/")) handleImageUpload(truck.id, file);
-                        }}
-                        tabIndex={0}
-                      >
-                        <ImagePlus className="h-4 w-4 text-muted-foreground" />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleImageUpload(truck.id, file);
-                          }}
-                        />
-                      </label>
-                    )}
+                    <ImageCell truck={truck} field="vehicle_photo_url" folder="vehicle" />
+                  </TableCell>
+                  {/* סביבה - תמונה */}
+                  <TableCell>
+                    <ImageCell truck={truck} field="street_photo_1_url" folder="street" />
+                  </TableCell>
+                  {/* מיקום - תמונה */}
+                  <TableCell>
+                    <ImageCell truck={truck} field="aerial_photo_url" folder="aerial" />
                   </TableCell>
                   {/* עמדה */}
                   <TableCell>
