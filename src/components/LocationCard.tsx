@@ -452,15 +452,26 @@ function InfraIcon({ label, ok, icon }: { label: string; ok?: boolean; icon: Rea
   );
 }
 
-function BoolField({ label, value, isAdmin, onChange }: { label: string; value: boolean | null; isAdmin: boolean; onChange: () => void }) {
+function BoolField({ label, value, isAdmin, onChange }: { label: string; value: boolean | null; isAdmin: boolean; onChange: (newValue: boolean | null) => void }) {
   return (
     <div className="flex items-center gap-3">
       {isAdmin ? (
-        <Checkbox
-          checked={value === true ? true : value === false ? "indeterminate" : false}
-          onCheckedChange={onChange}
-          className={value === false ? "border-destructive bg-destructive text-destructive-foreground" : ""}
-        />
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onChange(value === true ? null : true)}
+            className={`rounded p-1 transition-colors ${value === true ? "bg-green-100 text-green-700 ring-1 ring-green-400" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            <Check className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange(value === false ? null : false)}
+            className={`rounded p-1 transition-colors ${value === false ? "bg-red-100 text-destructive ring-1 ring-red-400" : "text-muted-foreground hover:bg-muted"}`}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       ) : (
         value === true ? <Check className="h-5 w-5 text-green-600" /> : value === false ? <X className="h-5 w-5 text-destructive" /> : <Minus className="h-5 w-5 text-muted-foreground" />
       )}
