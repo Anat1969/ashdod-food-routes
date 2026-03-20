@@ -390,7 +390,16 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
                   <span className="flex items-center gap-1">מבנה קיים בפועל <SortIcon col="has_truck" /></span>
                 </TableHead>
-                <TableHead className="text-right">תשתית</TableHead>
+                <TableHead className="text-right">
+                  <div className="flex flex-col items-end gap-0.5">
+                    <span>תשתית</span>
+                    <span className="text-[10px] font-normal text-muted-foreground flex items-center gap-2">
+                      <span>חשמל</span>
+                      <span>מים</span>
+                      <span>ביוב</span>
+                    </span>
+                  </div>
+                </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
                   <span className="flex items-center gap-1">סביבה <SortIcon col="environment_ok" /></span>
                 </TableHead>
