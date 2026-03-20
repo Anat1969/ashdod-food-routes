@@ -464,19 +464,27 @@ export default function Directory() {
                   </TableCell>
                   {/* סטטוס */}
                   <TableCell>
-                    <Select
-                      value={truck.status}
-                      onValueChange={(val) => updateStatus(truck.id, val)}
-                    >
-                      <SelectTrigger className="w-[120px] h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-block w-3 h-3 rounded-full shrink-0 ${STATUS_COLORS[truck.status] || "bg-muted"}`} />
+                      <Select
+                        value={truck.status}
+                        onValueChange={(val) => updateStatus(truck.id, val)}
+                      >
+                        <SelectTrigger className="w-[120px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>
+                              <span className="flex items-center gap-2">
+                                <span className={`inline-block w-2.5 h-2.5 rounded-full ${STATUS_COLORS[key] || "bg-muted"}`} />
+                                {label}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </TableCell>
                   {/* תאריך הגשה */}
                   <TableCell>
