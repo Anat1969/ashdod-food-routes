@@ -35,12 +35,12 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="premium-hero-deep text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.06]">
-        <div className="container mx-auto px-4 h-[60px] flex items-center justify-between">
+      <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04] backdrop-blur-sm">
+        <div className="container mx-auto px-4 h-[56px] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <img alt="סמל עיריית אשדוד" className="h-9 w-auto opacity-90 group-hover:opacity-100 transition-opacity" src={ashdodEmblem} style={{ filter: "brightness(0) invert(1)" }} />
-            <div className="hidden sm:block border-r border-primary-foreground/15 h-5 mr-1" />
-            <span className="hidden sm:block text-[11px] font-medium text-primary-foreground/40 tracking-wide">
+            <img alt="סמל עיריית אשדוד" className="h-8 w-auto opacity-85 group-hover:opacity-100 transition-opacity" src={ashdodEmblem} style={{ filter: "brightness(0) invert(1)" }} />
+            <div className="hidden sm:block border-r border-primary-foreground/10 h-4 mr-1" />
+            <span className="hidden sm:block text-[10px] font-medium text-primary-foreground/35 tracking-[0.15em] uppercase">
               עמדות מזון
             </span>
           </Link>

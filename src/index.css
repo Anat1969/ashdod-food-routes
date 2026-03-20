@@ -115,4 +115,15 @@
       hsl(216 48% 32%) 100%
     );
   }
+
+  .premium-hero-luxe {
+    background: linear-gradient(
+      165deg,
+      hsl(216 65% 14%) 0%,
+      hsl(216 62% 19%) 25%,
+      hsl(216 58% 24%) 55%,
+      hsl(216 50% 30%) 85%,
+      hsl(216 45% 33%) 100%
+    );
+  }
 }
