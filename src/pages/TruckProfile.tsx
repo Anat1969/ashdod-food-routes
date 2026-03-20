@@ -170,8 +170,8 @@ export default function TruckProfile() {
       <PageNavigation currentItemId={id} />
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{truck.truck_name}</h1>
           <p className="text-muted-foreground">{location?.location_type || "—"}</p>
+          <h1 className="text-2xl font-bold">{truck.truck_name}</h1>
         </div>
         <StatusBadge status={truck.status} className="text-sm" />
       </div>
