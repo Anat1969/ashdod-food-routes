@@ -359,11 +359,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
               )}
             </div>
-            {isAdmin ? (
-              <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="הערות ותנאים..." rows={4} />
-            ) : (
-              <p>{expertOpinion?.conditions || "—"}</p>
-            )}
+            <div>
+              <p className="text-muted-foreground mb-1">המלצה</p>
+              {isAdmin ? (
+                <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="המלצה..." rows={4} />
+              ) : (
+                <p>{expertOpinion?.conditions || "—"}</p>
+              )}
+            </div>
             <div className={`rounded-md border-2 py-2 text-center ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
               <p className="text-xs font-medium text-muted-foreground mb-0.5">סטטוס</p>
               <p className="text-base font-bold">
