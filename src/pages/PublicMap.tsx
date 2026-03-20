@@ -70,32 +70,35 @@ export default function PublicMap() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]" dir="rtl">
-      {/* Top search bar — clean and refined */}
-      <div className="bg-card border-b px-4 py-3 flex flex-col sm:flex-row items-center gap-2 z-10">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
-          <Input
-            placeholder="חיפוש לפי שם, קטגוריה או מיקום…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pr-9 h-10 text-sm bg-background"
-          />
+      {/* Compact toolbar — map-first orientation */}
+      <div className="bg-card border-b px-4 py-2.5 flex flex-col sm:flex-row items-center gap-2 z-10">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <MapPin className="h-4 w-4 text-primary" />
+          <span className="text-sm font-bold text-foreground">איתור מהיר</span>
+          <span className="text-[11px] text-muted-foreground/60">·</span>
+          <span className="text-[11px] text-muted-foreground/60">{sortedFiltered.length} עמדות פעילות</span>
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-[160px] h-10 text-sm">
-            <SelectValue placeholder="קטגוריה" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">כל הקטגוריות</SelectItem>
-            {CATEGORIES.map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            {sortedFiltered.length} עמדות
-          </span>
+        <div className="flex items-center gap-2 flex-1 justify-end">
+          <div className="relative max-w-[220px]">
+            <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
+            <Input
+              placeholder="חיפוש מהיר…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pr-8 h-8 text-xs bg-background"
+            />
+          </div>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-[130px] h-8 text-xs">
+              <SelectValue placeholder="קטגוריה" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">הכל</SelectItem>
+              {CATEGORIES.map((c) => (
+                <SelectItem key={c} value={c}>{c}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <PageNavigation />
         </div>
       </div>
