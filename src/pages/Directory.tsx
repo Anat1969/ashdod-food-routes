@@ -499,14 +499,14 @@ export default function Directory() {
                       </div>
                     </div>
                   </TableCell>
-                  {/* מצב סביבה */}
+                  {/* סביבה */}
                   <TableCell>
                     <TriStateButtons
                       value={truck.environment_ok}
                       onChange={(val) => updateField(truck.id, "environment_ok", val)}
                     />
                   </TableCell>
-                  {/* מצב פודטראק */}
+                  {/* מבנה */}
                   <TableCell>
                     <TriStateButtons
                       value={truck.truck_condition_ok}
