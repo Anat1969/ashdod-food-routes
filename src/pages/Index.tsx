@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  Building2, ChevronLeft,
+  ChevronLeft,
   ArrowLeftRight, Bell, CheckCircle2, Eye,
   Truck, ShieldCheck, UtensilsCrossed,
 } from "lucide-react";
@@ -11,137 +11,186 @@ export default function Index() {
     <div dir="rtl" className="min-h-screen bg-background">
 
       {/* ── Hero ── */}
-      <section className="premium-hero-deep text-primary-foreground relative overflow-hidden">
-        {/* Subtle geometric accent */}
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 80%, hsl(0 0% 100%) 0%, transparent 50%), radial-gradient(circle at 80% 20%, hsl(0 0% 100%) 0%, transparent 40%)",
-          }}
-        />
+      <section className="premium-hero-luxe text-primary-foreground relative overflow-hidden">
+        {/* Ambient light layers */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top-right warm glow */}
+          <div className="absolute -top-20 -left-20 w-[500px] h-[500px] rounded-full opacity-[0.07]"
+            style={{ background: "radial-gradient(circle, hsl(39 80% 52%) 0%, transparent 70%)" }}
+          />
+          {/* Bottom-left cool glow */}
+          <div className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-[0.05]"
+            style={{ background: "radial-gradient(circle, hsl(200 80% 60%) 0%, transparent 65%)" }}
+          />
+          {/* Fine grain texture */}
+          <div className="absolute inset-0 opacity-[0.03]"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }}
+          />
+        </div>
 
-        <div className="relative container mx-auto px-4 py-20 md:py-28 text-center max-w-2xl">
-          {/* Emblem */}
-          <div className="flex justify-center mb-6">
-            <div className="h-16 w-16 rounded-2xl bg-primary-foreground/10 backdrop-blur-sm flex items-center justify-center border border-primary-foreground/10">
-              <img
-                alt="סמל עיריית אשדוד"
-                src={ashdodEmblem}
-                className="h-10 w-auto opacity-90"
-                style={{ filter: "brightness(0) invert(1)", mixBlendMode: "screen" }}
-              />
+        <div className="relative container mx-auto px-4 pt-16 pb-20 md:pt-24 md:pb-28 text-center max-w-3xl">
+          {/* Emblem with glow ring */}
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-2xl bg-accent/20 blur-xl scale-125" />
+              <div className="relative h-[72px] w-[72px] rounded-2xl bg-primary-foreground/[0.08] backdrop-blur-md flex items-center justify-center border border-primary-foreground/[0.12] shadow-lg shadow-black/10">
+                <img
+                  alt="סמל עיריית אשדוד"
+                  src={ashdodEmblem}
+                  className="h-11 w-auto opacity-95"
+                  style={{ filter: "brightness(0) invert(1)" }}
+                />
+              </div>
             </div>
           </div>
 
-          <p className="text-[11px] tracking-[0.25em] opacity-40 mb-5 uppercase font-medium">
-            עיריית אשדוד · מחלקת הנדסה ותכנון עירוני
+          {/* Kicker */}
+          <p className="text-[10px] tracking-[0.35em] opacity-35 mb-6 uppercase font-medium">
+            עיריית אשדוד · הנדסה ותכנון עירוני
           </p>
 
-          <h1 className="text-3xl md:text-[2.75rem] font-bold mb-5 leading-[1.2] tracking-tight">
+          {/* Main headline */}
+          <h1 className="text-[2rem] md:text-[3.25rem] font-extrabold mb-4 leading-[1.1] tracking-tight">
             ניהול עמדות מזון
-            <br />
-            <span className="text-primary-foreground/70 font-medium text-2xl md:text-3xl">
-              במרחב הציבורי
-            </span>
           </h1>
-
-          <p className="text-sm opacity-50 leading-relaxed max-w-sm mx-auto">
-            מערכת מוניציפלית לניהול רישוי, פיקוח ומיפוי עמדות מזון ברחבי העיר
+          <p className="text-lg md:text-[1.35rem] font-light text-primary-foreground/55 mb-6 tracking-wide">
+            במרחב הציבורי של אשדוד
           </p>
 
-          {/* Accent line */}
-          <div className="mt-8 flex justify-center">
-            <div className="h-px w-16 bg-accent/50 rounded-full" />
+          {/* Accent divider */}
+          <div className="flex justify-center mb-7">
+            <div className="h-[2px] w-10 bg-accent/60 rounded-full" />
+          </div>
+
+          {/* Body */}
+          <p className="text-[13px] text-primary-foreground/40 leading-relaxed max-w-md mx-auto">
+            רישוי, פיקוח ומיפוי — במערכת אחת מתקדמת
+          </p>
+
+          {/* Hero CTA zone */}
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/apply"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-accent text-accent-foreground text-sm font-bold
+                shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02]
+                transition-all duration-200"
+            >
+              הגישו בקשה
+              <ChevronLeft className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/map"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-primary-foreground/[0.08] text-primary-foreground/80
+                border border-primary-foreground/[0.1] text-sm font-medium
+                hover:bg-primary-foreground/[0.14] hover:text-primary-foreground transition-all duration-200"
+            >
+              גלו את המפה
+            </Link>
           </div>
         </div>
+
+        {/* Bottom fade to page */}
+        <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      <div className="container mx-auto px-4 py-14 md:py-16 max-w-5xl">
+      {/* ── Role Cards Section ── */}
+      <div className="container mx-auto px-4 pt-6 pb-16 md:pt-8 md:pb-20 max-w-5xl">
 
         {/* Section label */}
-        <div className="text-center mb-10">
-          <p className="text-xs font-semibold text-muted-foreground/60 tracking-wide uppercase">
-            בחרו את התפקיד שלכם
+        <div className="text-center mb-12 md:mb-14">
+          <p className="text-[10px] font-semibold text-muted-foreground/50 tracking-[0.2em] uppercase mb-2">
+            בחרו את הכניסה שלכם
+          </p>
+          <p className="text-sm text-muted-foreground/70">
+            שלוש נקודות גישה — לפי הצורך שלכם
           </p>
         </div>
 
         {/* ── 3 Role Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-7 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 md:gap-8 mb-20">
 
           <RoleCard
             to="/journey?role=owner"
             icon={Truck}
-            accentClass="group-hover:bg-accent/12"
+            glowColor="hsl(39 80% 52%)"
+            iconBg="bg-accent/10"
             iconColor="text-accent"
             title="בעל עסק"
-            subtitle="הגשת בקשה להצבת עמדה"
-            description="הגישו בקשה, עקבו אחר הסטטוס, וקבלו אישור הצבה"
-            ctaLabel="צפו במסלול"
-            ctaAccent="bg-accent text-accent-foreground hover:bg-accent/90"
-            borderAccent="hover:border-accent/30"
+            subtitle="הגשה ומעקב"
+            description="הגישו בקשה, עקבו אחרי התהליך, וקבלו אישור הצבה"
+            ctaLabel="למסלול בעל העסק"
+            ctaBg="bg-accent text-accent-foreground hover:bg-accent/90 shadow-sm shadow-accent/20"
           />
 
           <RoleCard
             to="/journey?role=city"
             icon={ShieldCheck}
-            accentClass="group-hover:bg-primary/8"
+            glowColor="hsl(216 59% 40%)"
+            iconBg="bg-primary/8"
             iconColor="text-primary"
             title="עירייה"
-            subtitle="ניהול בקשות ומדיניות"
-            description="בדקו בקשות, קבעו מדיניות הצבה, ואשרו עמדות"
-            ctaLabel="צפו במסלול"
-            ctaAccent="bg-primary text-primary-foreground hover:bg-primary/90"
-            borderAccent="hover:border-primary/25"
+            subtitle="בקרה ואישור"
+            description="בדקו בקשות, קבעו מדיניות, ואשרו הצבת עמדות"
+            ctaLabel="למסלול העירייה"
+            ctaBg="bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20"
           />
 
           <RoleCard
             to="/map"
             icon={UtensilsCrossed}
-            accentClass="group-hover:bg-info/8"
+            glowColor="hsl(200 80% 50%)"
+            iconBg="bg-info/8"
             iconColor="text-info"
             title="תושב"
-            subtitle="גלו עמדות אוכל ברחבי העיר"
-            description="מפה אינטראקטיבית, תפריטים, שעות ומיקומים"
-            ctaLabel="גלו עמדות"
-            ctaAccent="bg-info text-info-foreground hover:bg-info/90"
-            borderAccent="hover:border-info/25"
+            subtitle="גילוי ומידע"
+            description="מפה אינטראקטיבית, תפריטים, שעות פעילות ומיקומים"
+            ctaLabel="גלו עמדות במפה"
+            ctaBg="bg-info text-info-foreground hover:bg-info/90 shadow-sm shadow-info/20"
           />
 
         </div>
 
         {/* ── Flow connection section ── */}
-        <div className="bg-card rounded-2xl border municipal-shadow p-7 md:p-8">
-          <h3 className="text-sm font-semibold mb-6 flex items-center gap-2.5 text-foreground">
-            <div className="h-7 w-7 rounded-lg bg-accent/10 flex items-center justify-center">
-              <ArrowLeftRight className="w-3.5 h-3.5 text-accent" />
+        <div className="bg-card rounded-2xl border municipal-shadow p-8 md:p-10">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-accent/10 mb-3">
+              <ArrowLeftRight className="w-4 h-4 text-accent" />
             </div>
-            איך שלושת המסלולים מתחברים
-          </h3>
+            <h3 className="text-sm font-bold text-foreground">
+              איך התהליך מתחבר
+            </h3>
+            <p className="text-xs text-muted-foreground/60 mt-1">
+              שלושה שלבים — מהגשה ועד פרסום
+            </p>
+          </div>
 
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-3 gap-5">
             <FlowCard
+              step="01"
               icon={Bell}
               title="הגשת בקשה"
               from="בעל עסק"
               to="עירייה"
               description="בעל העסק מגיש בקשה — העירייה מקבלת התראה ומתחילה בדיקה"
-              accent="border-s-[3px] border-accent/60"
+              accentColor="border-accent/50"
             />
             <FlowCard
+              step="02"
               icon={CheckCircle2}
-              title="החלטה והודעה"
+              title="בחינה והחלטה"
               from="עירייה"
               to="בעל עסק"
               description="החלטת העירייה מועברת עם נימוקים, תנאים ולוח זמנים"
-              accent="border-s-[3px] border-primary/50"
+              accentColor="border-primary/40"
             />
             <FlowCard
+              step="03"
               icon={Eye}
               title="פרסום ציבורי"
               from="אישור"
               to="תושבים"
               description="לאחר אישור — העמדה מופיעה על המפה הציבורית בזמן אמת"
-              accent="border-s-[3px] border-info/50"
+              accentColor="border-info/40"
             />
           </div>
         </div>
@@ -152,71 +201,86 @@ export default function Index() {
 }
 
 /* ── Role Card ── */
-function RoleCard({ to, icon: Icon, accentClass, iconColor, title, subtitle, description, ctaLabel, ctaAccent, borderAccent }: {
+function RoleCard({ to, icon: Icon, glowColor, iconBg, iconColor, title, subtitle, description, ctaLabel, ctaBg }: {
   to: string;
   icon: React.ElementType;
-  accentClass: string;
+  glowColor: string;
+  iconBg: string;
   iconColor: string;
   title: string;
   subtitle: string;
   description: string;
   ctaLabel: string;
-  ctaAccent: string;
-  borderAccent: string;
+  ctaBg: string;
 }) {
   return (
     <Link
       to={to}
-      className={`group relative rounded-2xl border bg-card p-8 md:p-9 municipal-shadow
-        hover:municipal-shadow-lg hover:-translate-y-1
-        transition-all duration-300 ease-out flex flex-col items-center text-center gap-6
-        ${borderAccent}`}
+      className="group relative rounded-2xl border bg-card municipal-shadow
+        hover:municipal-shadow-lg hover:-translate-y-1.5
+        transition-all duration-300 ease-out flex flex-col text-center overflow-hidden"
     >
-      {/* Icon badge */}
-      <div className={`w-14 h-14 rounded-xl bg-muted/60 ${accentClass} flex items-center justify-center
-        transition-all duration-300`}>
-        <Icon className={`w-6 h-6 ${iconColor}`} />
-      </div>
+      {/* Top accent bar */}
+      <div className="h-1 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{ background: glowColor }}
+      />
 
-      <div className="space-y-2">
-        <p className="text-lg font-bold text-foreground">{title}</p>
-        <p className="text-[13px] font-medium text-muted-foreground">{subtitle}</p>
-        <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[220px] mx-auto">
+      <div className="flex flex-col items-center gap-5 p-8 md:p-10 flex-1">
+        {/* Icon */}
+        <div className="relative">
+          <div className="absolute inset-0 rounded-2xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+            style={{ background: glowColor }}
+          />
+          <div className={`relative w-16 h-16 rounded-2xl ${iconBg} flex items-center justify-center
+            transition-all duration-300`}>
+            <Icon className={`w-7 h-7 ${iconColor}`} />
+          </div>
+        </div>
+
+        {/* Text */}
+        <div className="space-y-1.5">
+          <p className="text-xl font-bold text-foreground tracking-tight">{title}</p>
+          <p className="text-[13px] font-medium text-accent">{subtitle}</p>
+        </div>
+
+        <p className="text-xs text-muted-foreground/65 leading-relaxed max-w-[240px]">
           {description}
         </p>
-      </div>
 
-      {/* CTA */}
-      <div className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-[13px] font-semibold
-        ${ctaAccent} transition-all duration-200 mt-auto`}>
-        {ctaLabel}
-        <ChevronLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+        {/* CTA */}
+        <div className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[13px] font-semibold
+          ${ctaBg} transition-all duration-200 mt-auto`}>
+          {ctaLabel}
+          <ChevronLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+        </div>
       </div>
     </Link>
   );
 }
 
 /* ── Flow Card ── */
-function FlowCard({ icon: Icon, title, from, to, description, accent }: {
+function FlowCard({ step, icon: Icon, title, from, to, description, accentColor }: {
+  step: string;
   icon: React.ElementType;
   title: string;
   from: string;
   to: string;
   description: string;
-  accent: string;
+  accentColor: string;
 }) {
   return (
-    <div className={`bg-muted/30 rounded-xl p-5 ${accent}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-muted-foreground/70" />
-        <span className="text-xs font-semibold text-foreground">{title}</span>
+    <div className={`bg-muted/30 rounded-xl p-5 border-s-[3px] ${accentColor}`}>
+      <div className="flex items-center gap-2.5 mb-3">
+        <span className="text-[10px] font-bold text-muted-foreground/40 tracking-wider">{step}</span>
+        <Icon className="w-4 h-4 text-muted-foreground/60" />
+        <span className="text-xs font-bold text-foreground">{title}</span>
       </div>
       <div className="flex items-center gap-1.5 mb-3">
         <span className="text-[10px] bg-card rounded-full px-2.5 py-0.5 border font-medium text-foreground">{from}</span>
         <ArrowLeftRight className="w-3 h-3 text-muted-foreground/30" />
         <span className="text-[10px] bg-card rounded-full px-2.5 py-0.5 border font-medium text-foreground">{to}</span>
       </div>
-      <p className="text-xs text-muted-foreground/70 leading-relaxed">{description}</p>
+      <p className="text-xs text-muted-foreground/65 leading-relaxed">{description}</p>
     </div>
   );
 }
