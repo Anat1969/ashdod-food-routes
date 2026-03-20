@@ -381,7 +381,9 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("station_type")}>
                   <span className="flex items-center gap-1">סוג עמדה <SortIcon col="station_type" /></span>
                 </TableHead>
-                <TableHead className="text-right">תמונה</TableHead>
+                <TableHead className="text-right">מבנה</TableHead>
+                <TableHead className="text-right">סביבה</TableHead>
+                <TableHead className="text-right">מיקום</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
@@ -390,10 +392,10 @@ export default function Directory() {
                 </TableHead>
                 <TableHead className="text-right">תשתית</TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
-                  <span className="flex items-center gap-1">מצב סביבה <SortIcon col="environment_ok" /></span>
+                  <span className="flex items-center gap-1">סביבה <SortIcon col="environment_ok" /></span>
                 </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
-                  <span className="flex items-center gap-1">מצב פודטראק <SortIcon col="truck_condition_ok" /></span>
+                  <span className="flex items-center gap-1">מבנה <SortIcon col="truck_condition_ok" /></span>
                 </TableHead>
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
                   <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
