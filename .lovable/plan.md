@@ -1,36 +1,24 @@
 
 
-## Analysis
+## Tri-State Fix for LocationCard "מצב בשטח" Checkboxes
 
-The network requests reveal the root cause. When uploading zone images, the storage path includes the Hebrew zone name directly:
+The previous change was applied to the compliance checklist section in `TruckProfile.tsx`, but the "מצב סביבה תקין" and "מצב מבנה תקין" checkboxes live in `src/components/LocationCard.tsx` — and those still use a binary `!current` toggle.
 
-```
-zones/המצודה_1772023103592.jpg  → 400 InvalidKey
-zones/נחל לכיש_1772023117745.jpg → 400 InvalidKey
-```
+### Changes
 
-Storage keys do not support Hebrew characters or spaces. The error `"Invalid key"` is returned by the storage service.
+**File: `src/components/LocationCard.tsx`**
 
-## Fix
+1. **`toggleExpertBool` function** (line 154-166): Change from `!current` to tri-state cycle: `null → true → false → null`
 
-In `src/pages/ZoneCharacterization.tsx`, the `filePath` is built using `zone.name` which contains Hebrew text. The fix is to encode or replace the zone name with an ASCII-safe identifier (e.g., using `encodeURIComponent` or a simple index/hash).
+2. **`BoolField` component** (line ~458-466): Update the admin checkbox to use the same tri-state visual pattern:
+   - `true` → checked (green check)
+   - `false` → indeterminate state with destructive/red styling
+   - `null` → unchecked (not set)
 
-### Change in `ZoneCharacterization.tsx`
+3. **Read-only view** in `BoolField`: Show `Check` for true, `X` for false, `Minus` for null (already partially done but needs the Minus icon for null)
 
-Replace the line:
-```typescript
-const filePath = `zones/${zone.name}_${Date.now()}.${ext}`;
-```
-With:
-```typescript
-const safeName = encodeURIComponent(zone.name);
-const filePath = `zones/${safeName}_${Date.now()}.${ext}`;
-```
-
-This ensures the storage key contains only URL-safe ASCII characters while still being unique per zone.
-
-### Technical Details
-- **Root cause**: Supabase Storage rejects keys with non-ASCII characters (Hebrew) and spaces
-- **File changed**: `src/pages/ZoneCharacterization.tsx` (single line change)
-- **No database changes needed** - the `zone_images` table and RLS policies are already correct
+### Summary
+- One file changed: `src/components/LocationCard.tsx`
+- Two functions updated: `toggleExpertBool` + `BoolField`
+- Same tri-state pattern already used in the compliance checklist
 
