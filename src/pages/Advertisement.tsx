@@ -207,7 +207,7 @@ export default function Advertisement() {
                   truck={truck}
                   isSelected={selectedTruckId === truck.id}
                   onSelect={() => handleSelectTruck(truck.id)}
-                  onPhotoClick={() => openMenuDialog(truck)}
+                  onPhotoClick={() => openMenuDialog(truck.id)}
                   isPhotoUsable={isPhotoUsable}
                   onImgError={handleImgError}
                 />
