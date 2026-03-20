@@ -36,10 +36,10 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04]">
-        <div className="container mx-auto px-4 h-[56px] flex items-center justify-between">
+        <div className="container mx-auto px-4 h-[60px] flex items-center justify-between">
           <Link to="/" className="flex items-center group">
-            <div className="h-[46px] w-[46px] rounded-xl overflow-hidden bg-primary-foreground/[0.08] border border-primary-foreground/[0.1] flex items-center justify-center shadow-sm shadow-black/10">
-              <img alt="סמל עיריית אשדוד" className="h-[42px] w-[42px] object-contain" src={ashdodLogo} />
+            <div className="h-[44px] w-[44px] rounded-xl overflow-hidden bg-primary-foreground/[0.06] border border-primary-foreground/[0.08] flex items-center justify-center">
+              <img alt="סמל עיריית אשדוד" className="h-[40px] w-[40px] object-contain" src={ashdodLogo} />
             </div>
           </Link>
 

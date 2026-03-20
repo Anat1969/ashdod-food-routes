@@ -73,7 +73,7 @@ export default function Index() {
       </section>
 
       {/* ── Role Cards Section ── */}
-      <div className="container mx-auto px-4 -mt-4 pb-16 md:pb-20 max-w-5xl relative z-10">
+      <div className="container mx-auto px-4 pt-8 pb-16 md:pt-10 md:pb-20 max-w-5xl relative z-10">
 
         {/* Section label */}
         <div className="text-center mb-10 md:mb-12">
