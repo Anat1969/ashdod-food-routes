@@ -352,25 +352,15 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         </Card>
       </div>
 
-      {/* === ROW 4: סטטוס + שמור שינויים === */}
-      <div className="grid grid-cols-3 gap-3">
-        {isAdmin ? (
-          <Button onClick={saveAll} disabled={saving} className="h-full text-lg font-bold">
-            {saving ? "שומר..." : "שמור שינויים"}
-          </Button>
-        ) : (
-          <div />
-        )}
-
-        <Card className={`col-span-2 border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
-          <CardContent className="py-3 text-center">
-            <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
-            <p className="text-lg font-bold">
-              {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* === ROW 4: סטטוס === */}
+      <Card className={`border-2 ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
+        <CardContent className="py-3 text-center">
+          <p className="text-sm font-medium text-muted-foreground mb-1">סטטוס</p>
+          <p className="text-lg font-bold">
+            {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }
