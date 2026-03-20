@@ -145,8 +145,22 @@ export default function TruckProfile() {
     fetchData();
   };
 
-  if (loading) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">טוען...</div>;
-  if (!truck) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">פודטראק לא נמצא</div>;
+  if (loading) return (
+    <div className="container mx-auto px-4 py-16 text-center">
+      <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin mx-auto" />
+      <p className="text-sm text-muted-foreground mt-3">טוען פרטי עמדה…</p>
+    </div>
+  );
+  if (!truck) return (
+    <div className="container mx-auto px-4 py-16 text-center max-w-sm">
+      <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+        <Utensils className="h-6 w-6 text-muted-foreground/25" />
+      </div>
+      <p className="text-base font-semibold text-foreground mb-1">העמדה לא נמצאה</p>
+      <p className="text-sm text-muted-foreground mb-4">ייתכן שהכתובת שגויה או שהעמדה הוסרה</p>
+      <a href="/directory" className="text-sm text-primary font-semibold hover:underline">חזרה למאגר העמדות ←</a>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl" dir="rtl">
