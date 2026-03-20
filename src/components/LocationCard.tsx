@@ -457,9 +457,13 @@ function BoolField({ label, value, isAdmin, onChange }: { label: string; value: 
   return (
     <div className="flex items-center gap-3">
       {isAdmin ? (
-        <Checkbox checked={!!value} onCheckedChange={onChange} />
+        <Checkbox
+          checked={value === true ? true : value === false ? "indeterminate" : false}
+          onCheckedChange={onChange}
+          className={value === false ? "border-destructive bg-destructive text-destructive-foreground" : ""}
+        />
       ) : (
-        value ? <Check className="h-5 w-5 text-green-600" /> : <X className="h-5 w-5 text-destructive" />
+        value === true ? <Check className="h-5 w-5 text-green-600" /> : value === false ? <X className="h-5 w-5 text-destructive" /> : <Minus className="h-5 w-5 text-muted-foreground" />
       )}
       <span>{label}</span>
     </div>
