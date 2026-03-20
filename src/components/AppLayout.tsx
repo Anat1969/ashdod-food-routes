@@ -38,13 +38,15 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
       <header className="premium-hero-luxe text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.04]">
         <div className="container mx-auto px-4 h-[56px] flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="h-9 w-9 rounded-lg overflow-hidden bg-primary-foreground/[0.06] border border-primary-foreground/[0.08] flex items-center justify-center">
-              <img alt="סמל עיריית אשדוד" className="h-8 w-8 object-contain" src={ashdodLogo} />
+            <div className="h-11 w-11 rounded-xl overflow-hidden bg-primary-foreground/[0.08] border border-primary-foreground/[0.1] flex items-center justify-center shadow-sm shadow-black/10">
+              <img alt="סמל עיריית אשדוד" className="h-10 w-10 object-contain" src={ashdodLogo} />
             </div>
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="border-r border-primary-foreground/10 h-4" />
-              <span className="text-[11px] font-medium text-primary-foreground/40 tracking-wide">
-                עמדות מזון · אשדוד
+            <div className="hidden sm:flex flex-col leading-tight">
+              <span className="text-[13px] font-bold text-primary-foreground/90 tracking-tight">
+                עמדות מזון
+              </span>
+              <span className="text-[10px] font-medium text-primary-foreground/35 tracking-wide">
+                עיריית אשדוד
               </span>
             </div>
           </Link>
