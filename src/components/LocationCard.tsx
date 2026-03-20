@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Check, X, Zap, Droplets, CircleDot, Mail, Minus } from "lucide-react";
 import FileUpload from "@/components/FileUpload";
 import ImageLightbox from "@/components/ImageLightbox";
