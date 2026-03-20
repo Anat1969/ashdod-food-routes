@@ -270,8 +270,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             ) : (
               <>
                 <ReadOnlyRow label="שם מיקום" value={location?.name} />
-                <ReadOnlyRow label="רחוב" value={location?.street} />
-                <ReadOnlyRow label="שכונה" value={location?.neighborhood} />
+                <ReadOnlyRow label="כתובת" value={location?.street} />
                 <ReadOnlyRow label="גוש" value={location?.gush} />
                 <ReadOnlyRow label="חלקה" value={location?.chelka} />
               </>
