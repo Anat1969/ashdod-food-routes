@@ -263,16 +263,14 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
             {isAdmin ? (
               <>
                 <EditableRow label="שם מיקום" value={locName} onChange={setLocName} onBlur={() => saveLocationField({ name: locName || "ללא שם" })} />
-                <EditableRow label="רחוב" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
-                <EditableRow label="שכונה" value={locNeighborhood} onChange={setLocNeighborhood} onBlur={() => saveLocationField({ neighborhood: locNeighborhood || null })} />
+                <EditableRow label="כתובת" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
                 <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
                 <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
               </>
             ) : (
               <>
                 <ReadOnlyRow label="שם מיקום" value={location?.name} />
-                <ReadOnlyRow label="רחוב" value={location?.street} />
-                <ReadOnlyRow label="שכונה" value={location?.neighborhood} />
+                <ReadOnlyRow label="כתובת" value={location?.street} />
                 <ReadOnlyRow label="גוש" value={location?.gush} />
                 <ReadOnlyRow label="חלקה" value={location?.chelka} />
               </>
