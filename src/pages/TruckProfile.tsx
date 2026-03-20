@@ -233,7 +233,7 @@ export default function TruckProfile() {
               {/* הנחיות למבנה */}
               <Card className="municipal-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">א. הנחיות למבנה (הפודטראק)</CardTitle>
+                  <CardTitle className="text-base">א. הנחיות למבנה</CardTitle>
                   {!isAdmin && <p className="text-xs text-muted-foreground">צפייה בלבד</p>}
                 </CardHeader>
                 <CardContent className="space-y-1.5 max-h-[45vh] overflow-y-auto">

@@ -237,12 +237,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   await supabase.from("food_trucks").update({ vehicle_photo_url: null }).eq("id", truck.id);
                   onUpdate();
                 }}
-                label="הפודטראק"
+                label="מבנה"
                 accept="image/*"
                 className="h-full"
               />
             ) : (
-              <PhotoSlot label="הפודטראק" url={truck.vehicle_photo_url} className="h-full" />
+              <PhotoSlot label="מבנה" url={truck.vehicle_photo_url} className="h-full" />
             )}
           </div>
           {/* מפעיל - fills remaining space */}
