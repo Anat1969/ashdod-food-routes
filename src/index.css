@@ -49,6 +49,10 @@
     --warning-foreground: 216 59% 12%;
     --info: 200 80% 50%;
     --info-foreground: 0 0% 100%;
+
+    /* Gold accent for premium micro-details */
+    --gold: 39 75% 55%;
+    --gold-foreground: 216 59% 12%;
   }
 
   .dark {
@@ -71,6 +75,9 @@
     --border: 216 40% 22%;
     --input: 216 40% 22%;
     --ring: 39 80% 52%;
+
+    --gold: 39 75% 55%;
+    --gold-foreground: 216 20% 93%;
   }
 }
 
@@ -125,5 +132,19 @@
       hsl(216 50% 30%) 85%,
       hsl(216 45% 33%) 100%
     );
+  }
+
+  .gold-underline {
+    position: relative;
+  }
+  .gold-underline::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    right: 0;
+    width: 40px;
+    height: 2px;
+    background: hsl(var(--gold));
+    border-radius: 9999px;
   }
 }

@@ -22,7 +22,7 @@ interface Step {
   highlight?: boolean;
 }
 
-/* ─── Color Config ─────────────────────────────────────── */
+/* ─── Color Config — unified: primary (blue), accent (gold), primary-muted ─── */
 const ROLES = {
   owner: {
     label: "בעל עסק",
@@ -60,16 +60,16 @@ const ROLES = {
     label: "תושב",
     sub: "גלו עמדות אוכל ברחבי העיר",
     icon: UtensilsCrossed,
-    iconBg: "bg-info/10",
-    iconColor: "text-info",
-    border: "border-info/20",
-    header: "bg-info",
-    text: "text-info",
-    badge: "bg-info/10 text-info",
-    ring: "ring-info/20",
-    step: "bg-info",
-    light: "bg-info/5",
-    ctaBg: "bg-info text-info-foreground hover:bg-info/90",
+    iconBg: "bg-primary/6",
+    iconColor: "text-primary",
+    border: "border-primary/15",
+    header: "bg-primary",
+    text: "text-primary",
+    badge: "bg-primary/8 text-primary",
+    ring: "ring-primary/15",
+    step: "bg-primary",
+    light: "bg-primary/4",
+    ctaBg: "bg-primary text-primary-foreground hover:bg-primary/90",
     desc: "מפה אינטראקטיבית, תפריטים, שעות פעילות ומיקומים מדויקים",
   },
 } as const;
@@ -116,7 +116,7 @@ const STEPS: Record<RoleKey, Step[]> = {
 const INTERSECTIONS = [
   { from: "בעל עסק", to: "עירייה", icon: Bell, title: "הגשת בקשה", desc: "ברגע שבעל העסק מגיש — העירייה מקבלת התראה ומתחילה בדיקה", accent: "border-s-4 border-accent" },
   { from: "עירייה", to: "בעל עסק", icon: CheckCircle2, title: "החלטה והודעה", desc: "החלטת העירייה מועברת לבעל העסק עם נימוקים ותנאים", accent: "border-s-4 border-primary" },
-  { from: "אישור", to: "תושבים", icon: Eye, title: "פרסום ציבורי", desc: "לאחר אישור — העמדה מופיעה על המפה הציבורית", accent: "border-s-4 border-info" },
+  { from: "אישור", to: "תושבים", icon: Eye, title: "פרסום ציבורי", desc: "לאחר אישור — העמדה מופיעה על המפה הציבורית", accent: "border-s-4 border-primary/60" },
 ];
 
 /* ─── Step Card ────────────────────────────────────────── */
@@ -168,7 +168,7 @@ function StepCard({
 
           {isActive && (
             <div className="mt-2.5">
-              <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+              <p className="text-[13px] text-muted-foreground leading-relaxed">{step.desc}</p>
 
               {step.intersect && (
                 <div className="mt-2 flex items-center gap-1.5 text-[11px] text-accent bg-accent/5 border border-accent/20 rounded-lg px-2 py-1.5">
@@ -280,7 +280,7 @@ function RoleCard({ roleKey, onClick }: { roleKey: RoleKey; onClick: () => void 
       <div>
         <p className="text-lg font-bold text-foreground mb-1">{r.label}</p>
         <p className={`text-sm font-medium ${r.text} mb-2`}>{r.sub}</p>
-        <p className="text-xs text-muted-foreground/70 leading-relaxed max-w-[200px] mx-auto">{r.desc}</p>
+        <p className="text-[13px] text-muted-foreground/70 leading-relaxed max-w-[200px] mx-auto">{r.desc}</p>
       </div>
 
       <div className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium
@@ -302,12 +302,12 @@ export default function UserJourneyMap() {
   return (
     <div dir="rtl" className="min-h-screen bg-background">
 
-      {/* Hero */}
-      <section className="premium-hero text-primary-foreground py-10">
+      {/* Hero — unified brand gradient */}
+      <section className="premium-hero-deep text-primary-foreground py-10">
         <div className="container mx-auto px-4 text-center max-w-2xl">
-          <p className="text-xs tracking-widest opacity-50 mb-3 uppercase">ניהול עמדות מזון · אשדוד</p>
+          <p className="text-xs tracking-widest text-primary-foreground/40 mb-3 uppercase">ניהול עמדות מזון · אשדוד</p>
           <h1 className="text-2xl md:text-3xl font-bold mb-2">מסלולי משתמשים</h1>
-          <p className="text-sm opacity-70 leading-relaxed">
+          <p className="text-sm text-primary-foreground/55 leading-relaxed">
             בחרו את התפקיד שלכם — נציג את המסלול המותאם עבורכם
           </p>
         </div>
@@ -336,14 +336,14 @@ export default function UserJourneyMap() {
                     <div key={i} className={`bg-muted/40 rounded-lg p-4 ${c.accent}`}>
                       <div className="flex items-center gap-2 mb-2.5">
                         <IIcon className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-xs font-semibold text-foreground">{c.title}</span>
+                        <span className="text-sm font-semibold text-foreground">{c.title}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 mb-2.5">
-                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium text-foreground">{c.from}</span>
-                        <ArrowLeftRight className="w-3 h-3 text-muted-foreground/40" />
-                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium text-foreground">{c.to}</span>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium">{c.from}</span>
+                        <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
+                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium">{c.to}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{c.desc}</p>
+                      <p className="text-[13px] text-muted-foreground leading-relaxed">{c.desc}</p>
                     </div>
                   );
                 })}
@@ -351,53 +351,58 @@ export default function UserJourneyMap() {
             </div>
           </>
         ) : (
-          <>
-            {/* Role header */}
-            <div className={`rounded-xl p-5 mb-6 ${ROLES[selectedRole].step} text-white municipal-shadow-lg`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
-                    {(() => { const I = ROLES[selectedRole].icon; return <I className="w-5 h-5" />; })()}
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold">{ROLES[selectedRole].label}</p>
-                    <p className="text-sm opacity-80">{ROLES[selectedRole].sub}</p>
-                  </div>
+          <div>
+            {/* Active role header */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl ${ROLES[selectedRole].iconBg} flex items-center justify-center`}>
+                  {(() => { const RI = ROLES[selectedRole].icon; return <RI className={`w-5 h-5 ${ROLES[selectedRole].iconColor}`} />; })()}
                 </div>
-                <button
-                  onClick={() => setSelectedRole(null)}
-                  className="text-xs opacity-80 hover:opacity-100 bg-white/15 rounded-lg px-3 py-1.5 transition-all hover:bg-white/25"
-                >
-                  ← החליפו תפקיד
-                </button>
+                <div>
+                  <h2 className="text-lg font-bold text-foreground">{ROLES[selectedRole].label}</h2>
+                  <p className="text-[13px] text-muted-foreground">{ROLES[selectedRole].sub}</p>
+                </div>
               </div>
+              <button
+                onClick={() => setSelectedRole(null)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+              >
+                <ArrowRight className="w-3.5 h-3.5" />
+                בחירת תפקיד אחר
+              </button>
             </div>
 
             <JourneyPanel roleKey={selectedRole} />
 
-            {/* Other roles */}
-            <div className="mt-8 pt-6 border-t">
-              <p className="text-xs text-muted-foreground text-center mb-4">מעניין אתכם גם מסלול אחר?</p>
-              <div className="flex flex-wrap gap-3 justify-center">
-                {(["owner", "city", "resident"] as RoleKey[]).filter(k => k !== selectedRole).map(key => {
-                  const r = ROLES[key];
-                  const I = r.icon;
+            {/* Intersections */}
+            <div className="mt-12 bg-card rounded-xl border municipal-shadow p-6">
+              <h3 className="text-sm font-semibold mb-5 flex items-center gap-2 text-foreground">
+                <ArrowLeftRight className="w-4 h-4 text-accent" />
+                נקודות חיבור בין המסלולים
+              </h3>
+              <div className="grid sm:grid-cols-3 gap-4">
+                {INTERSECTIONS.map((c, i) => {
+                  const IIcon = c.icon;
                   return (
-                    <button
-                      key={key}
-                      onClick={() => setSelectedRole(key)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-all
-                        ${r.badge} hover:municipal-shadow`}
-                    >
-                      <I className="w-4 h-4" />
-                      {r.label}
-                    </button>
+                    <div key={i} className={`bg-muted/40 rounded-lg p-4 ${c.accent}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <IIcon className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm font-semibold text-foreground">{c.title}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium">{c.from}</span>
+                        <ArrowRight className="w-3 h-3 text-muted-foreground/30" />
+                        <span className="text-[10px] bg-card rounded-full px-2 py-0.5 border font-medium">{c.to}</span>
+                      </div>
+                      <p className="text-[13px] text-muted-foreground leading-relaxed">{c.desc}</p>
+                    </div>
                   );
                 })}
               </div>
             </div>
-          </>
+          </div>
         )}
+
       </div>
     </div>
   );
