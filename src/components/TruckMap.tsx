@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -38,7 +38,6 @@ interface TruckMapProps {
   onSelectTruck: (truck: TruckWithLocation) => void;
 }
 
-// Component to fly to selected truck
 function FlyToSelected({ truck }: { truck: TruckWithLocation | undefined }) {
   const map = useMap();
   useEffect(() => {
@@ -77,10 +76,19 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: Tru
           }}
         >
           <Popup>
-            <div className="text-right font-sans">
-              <strong>{truck.truck_name}</strong>
-              {truck.food_category && <p className="text-xs mt-1">{truck.food_category}</p>}
-              {truck.locations?.name && <p className="text-xs text-gray-500">{truck.locations.name}</p>}
+            <div className="text-right font-sans min-w-[140px]" dir="rtl">
+              <p className="font-bold text-sm text-foreground">{truck.truck_name}</p>
+              {truck.food_category && (
+                <p className="text-xs text-muted-foreground mt-0.5">{truck.food_category}</p>
+              )}
+              {truck.locations?.name && (
+                <p className="text-xs text-muted-foreground/70 mt-0.5">{truck.locations.name}</p>
+              )}
+              {truck.hours_from && truck.hours_to && (
+                <p className="text-[11px] text-muted-foreground/50 mt-1">
+                  {truck.hours_from} – {truck.hours_to}
+                </p>
+              )}
             </div>
           </Popup>
         </Marker>

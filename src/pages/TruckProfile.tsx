@@ -145,8 +145,22 @@ export default function TruckProfile() {
     fetchData();
   };
 
-  if (loading) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">טוען...</div>;
-  if (!truck) return <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">פודטראק לא נמצא</div>;
+  if (loading) return (
+    <div className="container mx-auto px-4 py-16 text-center">
+      <div className="w-8 h-8 rounded-full border-2 border-primary/30 border-t-primary animate-spin mx-auto" />
+      <p className="text-sm text-muted-foreground mt-3">טוען פרטי עמדה…</p>
+    </div>
+  );
+  if (!truck) return (
+    <div className="container mx-auto px-4 py-16 text-center max-w-sm">
+      <div className="w-14 h-14 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-4">
+        <Utensils className="h-6 w-6 text-muted-foreground/25" />
+      </div>
+      <p className="text-base font-semibold text-foreground mb-1">העמדה לא נמצאה</p>
+      <p className="text-sm text-muted-foreground mb-4">ייתכן שהכתובת שגויה או שהעמדה הוסרה</p>
+      <a href="/directory" className="text-sm text-primary font-semibold hover:underline">חזרה למאגר העמדות ←</a>
+    </div>
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl" dir="rtl">
@@ -410,29 +424,33 @@ function MenuTab({
   };
 
   return (
-    <div className="grid md:grid-cols-[auto_1fr] gap-4" dir="rtl">
+    <div className="grid md:grid-cols-[280px_1fr] gap-5" dir="rtl">
       {/* Left: truck info card */}
-      <Card className="municipal-shadow md:w-64">
-        {photo && (
-          <img src={photo} alt={truckName} className="w-full h-40 object-cover rounded-t-lg" />
+      <Card className="municipal-shadow overflow-hidden">
+        {photo ? (
+          <img src={photo} alt={truckName} className="w-full h-44 object-cover" />
+        ) : (
+          <div className="w-full h-36 bg-muted/40 flex items-center justify-center">
+            <Utensils className="h-8 w-8 text-muted-foreground/15" />
+          </div>
         )}
-        <CardContent className="pt-4 space-y-2 pb-4">
-          <h3 className="font-bold text-base">{truckName}</h3>
+        <CardContent className="pt-4 space-y-2.5 pb-5">
+          <h3 className="font-bold text-base text-foreground">{truckName}</h3>
           {foodCategory && (
             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Utensils className="h-3.5 w-3.5" />
+              <Utensils className="h-3.5 w-3.5 flex-shrink-0" />
               {foodCategory}
             </p>
           )}
           {location?.name && (
             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" />
+              <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
               {location.name}
             </p>
           )}
           {hoursFrom && hoursTo && (
             <p className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
+              <Clock className="h-3.5 w-3.5 flex-shrink-0" />
               {hoursFrom} – {hoursTo}
             </p>
           )}
@@ -446,20 +464,23 @@ function MenuTab({
         </CardHeader>
         <CardContent className="space-y-2">
           {menuItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4 text-center">
-              {canEdit ? "הוסף פריטים לתפריט" : "תפריט טרם הוזן"}
-            </p>
+            <div className="text-center py-8">
+              <Utensils className="h-6 w-6 text-muted-foreground/15 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">
+                {canEdit ? "הוסיפו את הפריט הראשון לתפריט" : "תפריט טרם הוזן"}
+              </p>
+            </div>
           ) : (
             <div className="divide-y">
               {menuItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between py-2.5">
-                  <span className="text-sm font-medium">{item.item_name}</span>
+                <div key={item.id} className="flex items-center justify-between py-3">
+                  <span className="text-sm font-medium text-foreground">{item.item_name}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-primary">₪{item.price}</span>
+                    <span className="text-sm font-bold tabular-nums text-foreground">₪{item.price}</span>
                     {canEdit && (
                       <button
                         onClick={() => deleteItem(item.id)}
-                        className="text-muted-foreground hover:text-destructive transition-colors"
+                        className="text-muted-foreground/50 hover:text-destructive transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -476,7 +497,7 @@ function MenuTab({
                 placeholder="שם הפריט"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="flex-1 h-8 text-sm"
+                className="flex-1 h-9 text-sm"
                 onKeyDown={(e) => e.key === "Enter" && addItem()}
               />
               <Input
@@ -484,10 +505,10 @@ function MenuTab({
                 type="number"
                 value={newPrice}
                 onChange={(e) => setNewPrice(e.target.value)}
-                className="w-20 h-8 text-sm"
+                className="w-20 h-9 text-sm"
                 onKeyDown={(e) => e.key === "Enter" && addItem()}
               />
-              <Button size="sm" onClick={addItem} disabled={saving || !newName.trim() || !newPrice} className="h-8">
+              <Button size="sm" onClick={addItem} disabled={saving || !newName.trim() || !newPrice} className="h-9">
                 <Plus className="h-3.5 w-3.5" />
               </Button>
             </div>
