@@ -35,40 +35,44 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="premium-hero text-primary-foreground municipal-shadow sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <img alt="סמל עיריית אשדוד" className="h-14 w-auto" src={ashdodEmblem} />
+      <header className="premium-hero-deep text-primary-foreground sticky top-0 z-50 border-b border-primary-foreground/[0.06]">
+        <div className="container mx-auto px-4 h-[60px] flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group">
+            <img alt="סמל עיריית אשדוד" className="h-9 w-auto opacity-90 group-hover:opacity-100 transition-opacity" src={ashdodEmblem} style={{ filter: "brightness(0) invert(1)" }} />
+            <div className="hidden sm:block border-r border-primary-foreground/15 h-5 mr-1" />
+            <span className="hidden sm:block text-[11px] font-medium text-primary-foreground/40 tracking-wide">
+              עמדות מזון
+            </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-0.5">
+          <nav className="hidden md:flex items-center gap-px">
             {navLinks.map((link) =>
             <Link
               key={link.to}
               to={link.to}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-3.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
               location.pathname === link.to ?
-              "bg-primary-foreground/15 text-primary-foreground" :
-              "text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/8"}`
+              "bg-primary-foreground/12 text-primary-foreground shadow-sm" :
+              "text-primary-foreground/55 hover:text-primary-foreground/90 hover:bg-primary-foreground/[0.06]"}`
               }>
-
                 {link.label}
               </Link>
             )}
+
+            <div className="border-r border-primary-foreground/10 h-5 mx-2" />
+
             {user ?
             <Button
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/10 mr-2">
-
-                <LogOut className="h-4 w-4 ml-1" />
+              className="text-primary-foreground/55 hover:text-primary-foreground hover:bg-primary-foreground/[0.08] text-[13px] h-9 px-3">
+                <LogOut className="h-3.5 w-3.5 ml-1.5" />
                 יציאה
               </Button> :
-
             <Link to="/login">
-                <Button variant="ghost" size="sm" className="text-primary-foreground/75 hover:text-primary-foreground hover:bg-primary-foreground/10 mr-2">
+                <Button variant="ghost" size="sm" className="text-primary-foreground/55 hover:text-primary-foreground hover:bg-primary-foreground/[0.08] text-[13px] h-9 px-3">
                   התחברות
                 </Button>
               </Link>
