@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import StatusBadge from "@/components/StatusBadge";
 import FileUpload from "@/components/FileUpload";
 import LocationCard from "@/components/LocationCard";
+import LocationEditor from "@/components/LocationEditor";
 import { DESIGN_ITEMS, STRUCTURE_ENV_ITEMS } from "@/lib/types";
 import type { FoodTruck, TruckStatus, ComplianceChecklist, ActivityLog, Location, Profile } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
