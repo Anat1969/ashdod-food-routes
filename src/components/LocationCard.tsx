@@ -274,7 +274,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                     <span className="text-xs">מיקום רצוי</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locElectricity} onCheckedChange={(v) => setLocElectricity(!!v)} />
+                    <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
                     <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
                   </div>
                   <div className="flex items-center gap-1">
