@@ -264,19 +264,27 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               <>
                 <EditableRow label="שם מיקום" value={locName} onChange={setLocName} onBlur={() => saveLocationField({ name: locName || "ללא שם" })} />
                 <EditableRow label="כתובת" value={locStreet} onChange={setLocStreet} onBlur={() => saveLocationField({ street: locStreet || null })} />
-                <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
-                <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
-                <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
-                <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
+                <div className="grid grid-cols-2 gap-2">
+                  <EditableRow label="גוש" value={locGush} onChange={setLocGush} onBlur={() => saveLocationField({ gush: locGush || null })} />
+                  <EditableRow label="חלקה" value={locChelka} onChange={setLocChelka} onBlur={() => saveLocationField({ chelka: locChelka || null })} />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
+                  <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
+                </div>
               </>
             ) : (
               <>
                 <ReadOnlyRow label="שם מיקום" value={location?.name} />
                 <ReadOnlyRow label="כתובת" value={location?.street} />
-                <ReadOnlyRow label="גוש" value={location?.gush} />
-                <ReadOnlyRow label="חלקה" value={location?.chelka} />
-                <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
-                <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
+                <div className="grid grid-cols-2 gap-2">
+                  <ReadOnlyRow label="גוש" value={location?.gush} />
+                  <ReadOnlyRow label="חלקה" value={location?.chelka} />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
+                  <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
+                </div>
               </>
             )}
           </CardContent>
