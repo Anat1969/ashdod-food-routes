@@ -38,10 +38,17 @@ interface TruckMapProps {
   onSelectTruck: (truck: TruckWithLocation) => void;
 }
 
+function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLocation & { locations: Location & { lat: number; lng: number } } {
+  if (!truck?.locations) return false;
+  const lat = Number(truck.locations.lat);
+  const lng = Number(truck.locations.lng);
+  return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
+}
+
 function FlyToSelected({ truck }: { truck: TruckWithLocation | undefined }) {
   const map = useMap();
   useEffect(() => {
-    if (truck?.locations?.lat && truck?.locations?.lng) {
+    if (hasValidCoords(truck)) {
       map.flyTo([Number(truck.locations.lat), Number(truck.locations.lng)], 17, { duration: 1 });
     }
   }, [truck?.id, truck?.locations?.lat, truck?.locations?.lng, map]);
