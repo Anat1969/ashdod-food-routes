@@ -367,11 +367,13 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <p>{expertOpinion?.conditions || "—"}</p>
               )}
             </div>
-            <div className={`rounded-md border-2 py-2 text-center ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
-              <p className="text-xs font-medium text-muted-foreground mb-0.5">סטטוס</p>
-              <p className="text-base font-bold">
-                {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
-              </p>
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1 text-right">סטטוס</p>
+              <div className={`rounded-md border-2 py-2 text-center ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
+                <p className="text-base font-bold">
+                  {isApproved ? "✅ מאושר" : `❌ ${STATUS_LABELS[truck.status as TruckStatus] || truck.status}`}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
