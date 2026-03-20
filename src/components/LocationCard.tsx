@@ -282,7 +282,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                     <Droplets className="h-4 w-4" /><span className="text-xs">מים</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locSewage} onCheckedChange={(v) => setLocSewage(!!v)} />
+                    <Checkbox checked={locSewage} onCheckedChange={(v) => { setLocSewage(!!v); saveLocationField({ infra_sewage: !!v }); }} />
                     <CircleDot className="h-4 w-4" /><span className="text-xs">ביוב</span>
                   </div>
                 </div>
