@@ -92,13 +92,15 @@ export default function Advertisement() {
     setSelectedTruckId(id);
   }, []);
 
-  const openMenuDialog = useCallback(async (truck: TruckWithLocation) => {
-    setMenuDialogTruckId(truck.id);
+  const openMenuDialog = useCallback(async (truckId: string) => {
+    // Always select the truck first — single source of truth
+    setSelectedTruckId(truckId);
+    setMenuDialogTruckId(truckId);
     setMenuLoading(true);
     const { data } = await supabase
       .from("menu_items")
       .select("*")
-      .eq("truck_id", truck.id)
+      .eq("truck_id", truckId)
       .order("sort_order", { ascending: true });
     setMenuItems((data as MenuItem[]) || []);
     setMenuLoading(false);
@@ -205,7 +207,7 @@ export default function Advertisement() {
                   truck={truck}
                   isSelected={selectedTruckId === truck.id}
                   onSelect={() => handleSelectTruck(truck.id)}
-                  onPhotoClick={() => openMenuDialog(truck)}
+                  onPhotoClick={() => openMenuDialog(truck.id)}
                   isPhotoUsable={isPhotoUsable}
                   onImgError={handleImgError}
                 />
