@@ -348,7 +348,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         {/* הערות ותנאים (left in RTL) */}
         <Card className="border-sky-300 bg-white/80">
           <CardHeader className="pb-2 pt-3">
-            <CardTitle className="text-base">הערות ותנאים</CardTitle>
+            <CardTitle className="text-base">חוות דעת</CardTitle>
           </CardHeader>
           <CardContent className="text-sm pb-3 space-y-3">
             <div>
