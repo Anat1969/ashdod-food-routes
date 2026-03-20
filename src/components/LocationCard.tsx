@@ -278,7 +278,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                     <Zap className="h-4 w-4" /><span className="text-xs">חשמל</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Checkbox checked={locWater} onCheckedChange={(v) => setLocWater(!!v)} />
+                    <Checkbox checked={locWater} onCheckedChange={(v) => { setLocWater(!!v); saveLocationField({ infra_water: !!v }); }} />
                     <Droplets className="h-4 w-4" /><span className="text-xs">מים</span>
                   </div>
                   <div className="flex items-center gap-1">
