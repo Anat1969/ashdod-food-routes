@@ -33,6 +33,7 @@ const defaultIcon = new L.Icon({
 });
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
+type TruckMapFocusMode = "default" | "advertisement";
 
 interface TruckMapProps {
   trucks: TruckWithLocation[];
@@ -48,6 +49,8 @@ interface TruckMapProps {
   sidebarPosition?: "left" | "right";
   /** Width of the sidebar in pixels — used for centering offset. Default 288. */
   sidebarWidth?: number;
+  /** Screen-specific framing behavior. Keep /map on default; use advertisement for split-view discovery framing. */
+  focusMode?: TruckMapFocusMode;
 }
 
 export function hasValidCoords(
@@ -75,6 +78,51 @@ const CLUSTER_DISABLE_ZOOM = 17;
 const SELECTION_ZOOM = 18;
 /** Max zoom when fitting all markers on first load */
 const INITIAL_ZOOM = 16;
+
+function getAdvertisementAnchorPoint(mapSize: L.Point): L.Point {
+  const isCompact = mapSize.y < 340;
+  const isNarrow = mapSize.x < 640;
+
+  return L.point(
+    mapSize.x * (isNarrow ? 0.5 : 0.56),
+    mapSize.y * (isCompact ? 0.78 : 0.72)
+  );
+}
+
+function getFramedCenterPoint({
+  focusMode,
+  map,
+  selectionZoom,
+  sidebarPosition,
+  sidebarWidth,
+  targetLat,
+  targetLng,
+}: {
+  focusMode: TruckMapFocusMode;
+  map: L.Map;
+  selectionZoom: number;
+  sidebarPosition: "left" | "right";
+  sidebarWidth: number;
+  targetLat: number;
+  targetLng: number;
+}) {
+  const mapSize = map.getSize();
+  const targetPoint = map.project([targetLat, targetLng], selectionZoom);
+
+  if (focusMode === "advertisement") {
+    const desiredMarkerPoint = getAdvertisementAnchorPoint(mapSize);
+    const viewportCenter = L.point(mapSize.x / 2, mapSize.y / 2);
+    const markerOffset = desiredMarkerPoint.subtract(viewportCenter);
+
+    return L.point(targetPoint.x - markerOffset.x, targetPoint.y - markerOffset.y);
+  }
+
+  const halfSidebar = mapSize.x > 800 ? sidebarWidth / 2 : 0;
+  const popupOffsetY = mapSize.y > 400 ? -40 : 0;
+  const offsetX = sidebarPosition === "right" ? -halfSidebar : halfSidebar;
+
+  return L.point(targetPoint.x + offsetX, targetPoint.y + popupOffsetY);
+}
 
 /**
  * Compute a tiny lat/lng offset for trucks sharing exact coordinates
@@ -108,6 +156,7 @@ function FlyToSelected({
   selectionZoom,
   sidebarPosition,
   sidebarWidth,
+  focusMode,
 }: {
   truck: TruckWithLocation | null | undefined;
   selectionKey: number;
@@ -116,6 +165,7 @@ function FlyToSelected({
   selectionZoom: number;
   sidebarPosition: "left" | "right";
   sidebarWidth: number;
+  focusMode: TruckMapFocusMode;
 }) {
   const map = useMap();
 
@@ -127,23 +177,23 @@ function FlyToSelected({
     const targetLat = Number(truck.locations.lat) + offset[0];
     const targetLng = Number(truck.locations.lng) + offset[1];
 
-    // Offset center to account for sidebar so the marker lands visually centered
-    // in the available map area, not behind the list panel.
-    const mapSize = map.getSize();
-    const halfSidebar = mapSize.x > 800 ? sidebarWidth / 2 : 0;
-    // Shift marker slightly below center so the popup (opens upward) stays in frame
-    const popupOffsetY = mapSize.y > 400 ? -40 : 0;
-
     map.closePopup();
 
-    const targetPoint = map.project([targetLat, targetLng], selectionZoom);
-    // 'right' sidebar → shift map center right so marker lands left of center (subtract X from marker perspective)
-    // 'left' sidebar → shift map center left so marker lands right of center (add X)
-    const offsetX = sidebarPosition === "right" ? -halfSidebar : halfSidebar;
-    const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y + popupOffsetY);
+    const adjustedPoint = getFramedCenterPoint({
+      focusMode,
+      map,
+      selectionZoom,
+      sidebarPosition,
+      sidebarWidth,
+      targetLat,
+      targetLng,
+    });
     const adjustedLatLng = map.unproject(adjustedPoint, selectionZoom);
 
-    map.flyTo(adjustedLatLng, selectionZoom, { duration: 0.5 });
+    map.flyTo(adjustedLatLng, selectionZoom, {
+      duration: focusMode === "advertisement" ? 0.45 : 0.5,
+      easeLinearity: 0.25,
+    });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
@@ -165,7 +215,7 @@ function FlyToSelected({
       clearTimeout(fallback);
       map.off("moveend", onMoveEnd);
     };
-  }, [truck?.id, selectionKey, map, offsets, selectionZoom, sidebarPosition, sidebarWidth]);
+  }, [truck?.id, selectionKey, focusMode, map, offsets, selectionZoom, sidebarPosition, sidebarWidth]);
 
   return null;
 }
@@ -177,17 +227,26 @@ function FitBoundsOnMount({
   initialZoom,
   sidebarPosition,
   sidebarWidth,
+  focusMode,
+  selectedTruck,
 }: {
   trucks: TruckWithLocation[];
   offsets: Record<string, [number, number]>;
   initialZoom: number;
   sidebarPosition: "left" | "right";
   sidebarWidth: number;
+  focusMode: TruckMapFocusMode;
+  selectedTruck: TruckWithLocation | null | undefined;
 }) {
   const map = useMap();
   const [fitted, setFitted] = useState(false);
 
   useEffect(() => {
+    if (focusMode === "advertisement" && hasValidCoords(selectedTruck)) {
+      setFitted(true);
+      return;
+    }
+
     if (fitted || trucks.length === 0) return;
     const points = trucks
       .filter(hasValidCoords)
@@ -207,7 +266,7 @@ function FitBoundsOnMount({
       maxZoom: initialZoom,
     });
     setFitted(true);
-  }, [trucks, fitted, map, offsets, initialZoom, sidebarPosition, sidebarWidth]);
+  }, [trucks, fitted, focusMode, map, offsets, initialZoom, selectedTruck, sidebarPosition, sidebarWidth]);
 
   return null;
 }
@@ -221,6 +280,7 @@ export default function TruckMap({
   initialZoom: initialZoomProp,
   sidebarPosition = "right",
   sidebarWidth = 288,
+  focusMode = "default",
 }: TruckMapProps) {
   const effectiveSelectionZoom = selectionZoomProp ?? SELECTION_ZOOM;
   const effectiveInitialZoom = initialZoomProp ?? INITIAL_ZOOM;
@@ -253,7 +313,7 @@ export default function TruckMap({
   return (
     <MapContainer
       center={[31.8044, 34.6553]}
-      zoom={INITIAL_ZOOM}
+      zoom={effectiveInitialZoom}
       className="w-full h-full z-0"
       style={{ minHeight: "300px" }}
     >
@@ -267,6 +327,8 @@ export default function TruckMap({
         initialZoom={effectiveInitialZoom}
         sidebarPosition={sidebarPosition}
         sidebarWidth={sidebarWidth}
+        focusMode={focusMode}
+        selectedTruck={selectedTruck}
       />
       <FlyToSelected
         truck={selectedTruck}
@@ -276,6 +338,7 @@ export default function TruckMap({
         selectionZoom={effectiveSelectionZoom}
         sidebarPosition={sidebarPosition}
         sidebarWidth={sidebarWidth}
+        focusMode={focusMode}
       />
 
       {/* Non-selected markers in cluster group */}
@@ -333,7 +396,12 @@ export default function TruckMap({
             },
           }}
         >
-          <Popup>
+          <Popup
+            keepInView={focusMode === "advertisement"}
+            autoPan={focusMode === "advertisement"}
+            autoPanPaddingTopLeft={focusMode === "advertisement" ? L.point(28, 72) : undefined}
+            autoPanPaddingBottomRight={focusMode === "advertisement" ? L.point(28, 32) : undefined}
+          >
             <div className="text-right font-sans min-w-[160px]" dir="rtl">
               <p className="font-bold text-sm text-foreground">{selectedTruck.truck_name}</p>
               {selectedTruck.food_category && (
