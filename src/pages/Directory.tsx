@@ -512,6 +512,7 @@ export default function Directory() {
                 )}
                 {viewMode === "conclusions" && (
                   <>
+                    <TableHead className="text-right w-[80px]">ניתוח</TableHead>
                     <TableHead className="text-right min-w-[200px]">ניתוח מצב קיים</TableHead>
                     <TableHead className="text-right min-w-[150px]">המלצה</TableHead>
                   </>
