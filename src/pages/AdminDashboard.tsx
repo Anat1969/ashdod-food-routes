@@ -14,6 +14,7 @@ import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function AdminDashboard() {
   const { isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [trucks, setTrucks] = useState<FoodTruck[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
