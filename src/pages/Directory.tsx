@@ -117,7 +117,7 @@ export default function Directory() {
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
-  const [viewMode, setViewMode] = useState<"edit" | "conclusions">("edit");
+  const [viewMode, setViewMode] = useState<"edit" | "conclusions">("conclusions");
   const [opinions, setOpinions] = useState<Record<string, ExpertOpinion>>({});
   const [generatingOpinion, setGeneratingOpinion] = useState<Record<string, boolean>>({});
 
