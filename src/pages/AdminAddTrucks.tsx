@@ -57,7 +57,7 @@ export default function AdminAddTrucks() {
 
     toast.success("הפודטראק נוסף בהצלחה");
     setTruckName("");
-    setVehicleType("");
+    
     setFoodCategory("");
     setLocationId("");
   };
