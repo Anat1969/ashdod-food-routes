@@ -303,6 +303,7 @@ export type Database = {
         Row: {
           building_area_sqm: number | null
           chelka: string | null
+          existing_building_approval: boolean | null
           gush: string | null
           id: string
           infra_electricity: boolean
@@ -320,6 +321,7 @@ export type Database = {
         Insert: {
           building_area_sqm?: number | null
           chelka?: string | null
+          existing_building_approval?: boolean | null
           gush?: string | null
           id?: string
           infra_electricity?: boolean
@@ -337,6 +339,7 @@ export type Database = {
         Update: {
           building_area_sqm?: number | null
           chelka?: string | null
+          existing_building_approval?: boolean | null
           gush?: string | null
           id?: string
           infra_electricity?: boolean
