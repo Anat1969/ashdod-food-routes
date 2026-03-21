@@ -146,7 +146,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setGeneratingOpinion(true);
     try {
       const payload = {
-        is_desired: true,
+        is_desired: locDesired,
         location_name: locName || location?.name || "",
         vehicle_type: truck.vehicle_type || "",
         structure_ok: expertOpinion?.structure_ok ?? (truck as any).truck_condition_ok ?? null,
@@ -195,7 +195,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     } finally {
       setGeneratingOpinion(false);
     }
-  }, [isAdmin, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
+  }, [isAdmin, locDesired, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
 
   const isApproved = truck.status === "approved";
 
