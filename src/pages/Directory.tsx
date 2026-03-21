@@ -105,6 +105,7 @@ export default function Directory() {
   const [sortColumn, setSortColumn] = useState<SortColumn>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
+  const [viewMode, setViewMode] = useState<"edit" | "conclusions">("edit");
 
   const fetchTrucks = async () => {
     const { data, error } = await supabase
