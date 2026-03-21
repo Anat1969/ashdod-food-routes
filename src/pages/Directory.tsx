@@ -50,6 +50,7 @@ interface LocationData {
   infra_electricity: boolean;
   infra_water: boolean;
   infra_sewage: boolean;
+  is_desired: boolean;
   name: string;
   street: string | null;
   neighborhood: string | null;
