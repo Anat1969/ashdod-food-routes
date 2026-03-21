@@ -47,6 +47,7 @@ export default function Advertisement() {
   const [loading, setLoading] = useState(true);
   const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
   const [menuDialogTruckId, setMenuDialogTruckId] = useState<string | null>(null);
+  const [selectionKey, setSelectionKey] = useState(0);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
