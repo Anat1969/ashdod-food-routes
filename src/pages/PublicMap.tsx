@@ -259,7 +259,7 @@ function TruckSideCard({
           onClick={(e) => e.stopPropagation()}
           className="inline-flex items-center text-[12px] text-primary hover:text-primary/80 font-semibold mt-1"
         >
-          פרטים נוספים ←
+          תפריט ופרטים נוספים ←
         </Link>
       </div>
     </div>
