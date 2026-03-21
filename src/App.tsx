@@ -24,6 +24,7 @@ import Dashboard from "./pages/Dashboard";
 import Advertisement from "./pages/Advertisement";
 import PublicMap from "./pages/PublicMap";
 import UserJourneyMap from "./pages/UserJourneyMap";
+import LocalExperience from "./pages/LocalExperience";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/location-card" element={<LocationCard />} />
               <Route path="/advertisement" element={<Advertisement />} />
               <Route path="/journey" element={<UserJourneyMap />} />
+              <Route path="/experience" element={<LocalExperience />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

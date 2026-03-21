@@ -28,6 +28,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   if (isAdmin) {
     navLinks.push({ to: "/directory", label: "מאגר עמדות" });
   }
+  navLinks.push({ to: "/experience", label: "חוויה מקומית..." });
   navLinks.push({ to: "/advertisement", label: "מפת כל הפודטראקים" });
   navLinks.push({ to: "/map", label: "מפת עמדות מאושרות" });
   if (isAdmin) {
