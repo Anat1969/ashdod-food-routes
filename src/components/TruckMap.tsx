@@ -103,11 +103,13 @@ function FlyToSelected({
   selectionKey,
   markerRefs,
   offsets,
+  selectionZoom,
 }: {
   truck: TruckWithLocation | null | undefined;
   selectionKey: number;
   markerRefs: React.MutableRefObject<Record<string, L.Marker>>;
   offsets: Record<string, [number, number]>;
+  selectionZoom: number;
 }) {
   const map = useMap();
 
