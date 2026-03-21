@@ -55,6 +55,7 @@ const App = () => (
               <Route path="/location-card" element={<LocationCard />} />
               <Route path="/advertisement" element={<Advertisement />} />
               <Route path="/journey" element={<UserJourneyMap />} />
+              <Route path="/experience" element={<LocalExperience />} />
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
