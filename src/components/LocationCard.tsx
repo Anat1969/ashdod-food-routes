@@ -48,7 +48,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
   const [locElectricity, setLocElectricity] = useState(location?.infra_electricity ?? false);
   const [locWater, setLocWater] = useState(location?.infra_water ?? false);
   const [locSewage, setLocSewage] = useState(location?.infra_sewage ?? false);
-  const [locBuildingApproval, setLocBuildingApproval] = useState<boolean | null>(location?.existing_building_approval ?? null);
 
   const [opName, setOpName] = useState((truck as any).operator_name || "");
   const [opPhone, setOpPhone] = useState(operator?.phone || "");
@@ -76,7 +75,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setLocElectricity(location?.infra_electricity ?? false);
     setLocWater(location?.infra_water ?? false);
     setLocSewage(location?.infra_sewage ?? false);
-    setLocBuildingApproval(location?.existing_building_approval ?? null);
   }, [location]);
 
   useEffect(() => {
@@ -156,7 +154,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         infra_water: locWater,
         infra_sewage: locSewage,
         environment_ok: expertOpinion?.environment_ok ?? (truck as any).environment_ok ?? null,
-        existing_building_approval: locBuildingApproval,
         operator_name: opName || (truck as any).operator_name || "",
       };
 
@@ -198,7 +195,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     } finally {
       setGeneratingOpinion(false);
     }
-  }, [isAdmin, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, locBuildingApproval, locDesired, opName, userId, onUpdate]);
+  }, [isAdmin, locDesired, locName, location, truck, expertOpinion, locElectricity, locWater, locSewage, opName, userId, onUpdate]);
 
   const isApproved = truck.status === "approved";
 
@@ -328,12 +325,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   <EditableRow label="שטח סביבה (מ״ר)" value={locSurroundingArea} onChange={setLocSurroundingArea} onBlur={() => saveLocationField({ surrounding_area_sqm: locSurroundingArea ? parseFloat(locSurroundingArea) : null })} type="number" />
                   <EditableRow label="שטח מבנה (מ״ר)" value={locBuildingArea} onChange={setLocBuildingArea} onBlur={() => saveLocationField({ building_area_sqm: locBuildingArea ? parseFloat(locBuildingArea) : null })} type="number" />
                 </div>
-                <BoolField
-                  label="אישור בנייה קיים"
-                  value={locBuildingApproval}
-                  isAdmin={isAdmin}
-                  onChange={(v) => { setLocBuildingApproval(v); saveLocationField({ existing_building_approval: v }); }}
-                />
               </>
             ) : (
               <>
@@ -347,12 +338,6 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                   <ReadOnlyRow label="שטח סביבה (מ״ר)" value={location?.surrounding_area_sqm?.toString()} />
                   <ReadOnlyRow label="שטח מבנה (מ״ר)" value={location?.building_area_sqm?.toString()} />
                 </div>
-                <BoolField
-                  label="אישור בנייה קיים"
-                  value={location?.existing_building_approval ?? null}
-                  isAdmin={false}
-                  onChange={() => {}}
-                />
               </>
             )}
           </CardContent>
