@@ -59,6 +59,15 @@ interface TruckWithLocation extends FoodTruck {
   location?: LocationData | null;
 }
 
+interface ExpertOpinion {
+  id: string;
+  truck_id: string;
+  location_analysis: string | null;
+  recommendation: string | null;
+  executive_summary: string | null;
+  is_final: boolean;
+}
+
 function TriStateButtons({
   value,
   onChange,
@@ -106,6 +115,7 @@ export default function Directory() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<"edit" | "conclusions">("edit");
+  const [opinions, setOpinions] = useState<Record<string, ExpertOpinion>>({});
 
   const fetchTrucks = async () => {
     const { data, error } = await supabase
@@ -118,9 +128,23 @@ export default function Directory() {
     setTrucks((data as TruckWithLocation[]) || []);
     setLoading(false);
   };
+  const fetchOpinions = async () => {
+    const { data } = await supabase
+      .from("expert_opinions")
+      .select("id, truck_id, location_analysis, recommendation, executive_summary, is_final")
+      .order("created_at", { ascending: false });
+    if (data) {
+      const map: Record<string, ExpertOpinion> = {};
+      data.forEach((op) => {
+        if (!map[op.truck_id]) map[op.truck_id] = op as ExpertOpinion;
+      });
+      setOpinions(map);
+    }
+  };
 
   useEffect(() => {
     fetchTrucks();
+    fetchOpinions();
     const channel = supabase
       .channel("food_trucks_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "food_trucks" }, () => {
@@ -406,28 +430,38 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
-                  <span className="flex items-center gap-1">מבנה קיים בפועל <SortIcon col="has_truck" /></span>
-                </TableHead>
-                <TableHead className="text-right">
-                  <div className="flex flex-col items-end gap-0.5">
-                    <span>תשתית</span>
-                    <span className="text-[10px] font-normal text-muted-foreground flex items-center gap-2">
-                      <span>חשמל</span>
-                      <span>מים</span>
-                      <span>ביוב</span>
-                    </span>
-                  </div>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
-                  <span className="flex items-center gap-1">סביבה תקינה <SortIcon col="environment_ok" /></span>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
-                  <span className="flex items-center gap-1">מבנה תקין <SortIcon col="truck_condition_ok" /></span>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
-                  <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
-                </TableHead>
+                {viewMode === "edit" && (
+                  <>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
+                      <span className="flex items-center gap-1">מבנה קיים בפועל <SortIcon col="has_truck" /></span>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span>תשתית</span>
+                        <span className="text-[10px] font-normal text-muted-foreground flex items-center gap-2">
+                          <span>חשמל</span>
+                          <span>מים</span>
+                          <span>ביוב</span>
+                        </span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
+                      <span className="flex items-center gap-1">סביבה תקינה <SortIcon col="environment_ok" /></span>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
+                      <span className="flex items-center gap-1">מבנה תקין <SortIcon col="truck_condition_ok" /></span>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
+                      <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
+                    </TableHead>
+                  </>
+                )}
+                {viewMode === "conclusions" && (
+                  <>
+                    <TableHead className="text-right min-w-[200px]">חוות דעת</TableHead>
+                    <TableHead className="text-right min-w-[150px]">המלצה</TableHead>
+                  </>
+                )}
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("status")}>
                   <span className="flex items-center gap-1">סטטוס <SortIcon col="status" /></span>
                 </TableHead>
@@ -478,142 +512,138 @@ export default function Directory() {
                       {truck.truck_name}
                     </Link>
                   </TableCell>
-                  {/* מבנה קיים בפועל */}
-                  <TableCell>
-                    {viewMode === "edit" ? (
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={!!truck.vehicle_type}
-                          onCheckedChange={(checked) =>
-                            updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
-                          }
-                        />
-                        {truck.vehicle_type ? (
-                          <Input
-                            className="h-8 text-xs w-[120px]"
-                            placeholder="שם העסק"
-                            value={truck.vehicle_type === "פודטראק" ? "" : truck.vehicle_type}
-                            onChange={(e) => {
-                              const val = e.target.value || "פודטראק";
-                              setTrucks((prev) => prev.map((t) => t.id === truck.id ? { ...t, vehicle_type: val } : t));
-                            }}
-                            onBlur={() => {
-                              updateField(truck.id, "vehicle_type", truck.vehicle_type || "פודטראק");
-                            }}
-                          />
-                        ) : (
-                          <span className="text-xs text-muted-foreground">לא מאויש</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs">{truck.vehicle_type || "לא מאויש"}</span>
-                    )}
-                  </TableCell>
-                  {/* תשתית */}
-                  <TableCell>
-                    {viewMode === "edit" ? (
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1" title="חשמל">
-                          <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                  {/* Edit-only columns */}
+                  {viewMode === "edit" && (
+                    <>
+                      {/* מבנה קיים בפועל */}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
                           <Checkbox
-                            checked={truck.location?.infra_electricity ?? false}
-                            onCheckedChange={(checked) => updateInfra(truck, "infra_electricity", !!checked)}
-                          />
-                        </div>
-                        <div className="flex items-center gap-1" title="מים">
-                          <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
-                          <Checkbox
-                            checked={truck.location?.infra_water ?? false}
-                            onCheckedChange={(checked) => updateInfra(truck, "infra_water", !!checked)}
-                          />
-                        </div>
-                        <div className="flex items-center gap-1" title="ביוב">
-                          <CircleDot className="h-3.5 w-3.5 text-muted-foreground" />
-                          <Checkbox
-                            checked={truck.location?.infra_sewage ?? false}
-                            onCheckedChange={(checked) => updateInfra(truck, "infra_sewage", !!checked)}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 text-xs">
-                        <span className={truck.location?.infra_electricity ? "text-green-600" : "text-muted-foreground"} title="חשמל">
-                          <Zap className="h-3.5 w-3.5 inline" /> {truck.location?.infra_electricity ? "✓" : "✗"}
-                        </span>
-                        <span className={truck.location?.infra_water ? "text-green-600" : "text-muted-foreground"} title="מים">
-                          <Droplets className="h-3.5 w-3.5 inline" /> {truck.location?.infra_water ? "✓" : "✗"}
-                        </span>
-                        <span className={truck.location?.infra_sewage ? "text-green-600" : "text-muted-foreground"} title="ביוב">
-                          <CircleDot className="h-3.5 w-3.5 inline" /> {truck.location?.infra_sewage ? "✓" : "✗"}
-                        </span>
-                      </div>
-                    )}
-                  </TableCell>
-                  {/* סביבה */}
-                  <TableCell>
-                    {viewMode === "edit" ? (
-                      <TriStateButtons
-                        value={truck.environment_ok}
-                        onChange={(val) => updateField(truck.id, "environment_ok", val)}
-                      />
-                    ) : (
-                      <span className={`text-xs font-medium ${truck.environment_ok === true ? "text-green-600" : truck.environment_ok === false ? "text-red-600" : "text-muted-foreground"}`}>
-                        {truck.environment_ok === true ? "✓ תקין" : truck.environment_ok === false ? "✗ לא תקין" : "—"}
-                      </span>
-                    )}
-                  </TableCell>
-                  {/* מבנה */}
-                  <TableCell>
-                    {viewMode === "edit" ? (
-                      <TriStateButtons
-                        value={truck.truck_condition_ok}
-                        onChange={(val) => updateField(truck.id, "truck_condition_ok", val)}
-                      />
-                    ) : (
-                      <span className={`text-xs font-medium ${truck.truck_condition_ok === true ? "text-green-600" : truck.truck_condition_ok === false ? "text-red-600" : "text-muted-foreground"}`}>
-                        {truck.truck_condition_ok === true ? "✓ תקין" : truck.truck_condition_ok === false ? "✗ לא תקין" : "—"}
-                      </span>
-                    )}
-                  </TableCell>
-                  {/* מפעיל */}
-                  <TableCell>
-                    {viewMode === "edit" ? (
-                      <div className="flex items-center gap-2">
-                        <Checkbox
-                          checked={!!(truck as any).has_operator}
-                          onCheckedChange={(checked) => {
-                            updateField(truck.id, "has_operator", !!checked);
-                            if (!checked) {
-                              updateField(truck.id, "operator_name", null);
-                              setOperatorEdits((prev) => {
-                                const next = { ...prev };
-                                delete next[truck.id];
-                                return next;
-                              });
+                            checked={!!truck.vehicle_type}
+                            onCheckedChange={(checked) =>
+                              updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
                             }
-                          }}
+                          />
+                          {truck.vehicle_type ? (
+                            <Input
+                              className="h-8 text-xs w-[120px]"
+                              placeholder="שם העסק"
+                              value={truck.vehicle_type === "פודטראק" ? "" : truck.vehicle_type}
+                              onChange={(e) => {
+                                const val = e.target.value || "פודטראק";
+                                setTrucks((prev) => prev.map((t) => t.id === truck.id ? { ...t, vehicle_type: val } : t));
+                              }}
+                              onBlur={() => {
+                                updateField(truck.id, "vehicle_type", truck.vehicle_type || "פודטראק");
+                              }}
+                            />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">לא מאויש</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      {/* תשתית */}
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1" title="חשמל">
+                            <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                            <Checkbox
+                              checked={truck.location?.infra_electricity ?? false}
+                              onCheckedChange={(checked) => updateInfra(truck, "infra_electricity", !!checked)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-1" title="מים">
+                            <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
+                            <Checkbox
+                              checked={truck.location?.infra_water ?? false}
+                              onCheckedChange={(checked) => updateInfra(truck, "infra_water", !!checked)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-1" title="ביוב">
+                            <CircleDot className="h-3.5 w-3.5 text-muted-foreground" />
+                            <Checkbox
+                              checked={truck.location?.infra_sewage ?? false}
+                              onCheckedChange={(checked) => updateInfra(truck, "infra_sewage", !!checked)}
+                            />
+                          </div>
+                        </div>
+                      </TableCell>
+                      {/* סביבה תקינה */}
+                      <TableCell>
+                        <TriStateButtons
+                          value={truck.environment_ok}
+                          onChange={(val) => updateField(truck.id, "environment_ok", val)}
                         />
-                        {(truck as any).has_operator ? (
-                          <Input
-                            className="h-8 text-xs w-[120px]"
-                            placeholder="שם המפעיל"
-                            value={operatorEdits[truck.id] ?? truck.operator_name ?? ""}
-                            onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
-                            onBlur={() => {
-                              const val = operatorEdits[truck.id];
-                              if (val !== undefined && val !== (truck.operator_name ?? "")) {
-                                updateField(truck.id, "operator_name", val || null);
+                      </TableCell>
+                      {/* מבנה תקין */}
+                      <TableCell>
+                        <TriStateButtons
+                          value={truck.truck_condition_ok}
+                          onChange={(val) => updateField(truck.id, "truck_condition_ok", val)}
+                        />
+                      </TableCell>
+                      {/* מפעיל */}
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Checkbox
+                            checked={!!(truck as any).has_operator}
+                            onCheckedChange={(checked) => {
+                              updateField(truck.id, "has_operator", !!checked);
+                              if (!checked) {
+                                updateField(truck.id, "operator_name", null);
+                                setOperatorEdits((prev) => {
+                                  const next = { ...prev };
+                                  delete next[truck.id];
+                                  return next;
+                                });
                               }
                             }}
                           />
+                          {(truck as any).has_operator ? (
+                            <Input
+                              className="h-8 text-xs w-[120px]"
+                              placeholder="שם המפעיל"
+                              value={operatorEdits[truck.id] ?? truck.operator_name ?? ""}
+                              onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
+                              onBlur={() => {
+                                const val = operatorEdits[truck.id];
+                                if (val !== undefined && val !== (truck.operator_name ?? "")) {
+                                  updateField(truck.id, "operator_name", val || null);
+                                }
+                              }}
+                            />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">אין</span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </>
+                  )}
+                  {/* Conclusions-only columns */}
+                  {viewMode === "conclusions" && (
+                    <>
+                      {/* חוות דעת */}
+                      <TableCell>
+                        {opinions[truck.id]?.location_analysis || opinions[truck.id]?.executive_summary ? (
+                          <p className="text-xs leading-relaxed text-foreground max-w-[250px]">
+                            {opinions[truck.id]?.location_analysis || opinions[truck.id]?.executive_summary}
+                          </p>
                         ) : (
-                          <span className="text-xs text-muted-foreground">אין</span>
+                          <span className="text-xs text-muted-foreground">אין חוות דעת</span>
                         )}
-                      </div>
-                    ) : (
-                      <span className="text-xs">{truck.operator_name || "אין"}</span>
-                    )}
-                  </TableCell>
+                      </TableCell>
+                      {/* המלצה */}
+                      <TableCell>
+                        {opinions[truck.id]?.recommendation ? (
+                          <p className="text-xs leading-relaxed font-medium text-foreground max-w-[200px]">
+                            {opinions[truck.id]?.recommendation}
+                          </p>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
+                    </>
+                  )}
                   {/* סטטוס */}
                   <TableCell>
                     {viewMode === "edit" ? (
