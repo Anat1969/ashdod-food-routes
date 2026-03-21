@@ -155,7 +155,7 @@ export default function PublicMap() {
                   key={truck.id}
                   truck={truck}
                   selected={truck.id === selectedId}
-                  onClick={() => setSelectedId(truck.id === selectedId ? null : truck.id)}
+                  onClick={() => setSelectedId(truck.id)}
                 />
               ))}
             </div>

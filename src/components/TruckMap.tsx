@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -46,19 +46,42 @@ function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLoc
   return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
 }
 
-function FlyToSelected({ truck }: { truck: TruckWithLocation | null | undefined }) {
+function FlyToSelected({ truck, markerRefs }: { truck: TruckWithLocation | null | undefined; markerRefs: React.MutableRefObject<Record<string, L.Marker>> }) {
   const map = useMap();
   useEffect(() => {
+    if (!truck?.id) return;
     if (hasValidCoords(truck)) {
-      map.flyTo([Number(truck.locations.lat), Number(truck.locations.lng)], 17, { duration: 1 });
+      const targetLat = Number(truck.locations.lat);
+      const targetLng = Number(truck.locations.lng);
+      
+      // Always fly to the location (even if same coords — ensures map is centered)
+      map.flyTo([targetLat, targetLng], 18, { duration: 0.8 });
+      
+      // After fly completes, open the popup for the selected marker
+      setTimeout(() => {
+        const marker = markerRefs.current[truck.id];
+        if (marker) {
+          // Ensure any clusters are spiderfied at this zoom
+          marker.openPopup();
+        }
+      }, 900);
     }
-  }, [truck?.id, truck?.locations?.lat, truck?.locations?.lng, map]);
+  }, [truck?.id, map]);
   return null;
 }
 
 export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: TruckMapProps) {
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
   const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
+  const markerRefs = useRef<Record<string, L.Marker>>({});
+
+  const setMarkerRef = useCallback((id: string, ref: L.Marker | null) => {
+    if (ref) {
+      markerRefs.current[id] = ref;
+    } else {
+      delete markerRefs.current[id];
+    }
+  }, []);
 
   return (
     <MapContainer
@@ -71,22 +94,29 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: Tru
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FlyToSelected truck={selectedTruck} />
+      <FlyToSelected truck={selectedTruck} markerRefs={markerRefs} />
       <MarkerClusterGroup
         chunkedLoading
         maxClusterRadius={40}
         spiderfyOnMaxZoom
         showCoverageOnHover={false}
+        disableClusteringAtZoom={17}
       >
         {trucksWithCoords.map((truck) => (
           <Marker
             key={truck.id}
             position={[Number(truck.locations!.lat), Number(truck.locations!.lng)]}
             icon={truck.id === selectedTruckId ? selectedIcon : defaultIcon}
+            ref={(ref) => setMarkerRef(truck.id, ref as unknown as L.Marker | null)}
             eventHandlers={{
               click: () => onSelectTruck(truck),
               mouseover: (e) => e.target.openPopup(),
-              mouseout: (e) => e.target.closePopup(),
+              mouseout: (e) => {
+                // Don't close popup if this is the selected marker
+                if (truck.id !== selectedTruckId) {
+                  e.target.closePopup();
+                }
+              },
             }}
           >
             <Popup>
