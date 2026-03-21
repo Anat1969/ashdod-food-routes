@@ -154,8 +154,60 @@ export default function Directory() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
+  const generateOpinionForTruck = async (truck: TruckWithLocation) => {
+    setGeneratingOpinion((prev) => ({ ...prev, [truck.id]: true }));
+    try {
+      const payload = {
+        is_desired: truck.location?.is_desired ?? null,
+        vehicle_type: truck.vehicle_type,
+        structure_ok: truck.truck_condition_ok,
+        infra_electricity: truck.location?.infra_electricity ?? null,
+        infra_water: truck.location?.infra_water ?? null,
+        infra_sewage: truck.location?.infra_sewage ?? null,
+        environment_ok: truck.environment_ok,
+        operator_name: truck.operator_name,
+        location_name: truck.location?.name ?? null,
+        existing_building_approval: truck.vehicle_type ? true : null,
+      };
 
-  const updateField = async (truckId: string, field: string, value: any) => {
+      const { data, error } = await supabase.functions.invoke("generate-opinion", {
+        body: payload,
+      });
+
+      if (error) throw error;
+
+      const { field_notes, conditions } = data as { field_notes: string; conditions: string };
+
+      const existing = opinions[truck.id];
+      if (existing) {
+        await supabase
+          .from("expert_opinions")
+          .update({
+            executive_summary: field_notes,
+            recommendation: conditions,
+          })
+          .eq("id", existing.id);
+      } else {
+        await supabase
+          .from("expert_opinions")
+          .insert({
+            truck_id: truck.id,
+            executive_summary: field_notes,
+            recommendation: conditions,
+          });
+      }
+
+      await fetchOpinions();
+      toast.success("חוות דעת והמלצה נוצרו בהצלחה");
+    } catch (e) {
+      console.error("generateOpinion error:", e);
+      toast.error("שגיאה ביצירת חוות דעת");
+    } finally {
+      setGeneratingOpinion((prev) => ({ ...prev, [truck.id]: false }));
+    }
+  };
+
+
     const { error } = await supabase
       .from("food_trucks")
       .update({ [field]: value } as any)
