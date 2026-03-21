@@ -70,12 +70,14 @@ export default function LocalExperience() {
   const addPost = () => setPosts((prev) => [...prev, createPost()]);
 
   const handleSave = async () => {
+    console.log("[ExperienceSave] user:", user?.id, "posts:", posts.length);
     if (!user) {
       toast.error("יש להתחבר כדי לשמור חוויות");
       return;
     }
 
     const validPosts = posts.filter((p) => p.text.trim() || p.imageUrl);
+    console.log("[ExperienceSave] validPosts:", validPosts.length, validPosts.map(p => ({ text: p.text?.substring(0, 20), hasImage: !!p.imageUrl })));
     if (validPosts.length === 0) {
       toast.error("אין תוכן לשמירה");
       return;
