@@ -28,9 +28,11 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   }
   if (isAdmin) {
     navLinks.push({ to: "/directory", label: "מאגר עמדות" });
-    navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
   navLinks.push({ to: "/advertisement", label: "כל העמדות" });
+  if (isAdmin) {
+    navLinks.push({ to: "/admin", label: "לוח בקרה" });
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
