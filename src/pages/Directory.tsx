@@ -128,9 +128,23 @@ export default function Directory() {
     setTrucks((data as TruckWithLocation[]) || []);
     setLoading(false);
   };
+  const fetchOpinions = async () => {
+    const { data } = await supabase
+      .from("expert_opinions")
+      .select("id, truck_id, location_analysis, recommendation, executive_summary, is_final")
+      .order("created_at", { ascending: false });
+    if (data) {
+      const map: Record<string, ExpertOpinion> = {};
+      data.forEach((op) => {
+        if (!map[op.truck_id]) map[op.truck_id] = op as ExpertOpinion;
+      });
+      setOpinions(map);
+    }
+  };
 
   useEffect(() => {
     fetchTrucks();
+    fetchOpinions();
     const channel = supabase
       .channel("food_trucks_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "food_trucks" }, () => {
