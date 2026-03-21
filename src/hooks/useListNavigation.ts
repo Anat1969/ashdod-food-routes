@@ -44,7 +44,12 @@ export function useListNavigation(currentId: string | undefined) {
   const location = useLocation();
 
   const stored = sessionStorage.getItem(LIST_KEY);
-  const list: StoredList | null = stored ? JSON.parse(stored) : null;
+  let list: StoredList | null = null;
+  try {
+    list = stored ? JSON.parse(stored) : null;
+  } catch {
+    list = null;
+  }
 
   const currentIndex = list?.items.findIndex((i) => i.id === currentId) ?? -1;
   const hasList = list !== null && currentIndex >= 0;
@@ -93,7 +98,8 @@ export function useRouteHistory() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const stack: string[] = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]");
+    let stack: string[] = [];
+    try { stack = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]"); } catch { stack = []; }
     const current = location.pathname + location.search;
     // Don't add duplicates
     if (stack[stack.length - 1] !== current) {
@@ -104,10 +110,12 @@ export function useRouteHistory() {
     }
   }, [location.pathname, location.search]);
 
-  const routeStack: string[] = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]");
+  let routeStack: string[] = [];
+  try { routeStack = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]"); } catch { routeStack = []; }
 
   const goToRouteStart = useCallback(() => {
-    const stack: string[] = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]");
+    let stack: string[] = [];
+    try { stack = JSON.parse(sessionStorage.getItem(ROUTE_STACK_KEY) || "[]"); } catch { stack = []; }
     if (stack.length > 0) {
       navigate(stack[0]);
     } else {
