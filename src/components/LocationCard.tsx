@@ -407,12 +407,12 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         </Card>
 
         {/* הערות ותנאים (left in RTL) */}
-        <Card className="border-sky-300 bg-white/80">
+        <Card className="border-sky-300 bg-white/80 flex flex-col">
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-base">חוות דעת</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm pb-3 space-y-3">
-            <div>
+          <CardContent className="text-sm pb-3 flex-1 flex flex-col">
+            <div className="mb-3">
               <p className="text-muted-foreground mb-1">ניתוח מצב קיים</p>
               {isAdmin ? (
                 <Textarea value={fieldNotes} onChange={(e) => setFieldNotes(e.target.value)} onBlur={() => saveExpertField({ field_notes: fieldNotes })} placeholder="ניתוח מצב השטח..." rows={3} />
@@ -420,7 +420,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <p className="text-sm">{expertOpinion?.field_notes || "—"}</p>
               )}
             </div>
-            <div>
+            <div className="mb-3">
               <p className="text-muted-foreground mb-1">המלצה</p>
               {isAdmin ? (
                 <Textarea value={conditions} onChange={(e) => setConditions(e.target.value)} onBlur={() => saveExpertField({ conditions })} placeholder="המלצה..." rows={4} />
@@ -428,7 +428,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                 <p>{expertOpinion?.conditions || "—"}</p>
               )}
             </div>
-            <div>
+            <div className="mt-auto">
               <p className="text-xs font-medium text-muted-foreground mb-1 text-right">סטטוס</p>
               <div className={`rounded-md border-2 py-2 text-center ${isApproved ? "border-green-500 bg-green-50" : "border-destructive bg-red-50"}`}>
                 <p className="text-base font-bold">
