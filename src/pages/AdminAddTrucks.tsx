@@ -43,7 +43,7 @@ export default function AdminAddTrucks() {
     setSaving(true);
     const { error } = await supabase.from("food_trucks").insert({
       truck_name: truckName.trim(),
-      vehicle_type: vehicleType || null,
+      
       food_category: foodCategory || null,
       location_id: locationId || null,
       status: "draft",
