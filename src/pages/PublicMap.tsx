@@ -287,7 +287,7 @@ function TruckSideCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  const photoUrl = truck.street_photo_2_url || truck.street_photo_1_url || truck.vehicle_photo_url;
+  
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Scroll selected card into view
@@ -300,59 +300,43 @@ function TruckSideCard({
   return (
     <div
       ref={cardRef}
-      className={`p-3 cursor-pointer transition-all duration-200 ${
+      className={`px-3 py-2.5 cursor-pointer transition-all duration-150 ${
         selected
-          ? "bg-primary/[0.06] border-s-[3px] border-s-primary ring-1 ring-inset ring-primary/10"
+          ? "bg-primary/[0.06] border-s-[3px] border-s-primary"
           : "hover:bg-muted/30"
       }`}
       onClick={onClick}
     >
-      {photoUrl ? (
-        <img
-          src={photoUrl}
-          alt={truck.truck_name}
-          className={`w-full h-28 object-cover rounded-lg mb-2.5 transition-shadow duration-200 ${
-            selected ? "ring-2 ring-primary/30" : ""
-          }`}
-        />
-      ) : (
-        <div className="w-full h-24 bg-muted/40 rounded-lg mb-2.5 flex items-center justify-center">
-          <UtensilsCrossed className="h-7 w-7 text-muted-foreground/15" />
-        </div>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="font-bold text-sm leading-tight text-foreground truncate">{truck.truck_name}</h3>
+        {truck.food_category && (
+          <Badge variant="secondary" className="text-[10px] shrink-0 font-medium">
+            {truck.food_category}
+          </Badge>
+        )}
+      </div>
+
+      {truck.locations?.name && (
+        <p className="text-[11px] text-muted-foreground/70 flex items-center gap-1 mt-1">
+          <MapPin className="h-3 w-3 shrink-0" />
+          {truck.locations.name}
+        </p>
       )}
 
-      <div className="space-y-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-sm leading-tight text-foreground">{truck.truck_name}</h3>
-          {truck.food_category && (
-            <Badge variant="secondary" className="text-[10px] shrink-0 font-medium">
-              {truck.food_category}
-            </Badge>
-          )}
-        </div>
+      {truck.hours_from && truck.hours_to && (
+        <p className="text-[11px] text-muted-foreground/70 flex items-center gap-1 mt-0.5">
+          <Clock className="h-3 w-3 shrink-0" />
+          {truck.hours_from} – {truck.hours_to}
+        </p>
+      )}
 
-        {truck.locations?.name && (
-          <p className="text-[12px] text-muted-foreground/70 flex items-center gap-1">
-            <MapPin className="h-3 w-3 shrink-0" />
-            {truck.locations.name}
-          </p>
-        )}
-
-        {truck.hours_from && truck.hours_to && (
-          <p className="text-[12px] text-muted-foreground/70 flex items-center gap-1">
-            <Clock className="h-3 w-3 shrink-0" />
-            {truck.hours_from} – {truck.hours_to}
-          </p>
-        )}
-
-        <Link
-          to={`/truck/${truck.id}`}
-          onClick={(e) => e.stopPropagation()}
-          className="inline-flex items-center text-[12px] text-primary hover:text-primary/80 font-semibold mt-1"
-        >
-          תפריט ופרטים נוספים ←
-        </Link>
-      </div>
+      <Link
+        to={`/truck/${truck.id}`}
+        onClick={(e) => e.stopPropagation()}
+        className="inline-flex items-center text-[11px] text-primary hover:text-primary/80 font-semibold mt-1"
+      >
+        פרטים נוספים ←
+      </Link>
     </div>
   );
 }
