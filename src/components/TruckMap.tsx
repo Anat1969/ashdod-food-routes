@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Pane } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -63,8 +63,10 @@ export function hasValidCoords(
 
 /** Zoom level at which clustering is fully disabled */
 const CLUSTER_DISABLE_ZOOM = 17;
-/** Zoom level used when flying to a selected marker */
-const SELECTION_ZOOM = 18;
+/** Zoom level used when flying to a selected marker — street-level clarity */
+const SELECTION_ZOOM = 17;
+/** Initial zoom — neighbourhood-level overview */
+const INITIAL_ZOOM = 15;
 
 /**
  * Compute a tiny lat/lng offset for trucks sharing exact coordinates
@@ -113,8 +115,20 @@ function FlyToSelected({
     const targetLat = Number(truck.locations.lat) + offset[0];
     const targetLng = Number(truck.locations.lng) + offset[1];
 
+    // Offset center slightly left (in screen space) to account for the right sidebar
+    // so the marker lands visually centered in the map area, not behind the list panel
+    const mapSize = map.getSize();
+    const sidebarPx = 288; // w-72 sidebar
+    const offsetX = mapSize.x > 800 ? sidebarPx / 2 : 0;
+
     map.closePopup();
-    map.flyTo([targetLat, targetLng], SELECTION_ZOOM, { duration: 0.7 });
+
+    // Fly to point, then pan to compensate for sidebar
+    const targetPoint = map.project([targetLat, targetLng], SELECTION_ZOOM);
+    const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
+    const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
+
+    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.6 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
@@ -122,7 +136,6 @@ function FlyToSelected({
       if (marker) marker.openPopup();
     };
 
-    // Use both: moveend for reliability + fallback timer for edge cases
     const onMoveEnd = () => {
       openPopup();
       map.off("moveend", onMoveEnd);
@@ -131,13 +144,41 @@ function FlyToSelected({
     const fallback = setTimeout(() => {
       map.off("moveend", onMoveEnd);
       openPopup();
-    }, 1200);
+    }, 1000);
 
     return () => {
       clearTimeout(fallback);
       map.off("moveend", onMoveEnd);
     };
   }, [truck?.id, selectionKey, map, offsets]);
+
+  return null;
+}
+
+/** On first mount, fit bounds to all markers so the initial view is meaningful */
+function FitBoundsOnMount({ trucks, offsets }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]> }) {
+  const map = useMap();
+  const [fitted, setFitted] = useState(false);
+
+  useEffect(() => {
+    if (fitted || trucks.length === 0) return;
+    const points = trucks
+      .filter(hasValidCoords)
+      .map((t) => {
+        const o = offsets[t.id] || [0, 0];
+        return L.latLng(Number(t.locations.lat) + o[0], Number(t.locations.lng) + o[1]);
+      });
+    if (points.length === 0) return;
+
+    const bounds = L.latLngBounds(points);
+    // Pad right side for the sidebar (288px)
+    map.fitBounds(bounds, {
+      paddingTopLeft: [20, 20],
+      paddingBottomRight: [300, 20],
+      maxZoom: INITIAL_ZOOM,
+    });
+    setFitted(true);
+  }, [trucks, fitted, map, offsets]);
 
   return null;
 }
@@ -177,7 +218,7 @@ export default function TruckMap({
   return (
     <MapContainer
       center={[31.8044, 34.6553]}
-      zoom={14}
+      zoom={INITIAL_ZOOM}
       className="w-full h-full z-0"
       style={{ minHeight: "300px" }}
     >
@@ -185,6 +226,7 @@ export default function TruckMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} />
       <FlyToSelected
         truck={selectedTruck}
         selectionKey={selectionKey}
