@@ -66,6 +66,8 @@ interface ExpertOpinion {
   location_analysis: string | null;
   recommendation: string | null;
   executive_summary: string | null;
+  field_notes: string | null;
+  conditions: string | null;
   is_final: boolean;
 }
 
