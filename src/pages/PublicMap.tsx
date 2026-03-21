@@ -29,6 +29,12 @@ export default function PublicMap() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectionKey, setSelectionKey] = useState(0);
+
+  const selectTruck = useCallback((id: string) => {
+    setSelectedId(id);
+    setSelectionKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     const fetchApproved = async () => {
