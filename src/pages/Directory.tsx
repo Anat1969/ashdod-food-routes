@@ -644,7 +644,6 @@ export default function Directory() {
                       </TableCell>
                     </>
                   )}
-                  </TableCell>
                   {/* סטטוס */}
                   <TableCell>
                     {viewMode === "edit" ? (
