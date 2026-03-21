@@ -24,6 +24,7 @@ import Dashboard from "./pages/Dashboard";
 import Advertisement from "./pages/Advertisement";
 import PublicMap from "./pages/PublicMap";
 import UserJourneyMap from "./pages/UserJourneyMap";
+import LocalExperience from "./pages/LocalExperience";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
