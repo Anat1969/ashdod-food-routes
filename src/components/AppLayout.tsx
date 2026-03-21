@@ -18,7 +18,6 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
 
   const navLinks = [
   { to: "/", label: "ראשי" },
-  { to: "/map", label: "מפת עמדות מאושרות" },
   { to: "/journey", label: "מסלולים" },
   { to: "/policy", label: "מדיניות" },
   { to: "/apply", label: "הגשת בקשה" }];
@@ -30,6 +29,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
     navLinks.push({ to: "/directory", label: "מאגר עמדות" });
   }
   navLinks.push({ to: "/advertisement", label: "כל העמדות" });
+  navLinks.push({ to: "/map", label: "מפת עמדות מאושרות" });
   if (isAdmin) {
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
