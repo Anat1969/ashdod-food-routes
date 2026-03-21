@@ -134,6 +134,30 @@ export type Database = {
           },
         ]
       }
+      experience_posts: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          text_content: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          text_content?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          text_content?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       expert_opinions: {
         Row: {
           author_id: string | null
