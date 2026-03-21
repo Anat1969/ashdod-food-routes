@@ -100,6 +100,13 @@ export default function PublicMap() {
               ))}
             </SelectContent>
           </Select>
+          <Link
+            to="/experience"
+            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-semibold bg-accent/10 text-accent hover:bg-accent/20 transition-colors"
+          >
+            <Heart className="h-3.5 w-3.5" />
+            חוויה מקומית...
+          </Link>
           <PageNavigation />
         </div>
       </div>
