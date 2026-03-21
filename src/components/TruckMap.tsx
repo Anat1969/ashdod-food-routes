@@ -181,7 +181,7 @@ function FitBoundsOnMount({ trucks, offsets, initialZoom }: { trucks: TruckWithL
     map.fitBounds(bounds, {
       paddingTopLeft: [20, 20],
       paddingBottomRight: [300, 20],
-      maxZoom: INITIAL_ZOOM,
+      maxZoom: initialZoom,
     });
     setFitted(true);
   }, [trucks, fitted, map, offsets]);
