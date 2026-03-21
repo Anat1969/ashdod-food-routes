@@ -442,19 +442,23 @@ export default function Directory() {
                 <TableRow key={truck.id} className="hover:bg-muted/50">
                   {/* סוג עמדה */}
                   <TableCell>
-                    <Select
-                      value={truck.location?.location_type || ""}
-                      onValueChange={(val) => updateLocationType(truck, val)}
-                    >
-                      <SelectTrigger className="w-[140px] h-8 text-xs">
-                        <SelectValue placeholder="—" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STATION_TYPES.map((type) => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {viewMode === "edit" ? (
+                      <Select
+                        value={truck.location?.location_type || ""}
+                        onValueChange={(val) => updateLocationType(truck, val)}
+                      >
+                        <SelectTrigger className="w-[140px] h-8 text-xs">
+                          <SelectValue placeholder="—" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATION_TYPES.map((type) => (
+                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <span className="text-xs">{truck.location?.location_type || "—"}</span>
+                    )}
                   </TableCell>
                   {/* מיקום - תמונה */}
                   <TableCell>
@@ -476,126 +480,164 @@ export default function Directory() {
                   </TableCell>
                   {/* מבנה קיים בפועל */}
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={!!truck.vehicle_type}
-                        onCheckedChange={(checked) =>
-                          updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
-                        }
-                      />
-                      {truck.vehicle_type ? (
-                        <Input
-                          className="h-8 text-xs w-[120px]"
-                          placeholder="שם העסק"
-                          value={truck.vehicle_type === "פודטראק" ? "" : truck.vehicle_type}
-                          onChange={(e) => {
-                            const val = e.target.value || "פודטראק";
-                            setTrucks((prev) => prev.map((t) => t.id === truck.id ? { ...t, vehicle_type: val } : t));
-                          }}
-                          onBlur={() => {
-                            updateField(truck.id, "vehicle_type", truck.vehicle_type || "פודטראק");
-                          }}
+                    {viewMode === "edit" ? (
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={!!truck.vehicle_type}
+                          onCheckedChange={(checked) =>
+                            updateField(truck.id, "vehicle_type", checked ? "פודטראק" : null)
+                          }
                         />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">לא מאויש</span>
-                      )}
-                    </div>
+                        {truck.vehicle_type ? (
+                          <Input
+                            className="h-8 text-xs w-[120px]"
+                            placeholder="שם העסק"
+                            value={truck.vehicle_type === "פודטראק" ? "" : truck.vehicle_type}
+                            onChange={(e) => {
+                              const val = e.target.value || "פודטראק";
+                              setTrucks((prev) => prev.map((t) => t.id === truck.id ? { ...t, vehicle_type: val } : t));
+                            }}
+                            onBlur={() => {
+                              updateField(truck.id, "vehicle_type", truck.vehicle_type || "פודטראק");
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">לא מאויש</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs">{truck.vehicle_type || "לא מאויש"}</span>
+                    )}
                   </TableCell>
                   {/* תשתית */}
                   <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1" title="חשמל">
-                        <Zap className="h-3.5 w-3.5 text-muted-foreground" />
-                        <Checkbox
-                          checked={truck.location?.infra_electricity ?? false}
-                          onCheckedChange={(checked) => updateInfra(truck, "infra_electricity", !!checked)}
-                        />
+                    {viewMode === "edit" ? (
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1" title="חשמל">
+                          <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                          <Checkbox
+                            checked={truck.location?.infra_electricity ?? false}
+                            onCheckedChange={(checked) => updateInfra(truck, "infra_electricity", !!checked)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-1" title="מים">
+                          <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
+                          <Checkbox
+                            checked={truck.location?.infra_water ?? false}
+                            onCheckedChange={(checked) => updateInfra(truck, "infra_water", !!checked)}
+                          />
+                        </div>
+                        <div className="flex items-center gap-1" title="ביוב">
+                          <CircleDot className="h-3.5 w-3.5 text-muted-foreground" />
+                          <Checkbox
+                            checked={truck.location?.infra_sewage ?? false}
+                            onCheckedChange={(checked) => updateInfra(truck, "infra_sewage", !!checked)}
+                          />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1" title="מים">
-                        <Droplets className="h-3.5 w-3.5 text-muted-foreground" />
-                        <Checkbox
-                          checked={truck.location?.infra_water ?? false}
-                          onCheckedChange={(checked) => updateInfra(truck, "infra_water", !!checked)}
-                        />
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className={truck.location?.infra_electricity ? "text-green-600" : "text-muted-foreground"} title="חשמל">
+                          <Zap className="h-3.5 w-3.5 inline" /> {truck.location?.infra_electricity ? "✓" : "✗"}
+                        </span>
+                        <span className={truck.location?.infra_water ? "text-green-600" : "text-muted-foreground"} title="מים">
+                          <Droplets className="h-3.5 w-3.5 inline" /> {truck.location?.infra_water ? "✓" : "✗"}
+                        </span>
+                        <span className={truck.location?.infra_sewage ? "text-green-600" : "text-muted-foreground"} title="ביוב">
+                          <CircleDot className="h-3.5 w-3.5 inline" /> {truck.location?.infra_sewage ? "✓" : "✗"}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-1" title="ביוב">
-                        <CircleDot className="h-3.5 w-3.5 text-muted-foreground" />
-                        <Checkbox
-                          checked={truck.location?.infra_sewage ?? false}
-                          onCheckedChange={(checked) => updateInfra(truck, "infra_sewage", !!checked)}
-                        />
-                      </div>
-                    </div>
+                    )}
                   </TableCell>
                   {/* סביבה */}
                   <TableCell>
-                    <TriStateButtons
-                      value={truck.environment_ok}
-                      onChange={(val) => updateField(truck.id, "environment_ok", val)}
-                    />
+                    {viewMode === "edit" ? (
+                      <TriStateButtons
+                        value={truck.environment_ok}
+                        onChange={(val) => updateField(truck.id, "environment_ok", val)}
+                      />
+                    ) : (
+                      <span className={`text-xs font-medium ${truck.environment_ok === true ? "text-green-600" : truck.environment_ok === false ? "text-red-600" : "text-muted-foreground"}`}>
+                        {truck.environment_ok === true ? "✓ תקין" : truck.environment_ok === false ? "✗ לא תקין" : "—"}
+                      </span>
+                    )}
                   </TableCell>
                   {/* מבנה */}
                   <TableCell>
-                    <TriStateButtons
-                      value={truck.truck_condition_ok}
-                      onChange={(val) => updateField(truck.id, "truck_condition_ok", val)}
-                    />
+                    {viewMode === "edit" ? (
+                      <TriStateButtons
+                        value={truck.truck_condition_ok}
+                        onChange={(val) => updateField(truck.id, "truck_condition_ok", val)}
+                      />
+                    ) : (
+                      <span className={`text-xs font-medium ${truck.truck_condition_ok === true ? "text-green-600" : truck.truck_condition_ok === false ? "text-red-600" : "text-muted-foreground"}`}>
+                        {truck.truck_condition_ok === true ? "✓ תקין" : truck.truck_condition_ok === false ? "✗ לא תקין" : "—"}
+                      </span>
+                    )}
                   </TableCell>
                   {/* מפעיל */}
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={!!(truck as any).has_operator}
-                        onCheckedChange={(checked) => {
-                          updateField(truck.id, "has_operator", !!checked);
-                          if (!checked) {
-                            updateField(truck.id, "operator_name", null);
-                            setOperatorEdits((prev) => {
-                              const next = { ...prev };
-                              delete next[truck.id];
-                              return next;
-                            });
-                          }
-                        }}
-                      />
-                      {(truck as any).has_operator ? (
-                        <Input
-                          className="h-8 text-xs w-[120px]"
-                          placeholder="שם המפעיל"
-                          value={operatorEdits[truck.id] ?? truck.operator_name ?? ""}
-                          onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
-                          onBlur={() => {
-                            const val = operatorEdits[truck.id];
-                            if (val !== undefined && val !== (truck.operator_name ?? "")) {
-                              updateField(truck.id, "operator_name", val || null);
+                    {viewMode === "edit" ? (
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={!!(truck as any).has_operator}
+                          onCheckedChange={(checked) => {
+                            updateField(truck.id, "has_operator", !!checked);
+                            if (!checked) {
+                              updateField(truck.id, "operator_name", null);
+                              setOperatorEdits((prev) => {
+                                const next = { ...prev };
+                                delete next[truck.id];
+                                return next;
+                              });
                             }
                           }}
                         />
-                      ) : (
-                        <span className="text-xs text-muted-foreground">אין</span>
-                      )}
-                    </div>
+                        {(truck as any).has_operator ? (
+                          <Input
+                            className="h-8 text-xs w-[120px]"
+                            placeholder="שם המפעיל"
+                            value={operatorEdits[truck.id] ?? truck.operator_name ?? ""}
+                            onChange={(e) => setOperatorEdits((prev) => ({ ...prev, [truck.id]: e.target.value }))}
+                            onBlur={() => {
+                              const val = operatorEdits[truck.id];
+                              if (val !== undefined && val !== (truck.operator_name ?? "")) {
+                                updateField(truck.id, "operator_name", val || null);
+                              }
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs text-muted-foreground">אין</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-xs">{truck.operator_name || "אין"}</span>
+                    )}
                   </TableCell>
                   {/* סטטוס */}
                   <TableCell>
-                    <Select
-                      value={truck.status}
-                      onValueChange={(val) => updateStatus(truck.id, val)}
-                    >
-                      <SelectTrigger className="w-[120px] h-8 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>
-                            <span className="flex items-center gap-2">
-                              <span className={`inline-block w-2.5 h-2.5 rounded-full ${STATUS_COLORS[key] || "bg-muted"}`} />
-                              {label}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {viewMode === "edit" ? (
+                      <Select
+                        value={truck.status}
+                        onValueChange={(val) => updateStatus(truck.id, val)}
+                      >
+                        <SelectTrigger className="w-[120px] h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(Object.entries(STATUS_LABELS) as [TruckStatus, string][]).map(([key, label]) => (
+                            <SelectItem key={key} value={key}>
+                              <span className="flex items-center gap-2">
+                                <span className={`inline-block w-2.5 h-2.5 rounded-full ${STATUS_COLORS[key] || "bg-muted"}`} />
+                                {label}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <StatusBadge status={truck.status as TruckStatus} />
+                    )}
                   </TableCell>
                   {/* תאריך הגשה */}
                   <TableCell>
@@ -605,30 +647,32 @@ export default function Directory() {
                   </TableCell>
                   {/* מחיקה */}
                   <TableCell>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent dir="rtl">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>מחיקת רשומה</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            האם למחוק את "{truck.truck_name}"? פעולה זו אינה ניתנת לביטול.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter className="flex-row-reverse gap-2">
-                          <AlertDialogCancel>ביטול</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => deleteTruck(truck.id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            מחק
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    {viewMode === "edit" && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent dir="rtl">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>מחיקת רשומה</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              האם למחוק את "{truck.truck_name}"? פעולה זו אינה ניתנת לביטול.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter className="flex-row-reverse gap-2">
+                            <AlertDialogCancel>ביטול</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteTruck(truck.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              מחק
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
