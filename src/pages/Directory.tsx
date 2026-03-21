@@ -133,7 +133,7 @@ export default function Directory() {
   const fetchOpinions = async () => {
     const { data } = await supabase
       .from("expert_opinions")
-      .select("id, truck_id, location_analysis, recommendation, executive_summary, is_final")
+      .select("id, truck_id, location_analysis, recommendation, executive_summary, field_notes, conditions, is_final")
       .order("created_at", { ascending: false });
     if (data) {
       const map: Record<string, ExpertOpinion> = {};
@@ -696,23 +696,31 @@ export default function Directory() {
                       </TableCell>
                       {/* ניתוח מצב קיים */}
                       <TableCell>
-                        {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis ? (
-                          <p className="text-xs leading-relaxed text-foreground max-w-[250px]">
-                            {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis}
-                          </p>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">אין ניתוח</span>
-                        )}
+                        {(() => {
+                          const op = opinions[truck.id];
+                          const text = op?.executive_summary || op?.field_notes || op?.location_analysis;
+                          return text ? (
+                            <p className="text-xs leading-relaxed text-foreground max-w-[250px]">
+                              {text}
+                            </p>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">אין ניתוח</span>
+                          );
+                        })()}
                       </TableCell>
                       {/* המלצה */}
                       <TableCell>
-                        {opinions[truck.id]?.recommendation ? (
-                          <p className="text-xs leading-relaxed font-medium text-foreground max-w-[200px]">
-                            {opinions[truck.id]?.recommendation}
-                          </p>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">—</span>
-                        )}
+                        {(() => {
+                          const op = opinions[truck.id];
+                          const text = op?.recommendation || op?.conditions;
+                          return text ? (
+                            <p className="text-xs leading-relaxed font-medium text-foreground max-w-[200px]">
+                              {text}
+                            </p>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          );
+                        })()}
                       </TableCell>
                     </>
                   )}
