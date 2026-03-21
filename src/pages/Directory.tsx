@@ -430,28 +430,38 @@ export default function Directory() {
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_name")}>
                   <span className="flex items-center gap-1">עמדה <SortIcon col="truck_name" /></span>
                 </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
-                  <span className="flex items-center gap-1">מבנה קיים בפועל <SortIcon col="has_truck" /></span>
-                </TableHead>
-                <TableHead className="text-right">
-                  <div className="flex flex-col items-end gap-0.5">
-                    <span>תשתית</span>
-                    <span className="text-[10px] font-normal text-muted-foreground flex items-center gap-2">
-                      <span>חשמל</span>
-                      <span>מים</span>
-                      <span>ביוב</span>
-                    </span>
-                  </div>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
-                  <span className="flex items-center gap-1">סביבה תקינה <SortIcon col="environment_ok" /></span>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
-                  <span className="flex items-center gap-1">מבנה תקין <SortIcon col="truck_condition_ok" /></span>
-                </TableHead>
-                <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
-                  <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
-                </TableHead>
+                {viewMode === "edit" && (
+                  <>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("has_truck")}>
+                      <span className="flex items-center gap-1">מבנה קיים בפועל <SortIcon col="has_truck" /></span>
+                    </TableHead>
+                    <TableHead className="text-right">
+                      <div className="flex flex-col items-end gap-0.5">
+                        <span>תשתית</span>
+                        <span className="text-[10px] font-normal text-muted-foreground flex items-center gap-2">
+                          <span>חשמל</span>
+                          <span>מים</span>
+                          <span>ביוב</span>
+                        </span>
+                      </div>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("environment_ok")}>
+                      <span className="flex items-center gap-1">סביבה תקינה <SortIcon col="environment_ok" /></span>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("truck_condition_ok")}>
+                      <span className="flex items-center gap-1">מבנה תקין <SortIcon col="truck_condition_ok" /></span>
+                    </TableHead>
+                    <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("operator_name")}>
+                      <span className="flex items-center gap-1">מפעיל <SortIcon col="operator_name" /></span>
+                    </TableHead>
+                  </>
+                )}
+                {viewMode === "conclusions" && (
+                  <>
+                    <TableHead className="text-right min-w-[200px]">חוות דעת</TableHead>
+                    <TableHead className="text-right min-w-[150px]">המלצה</TableHead>
+                  </>
+                )}
                 <TableHead className="text-right cursor-pointer select-none hover:bg-muted/50" onClick={() => toggleSort("status")}>
                   <span className="flex items-center gap-1">סטטוס <SortIcon col="status" /></span>
                 </TableHead>
