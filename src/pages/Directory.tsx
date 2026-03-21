@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2, ImagePlus, Eye, Pencil } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2, ImagePlus, Eye, Pencil, Sparkles, Loader2 } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
@@ -50,6 +50,7 @@ interface LocationData {
   infra_electricity: boolean;
   infra_water: boolean;
   infra_sewage: boolean;
+  is_desired: boolean;
   name: string;
   street: string | null;
   neighborhood: string | null;
@@ -116,6 +117,7 @@ export default function Directory() {
   const [operatorEdits, setOperatorEdits] = useState<Record<string, string>>({});
   const [viewMode, setViewMode] = useState<"edit" | "conclusions">("edit");
   const [opinions, setOpinions] = useState<Record<string, ExpertOpinion>>({});
+  const [generatingOpinion, setGeneratingOpinion] = useState<Record<string, boolean>>({});
 
   const fetchTrucks = async () => {
     const { data, error } = await supabase
@@ -153,6 +155,58 @@ export default function Directory() {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, []);
+  const generateOpinionForTruck = async (truck: TruckWithLocation) => {
+    setGeneratingOpinion((prev) => ({ ...prev, [truck.id]: true }));
+    try {
+      const payload = {
+        is_desired: truck.location?.is_desired ?? null,
+        vehicle_type: truck.vehicle_type,
+        structure_ok: truck.truck_condition_ok,
+        infra_electricity: truck.location?.infra_electricity ?? null,
+        infra_water: truck.location?.infra_water ?? null,
+        infra_sewage: truck.location?.infra_sewage ?? null,
+        environment_ok: truck.environment_ok,
+        operator_name: truck.operator_name,
+        location_name: truck.location?.name ?? null,
+        existing_building_approval: truck.vehicle_type ? true : null,
+      };
+
+      const { data, error } = await supabase.functions.invoke("generate-opinion", {
+        body: payload,
+      });
+
+      if (error) throw error;
+
+      const { field_notes, conditions } = data as { field_notes: string; conditions: string };
+
+      const existing = opinions[truck.id];
+      if (existing) {
+        await supabase
+          .from("expert_opinions")
+          .update({
+            executive_summary: field_notes,
+            recommendation: conditions,
+          })
+          .eq("id", existing.id);
+      } else {
+        await supabase
+          .from("expert_opinions")
+          .insert({
+            truck_id: truck.id,
+            executive_summary: field_notes,
+            recommendation: conditions,
+          });
+      }
+
+      await fetchOpinions();
+      toast.success("חוות דעת והמלצה נוצרו בהצלחה");
+    } catch (e) {
+      console.error("generateOpinion error:", e);
+      toast.error("שגיאה ביצירת חוות דעת");
+    } finally {
+      setGeneratingOpinion((prev) => ({ ...prev, [truck.id]: false }));
+    }
+  };
 
   const updateField = async (truckId: string, field: string, value: any) => {
     const { error } = await supabase
@@ -458,6 +512,7 @@ export default function Directory() {
                 )}
                 {viewMode === "conclusions" && (
                   <>
+                    <TableHead className="text-right w-[80px]">ניתוח</TableHead>
                     <TableHead className="text-right min-w-[200px]">ניתוח מצב קיים</TableHead>
                     <TableHead className="text-right min-w-[150px]">המלצה</TableHead>
                   </>
@@ -622,6 +677,23 @@ export default function Directory() {
                   {/* Conclusions-only columns */}
                   {viewMode === "conclusions" && (
                     <>
+                      {/* כפתור ניתוח */}
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs gap-1"
+                          disabled={generatingOpinion[truck.id]}
+                          onClick={() => generateOpinionForTruck(truck)}
+                        >
+                          {generatingOpinion[truck.id] ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3.5 w-3.5" />
+                          )}
+                          {generatingOpinion[truck.id] ? "מנתח..." : "נתח"}
+                        </Button>
+                      </TableCell>
                       {/* ניתוח מצב קיים */}
                       <TableCell>
                         {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis ? (
