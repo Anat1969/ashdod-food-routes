@@ -226,6 +226,7 @@ export default function Advertisement() {
                 trucks={trucks}
                 selectedTruckId={selectedTruckId}
                 onSelectTruck={(truck) => handleSelectTruck(truck.id)}
+                selectionKey={selectionKey}
               />
             </div>
 
