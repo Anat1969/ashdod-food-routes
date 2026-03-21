@@ -622,14 +622,14 @@ export default function Directory() {
                   {/* Conclusions-only columns */}
                   {viewMode === "conclusions" && (
                     <>
-                      {/* חוות דעת */}
+                      {/* ניתוח מצב קיים */}
                       <TableCell>
-                        {opinions[truck.id]?.location_analysis || opinions[truck.id]?.executive_summary ? (
+                        {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis ? (
                           <p className="text-xs leading-relaxed text-foreground max-w-[250px]">
-                            {opinions[truck.id]?.location_analysis || opinions[truck.id]?.executive_summary}
+                            {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis}
                           </p>
                         ) : (
-                          <span className="text-xs text-muted-foreground">אין חוות דעת</span>
+                          <span className="text-xs text-muted-foreground">אין ניתוח</span>
                         )}
                       </TableCell>
                       {/* המלצה */}
