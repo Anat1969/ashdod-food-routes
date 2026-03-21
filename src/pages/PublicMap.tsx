@@ -287,7 +287,7 @@ function TruckSideCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  const photoUrl = truck.street_photo_2_url || truck.street_photo_1_url || truck.vehicle_photo_url;
+  
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Scroll selected card into view
