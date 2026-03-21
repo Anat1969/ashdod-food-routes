@@ -162,7 +162,7 @@ function FlyToSelected({
 }
 
 /** On first mount, fit bounds to all markers so the initial view is meaningful */
-function FitBoundsOnMount({ trucks, offsets }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]> }) {
+function FitBoundsOnMount({ trucks, offsets, initialZoom }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]>; initialZoom: number }) {
   const map = useMap();
   const [fitted, setFitted] = useState(false);
 
