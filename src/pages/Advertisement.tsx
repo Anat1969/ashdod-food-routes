@@ -228,6 +228,8 @@ export default function Advertisement() {
                 onSelectTruck={(truck) => handleSelectTruck(truck.id)}
                 selectionKey={selectionKey}
                 focusMode="advertisement"
+                sidebarPosition="right"
+                sidebarWidth={400}
                 selectionZoom={18}
                 initialZoom={17}
               />

@@ -102,11 +102,21 @@ function getFramedCenterPoint({
   const targetPoint = map.project([targetLat, targetLng], selectionZoom);
 
   if (focusMode === "advertisement") {
-    const desiredMarkerPoint = getAdvertisementAnchorPoint(mapSize);
-    const viewportCenter = L.point(mapSize.x / 2, mapSize.y / 2);
-    const markerOffset = desiredMarkerPoint.subtract(viewportCenter);
+    // Layout-aware: compute center of the actual map area (excluding sidebar)
+    const effectiveSidebar = mapSize.x > 640 ? sidebarWidth : 0;
+    const mapAreaWidth = mapSize.x - effectiveSidebar;
+    // Center of the visible map area (accounting for sidebar on right)
+    const mapAreaCenterX = sidebarPosition === "right"
+      ? mapAreaWidth / 2
+      : effectiveSidebar + mapAreaWidth / 2;
+    // Place marker slightly above center so popup has room above
+    const mapAreaCenterY = mapSize.y * 0.55;
 
-    return L.point(targetPoint.x - markerOffset.x, targetPoint.y - markerOffset.y);
+    const viewportCenter = L.point(mapSize.x / 2, mapSize.y / 2);
+    const desiredPoint = L.point(mapAreaCenterX, mapAreaCenterY);
+    const offset = desiredPoint.subtract(viewportCenter);
+
+    return L.point(targetPoint.x - offset.x, targetPoint.y - offset.y);
   }
 
   const halfSidebar = mapSize.x > 800 ? sidebarWidth / 2 : 0;
