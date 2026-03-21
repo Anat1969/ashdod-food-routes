@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import type { FoodTruck, Location } from "@/lib/types";
 
 // Fix default marker icons for leaflet + bundlers
@@ -45,7 +46,7 @@ function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLoc
   return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
 }
 
-function FlyToSelected({ truck }: { truck: TruckWithLocation | undefined }) {
+function FlyToSelected({ truck }: { truck: TruckWithLocation | null | undefined }) {
   const map = useMap();
   useEffect(() => {
     if (hasValidCoords(truck)) {
@@ -71,35 +72,42 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: Tru
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <FlyToSelected truck={selectedTruck} />
-      {trucksWithCoords.map((truck) => (
-        <Marker
-          key={truck.id}
-          position={[Number(truck.locations!.lat), Number(truck.locations!.lng)]}
-          icon={truck.id === selectedTruckId ? selectedIcon : defaultIcon}
-          eventHandlers={{
-            click: () => onSelectTruck(truck),
-            mouseover: (e) => e.target.openPopup(),
-            mouseout: (e) => e.target.closePopup(),
-          }}
-        >
-          <Popup>
-            <div className="text-right font-sans min-w-[140px]" dir="rtl">
-              <p className="font-bold text-sm text-foreground">{truck.truck_name}</p>
-              {truck.food_category && (
-                <p className="text-xs text-muted-foreground mt-0.5">{truck.food_category}</p>
-              )}
-              {truck.locations?.name && (
-                <p className="text-xs text-muted-foreground/70 mt-0.5">{truck.locations.name}</p>
-              )}
-              {truck.hours_from && truck.hours_to && (
-                <p className="text-[11px] text-muted-foreground/50 mt-1">
-                  {truck.hours_from} – {truck.hours_to}
-                </p>
-              )}
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+      <MarkerClusterGroup
+        chunkedLoading
+        maxClusterRadius={40}
+        spiderfyOnMaxZoom
+        showCoverageOnHover={false}
+      >
+        {trucksWithCoords.map((truck) => (
+          <Marker
+            key={truck.id}
+            position={[Number(truck.locations!.lat), Number(truck.locations!.lng)]}
+            icon={truck.id === selectedTruckId ? selectedIcon : defaultIcon}
+            eventHandlers={{
+              click: () => onSelectTruck(truck),
+              mouseover: (e) => e.target.openPopup(),
+              mouseout: (e) => e.target.closePopup(),
+            }}
+          >
+            <Popup>
+              <div className="text-right font-sans min-w-[140px]" dir="rtl">
+                <p className="font-bold text-sm text-foreground">{truck.truck_name}</p>
+                {truck.food_category && (
+                  <p className="text-xs text-muted-foreground mt-0.5">{truck.food_category}</p>
+                )}
+                {truck.locations?.name && (
+                  <p className="text-xs text-muted-foreground/70 mt-0.5">{truck.locations.name}</p>
+                )}
+                {truck.hours_from && truck.hours_to && (
+                  <p className="text-[11px] text-muted-foreground/50 mt-1">
+                    {truck.hours_from} – {truck.hours_to}
+                  </p>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }
