@@ -133,7 +133,7 @@ export default function Directory() {
   const fetchOpinions = async () => {
     const { data } = await supabase
       .from("expert_opinions")
-      .select("id, truck_id, location_analysis, recommendation, executive_summary, is_final")
+      .select("id, truck_id, location_analysis, recommendation, executive_summary, field_notes, conditions, is_final")
       .order("created_at", { ascending: false });
     if (data) {
       const map: Record<string, ExpertOpinion> = {};
