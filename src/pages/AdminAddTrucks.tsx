@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +16,6 @@ interface Location {
 }
 
 export default function AdminAddTrucks() {
-  const { isAdmin, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [locations, setLocations] = useState<Location[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -32,16 +28,10 @@ export default function AdminAddTrucks() {
   const [importing, setImporting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) navigate("/login");
-  }, [authLoading, isAdmin, navigate]);
-
-  useEffect(() => {
     supabase.from("locations").select("id, name").then(({ data }) => {
       setLocations(data || []);
     });
   }, []);
-
-  if (authLoading || !isAdmin) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
