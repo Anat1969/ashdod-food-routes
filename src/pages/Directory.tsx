@@ -458,7 +458,7 @@ export default function Directory() {
                 )}
                 {viewMode === "conclusions" && (
                   <>
-                    <TableHead className="text-right min-w-[200px]">חוות דעת</TableHead>
+                    <TableHead className="text-right min-w-[200px]">ניתוח מצב קיים</TableHead>
                     <TableHead className="text-right min-w-[150px]">המלצה</TableHead>
                   </>
                 )}
