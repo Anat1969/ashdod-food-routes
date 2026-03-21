@@ -63,10 +63,10 @@ export function hasValidCoords(
 
 /** Zoom level at which clustering is fully disabled */
 const CLUSTER_DISABLE_ZOOM = 17;
-/** Zoom level used when flying to a selected marker — street-level clarity */
-const SELECTION_ZOOM = 17;
-/** Initial zoom — neighbourhood-level overview */
-const INITIAL_ZOOM = 15;
+/** Zoom level used when flying to a selected marker — close street-level */
+const SELECTION_ZOOM = 18;
+/** Max zoom when fitting all markers on first load */
+const INITIAL_ZOOM = 16;
 
 /**
  * Compute a tiny lat/lng offset for trucks sharing exact coordinates
@@ -128,7 +128,7 @@ function FlyToSelected({
     const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
     const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
 
-    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.6 });
+    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.5 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
