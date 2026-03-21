@@ -112,6 +112,8 @@ export default function Advertisement() {
     setMenuDialogTruckId(null);
     setMenuItems([]);
     setNewItem({ item_name: "", price: "" });
+    // Re-emphasize the selected truck on the map after dialog closes
+    setSelectionKey((k) => k + 1);
   }, []);
 
   const addMenuItem = async () => {
