@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,12 @@ export default function PublicMap() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectionKey, setSelectionKey] = useState(0);
+
+  const selectTruck = useCallback((id: string) => {
+    setSelectedId(id);
+    setSelectionKey((k) => k + 1);
+  }, []);
 
   useEffect(() => {
     const fetchApproved = async () => {
@@ -124,7 +130,8 @@ export default function PublicMap() {
             <TruckMap
               trucks={sortedFiltered}
               selectedTruckId={selectedId}
-              onSelectTruck={(t) => setSelectedId(t.id)}
+              onSelectTruck={(t) => selectTruck(t.id)}
+              selectionKey={selectionKey}
             />
           )}
         </div>
@@ -155,7 +162,7 @@ export default function PublicMap() {
                   key={truck.id}
                   truck={truck}
                   selected={truck.id === selectedId}
-                  onClick={() => setSelectedId(truck.id)}
+                  onClick={() => selectTruck(truck.id)}
                 />
               ))}
             </div>

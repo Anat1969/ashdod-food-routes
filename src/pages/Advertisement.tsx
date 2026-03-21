@@ -47,6 +47,7 @@ export default function Advertisement() {
   const [loading, setLoading] = useState(true);
   const [selectedTruckId, setSelectedTruckId] = useState<string | null>(null);
   const [menuDialogTruckId, setMenuDialogTruckId] = useState<string | null>(null);
+  const [selectionKey, setSelectionKey] = useState(0);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
   const [newItem, setNewItem] = useState<NewItemDraft>({ item_name: "", price: "" });
@@ -90,6 +91,7 @@ export default function Advertisement() {
   const handleSelectTruck = useCallback((truckOrId: TruckWithLocation | string) => {
     const id = typeof truckOrId === "string" ? truckOrId : truckOrId.id;
     setSelectedTruckId(id);
+    setSelectionKey((k) => k + 1);
   }, []);
 
   const openMenuDialog = useCallback(async (truckId: string) => {
@@ -110,6 +112,8 @@ export default function Advertisement() {
     setMenuDialogTruckId(null);
     setMenuItems([]);
     setNewItem({ item_name: "", price: "" });
+    // Re-emphasize the selected truck on the map after dialog closes
+    setSelectionKey((k) => k + 1);
   }, []);
 
   const addMenuItem = async () => {
@@ -222,6 +226,7 @@ export default function Advertisement() {
                 trucks={trucks}
                 selectedTruckId={selectedTruckId}
                 onSelectTruck={(truck) => handleSelectTruck(truck.id)}
+                selectionKey={selectionKey}
               />
             </div>
 

@@ -37,6 +37,8 @@ interface TruckMapProps {
   trucks: TruckWithLocation[];
   selectedTruckId: string | null;
   onSelectTruck: (truck: TruckWithLocation) => void;
+  /** Increment to force re-emphasis (flyTo + popup) even if selectedTruckId hasn't changed */
+  selectionKey?: number;
 }
 
 function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLocation & { locations: Location & { lat: number; lng: number } } {
@@ -46,31 +48,51 @@ function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLoc
   return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
 }
 
-function FlyToSelected({ truck, markerRefs }: { truck: TruckWithLocation | null | undefined; markerRefs: React.MutableRefObject<Record<string, L.Marker>> }) {
+/** Zoom level at which clustering is fully disabled — markers always individual above this */
+const CLUSTER_DISABLE_ZOOM = 17;
+/** Zoom level used when flying to a selected marker — must be > CLUSTER_DISABLE_ZOOM */
+const SELECTION_ZOOM = 18;
+
+function FlyToSelected({
+  truck,
+  selectionKey,
+  markerRefs,
+}: {
+  truck: TruckWithLocation | null | undefined;
+  selectionKey: number;
+  markerRefs: React.MutableRefObject<Record<string, L.Marker>>;
+}) {
   const map = useMap();
+
   useEffect(() => {
     if (!truck?.id) return;
-    if (hasValidCoords(truck)) {
-      const targetLat = Number(truck.locations.lat);
-      const targetLng = Number(truck.locations.lng);
-      
-      // Always fly to the location (even if same coords — ensures map is centered)
-      map.flyTo([targetLat, targetLng], 18, { duration: 0.8 });
-      
-      // After fly completes, open the popup for the selected marker
-      setTimeout(() => {
-        const marker = markerRefs.current[truck.id];
-        if (marker) {
-          // Ensure any clusters are spiderfied at this zoom
-          marker.openPopup();
-        }
-      }, 900);
-    }
-  }, [truck?.id, map]);
+    if (!hasValidCoords(truck)) return;
+
+    const targetLat = Number(truck.locations.lat);
+    const targetLng = Number(truck.locations.lng);
+
+    // Close any currently open popups first for clean transition
+    map.closePopup();
+
+    // Fly to the marker — zoom past cluster threshold so marker is always individually visible
+    map.flyTo([targetLat, targetLng], SELECTION_ZOOM, { duration: 0.7 });
+
+    // After fly completes, open popup for the selected marker
+    const timer = setTimeout(() => {
+      const marker = markerRefs.current[truck.id];
+      if (marker) {
+        marker.openPopup();
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+    // selectionKey allows parents to force re-trigger even for the same truck
+  }, [truck?.id, selectionKey, map]);
+
   return null;
 }
 
-export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: TruckMapProps) {
+export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selectionKey = 0 }: TruckMapProps) {
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
   const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
   const markerRefs = useRef<Record<string, L.Marker>>({});
@@ -94,13 +116,13 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck }: Tru
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FlyToSelected truck={selectedTruck} markerRefs={markerRefs} />
+      <FlyToSelected truck={selectedTruck} selectionKey={selectionKey} markerRefs={markerRefs} />
       <MarkerClusterGroup
         chunkedLoading
         maxClusterRadius={40}
         spiderfyOnMaxZoom
         showCoverageOnHover={false}
-        disableClusteringAtZoom={17}
+        disableClusteringAtZoom={CLUSTER_DISABLE_ZOOM}
       >
         {trucksWithCoords.map((truck) => (
           <Marker
