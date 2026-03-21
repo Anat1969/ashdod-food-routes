@@ -91,6 +91,7 @@ export default function Advertisement() {
   const handleSelectTruck = useCallback((truckOrId: TruckWithLocation | string) => {
     const id = typeof truckOrId === "string" ? truckOrId : truckOrId.id;
     setSelectedTruckId(id);
+    setSelectionKey((k) => k + 1);
   }, []);
 
   const openMenuDialog = useCallback(async (truckId: string) => {
