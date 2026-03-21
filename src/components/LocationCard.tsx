@@ -146,7 +146,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
     setGeneratingOpinion(true);
     try {
       const payload = {
-        is_desired: locDesired,
+        is_desired: true, // generateOpinion is only called when toggling ON
         location_name: locName || location?.name || "",
         vehicle_type: truck.vehicle_type || "",
         structure_ok: expertOpinion?.structure_ok ?? (truck as any).truck_condition_ok ?? null,
