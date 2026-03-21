@@ -115,8 +115,20 @@ function FlyToSelected({
     const targetLat = Number(truck.locations.lat) + offset[0];
     const targetLng = Number(truck.locations.lng) + offset[1];
 
+    // Offset center slightly left (in screen space) to account for the right sidebar
+    // so the marker lands visually centered in the map area, not behind the list panel
+    const mapSize = map.getSize();
+    const sidebarPx = 288; // w-72 sidebar
+    const offsetX = mapSize.x > 800 ? sidebarPx / 2 : 0;
+
     map.closePopup();
-    map.flyTo([targetLat, targetLng], SELECTION_ZOOM, { duration: 0.7 });
+
+    // Fly to point, then pan to compensate for sidebar
+    const targetPoint = map.project([targetLat, targetLng], SELECTION_ZOOM);
+    const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
+    const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
+
+    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.6 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
@@ -124,7 +136,6 @@ function FlyToSelected({
       if (marker) marker.openPopup();
     };
 
-    // Use both: moveend for reliability + fallback timer for edge cases
     const onMoveEnd = () => {
       openPopup();
       map.off("moveend", onMoveEnd);
@@ -133,7 +144,7 @@ function FlyToSelected({
     const fallback = setTimeout(() => {
       map.off("moveend", onMoveEnd);
       openPopup();
-    }, 1200);
+    }, 1000);
 
     return () => {
       clearTimeout(fallback);
