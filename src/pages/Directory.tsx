@@ -59,6 +59,15 @@ interface TruckWithLocation extends FoodTruck {
   location?: LocationData | null;
 }
 
+interface ExpertOpinion {
+  id: string;
+  truck_id: string;
+  location_analysis: string | null;
+  recommendation: string | null;
+  executive_summary: string | null;
+  is_final: boolean;
+}
+
 function TriStateButtons({
   value,
   onChange,
