@@ -227,6 +227,8 @@ export default function Advertisement() {
                 selectedTruckId={selectedTruckId}
                 onSelectTruck={(truck) => handleSelectTruck(truck.id)}
                 selectionKey={selectionKey}
+                selectionZoom={18}
+                initialZoom={17}
               />
             </div>
 

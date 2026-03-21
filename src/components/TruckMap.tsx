@@ -236,12 +236,13 @@ export default function TruckMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} />
+      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} initialZoom={effectiveInitialZoom} />
       <FlyToSelected
         truck={selectedTruck}
         selectionKey={selectionKey}
         markerRefs={markerRefs}
         offsets={offsets}
+        selectionZoom={effectiveSelectionZoom}
       />
 
       {/* Non-selected markers in cluster group */}
