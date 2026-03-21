@@ -362,6 +362,24 @@ export default function Directory() {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant={viewMode === "conclusions" ? "default" : "outline"}
+          size="lg"
+          className="h-12 px-4 gap-2"
+          onClick={() => setViewMode(viewMode === "edit" ? "conclusions" : "edit")}
+        >
+          {viewMode === "edit" ? (
+            <>
+              <Eye className="h-4 w-4" />
+              צפייה במסקנות
+            </>
+          ) : (
+            <>
+              <Pencil className="h-4 w-4" />
+              עריכת נתונים
+            </>
+          )}
+        </Button>
       </div>
 
       <div className="mb-6 rounded-lg overflow-hidden border shadow-sm">
