@@ -63,7 +63,7 @@ export default function Index() {
                 border border-primary-foreground/[0.1] text-sm font-medium
                 hover:bg-primary-foreground/[0.14] hover:text-primary-foreground transition-all duration-200"
             >
-              גלו את המפה
+              מפת כל הפודטראקים
             </Link>
           </div>
         </div>
