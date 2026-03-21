@@ -79,15 +79,7 @@ const SELECTION_ZOOM = 18;
 /** Max zoom when fitting all markers on first load */
 const INITIAL_ZOOM = 16;
 
-function getAdvertisementAnchorPoint(mapSize: L.Point): L.Point {
-  const isCompact = mapSize.y < 340;
-  const isNarrow = mapSize.x < 640;
-
-  return L.point(
-    mapSize.x * (isNarrow ? 0.5 : 0.56),
-    mapSize.y * (isCompact ? 0.78 : 0.72)
-  );
-}
+/** No longer needed — advertisement mode now uses layout-aware sidebar offset */
 
 function getFramedCenterPoint({
   focusMode,
