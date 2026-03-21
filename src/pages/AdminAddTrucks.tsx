@@ -126,20 +126,6 @@ export default function AdminAddTrucks() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="vehicleType">סוג רכב</Label>
-                <Select value={vehicleType} onValueChange={setVehicleType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר סוג" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="truck">משאית</SelectItem>
-                    <SelectItem value="trailer">נגרר</SelectItem>
-                    <SelectItem value="cart">עגלה</SelectItem>
-                    <SelectItem value="stand">דוכן</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="foodCategory">קטגוריית אוכל</Label>
