@@ -20,7 +20,7 @@ export default function AdminAddTrucks() {
   const [saving, setSaving] = useState(false);
 
   const [truckName, setTruckName] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
+  
   const [foodCategory, setFoodCategory] = useState("");
   const [locationId, setLocationId] = useState("");
 
