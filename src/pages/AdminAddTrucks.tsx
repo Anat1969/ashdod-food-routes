@@ -20,7 +20,7 @@ export default function AdminAddTrucks() {
   const [saving, setSaving] = useState(false);
 
   const [truckName, setTruckName] = useState("");
-  const [vehicleType, setVehicleType] = useState("");
+  
   const [foodCategory, setFoodCategory] = useState("");
   const [locationId, setLocationId] = useState("");
 
@@ -43,7 +43,7 @@ export default function AdminAddTrucks() {
     setSaving(true);
     const { error } = await supabase.from("food_trucks").insert({
       truck_name: truckName.trim(),
-      vehicle_type: vehicleType || null,
+      
       food_category: foodCategory || null,
       location_id: locationId || null,
       status: "draft",
@@ -57,7 +57,7 @@ export default function AdminAddTrucks() {
 
     toast.success("הפודטראק נוסף בהצלחה");
     setTruckName("");
-    setVehicleType("");
+    
     setFoodCategory("");
     setLocationId("");
   };
@@ -126,20 +126,6 @@ export default function AdminAddTrucks() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="vehicleType">סוג רכב</Label>
-                <Select value={vehicleType} onValueChange={setVehicleType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר סוג" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="truck">משאית</SelectItem>
-                    <SelectItem value="trailer">נגרר</SelectItem>
-                    <SelectItem value="cart">עגלה</SelectItem>
-                    <SelectItem value="stand">דוכן</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
               <div className="space-y-2">
                 <Label htmlFor="foodCategory">קטגוריית אוכל</Label>
