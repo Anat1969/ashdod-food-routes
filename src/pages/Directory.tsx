@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import StatusBadge from "@/components/StatusBadge";
-import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2, ImagePlus, Eye, Pencil } from "lucide-react";
+import { Search, Zap, Droplets, CircleDot, ArrowUp, ArrowDown, ArrowUpDown, Check, X, Trash2, ImagePlus, Eye, Pencil, Sparkles, Loader2 } from "lucide-react";
 import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
