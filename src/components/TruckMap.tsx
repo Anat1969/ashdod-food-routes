@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { useEffect, useRef, useCallback, useMemo } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Pane } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MarkerClusterGroup from "react-leaflet-cluster";
@@ -13,12 +13,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
+// Selected marker: larger red icon so it stands out clearly
 const selectedIcon = new L.Icon({
-  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
+  iconSize: [30, 49],
+  iconAnchor: [15, 49],
+  popupAnchor: [1, -40],
   shadowSize: [41, 41],
 });
 
@@ -41,26 +42,66 @@ interface TruckMapProps {
   selectionKey?: number;
 }
 
-function hasValidCoords(truck?: TruckWithLocation | null): truck is TruckWithLocation & { locations: Location & { lat: number; lng: number } } {
+export function hasValidCoords(
+  truck?: TruckWithLocation | null
+): truck is TruckWithLocation & {
+  locations: Location & { lat: number; lng: number };
+} {
   if (!truck?.locations) return false;
   const lat = Number(truck.locations.lat);
   const lng = Number(truck.locations.lng);
-  return Number.isFinite(lat) && Number.isFinite(lng) && lat !== 0 && lng !== 0;
+  return (
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    lat !== 0 &&
+    lng !== 0 &&
+    Number.isFinite(Number(truck.locations.lng)) &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lng) <= 180
+  );
 }
 
-/** Zoom level at which clustering is fully disabled — markers always individual above this */
+/** Zoom level at which clustering is fully disabled */
 const CLUSTER_DISABLE_ZOOM = 17;
-/** Zoom level used when flying to a selected marker — must be > CLUSTER_DISABLE_ZOOM */
+/** Zoom level used when flying to a selected marker */
 const SELECTION_ZOOM = 18;
+
+/**
+ * Compute a tiny lat/lng offset for trucks sharing exact coordinates
+ * so they don't perfectly overlap and become indistinguishable.
+ */
+function computeOffsets(trucks: TruckWithLocation[]): Record<string, [number, number]> {
+  // Group by coordinate key
+  const groups: Record<string, string[]> = {};
+  for (const t of trucks) {
+    if (!hasValidCoords(t)) continue;
+    const key = `${Number(t.locations.lat).toFixed(8)},${Number(t.locations.lng).toFixed(8)}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(t.id);
+  }
+  const offsets: Record<string, [number, number]> = {};
+  for (const ids of Object.values(groups)) {
+    if (ids.length <= 1) continue;
+    // Spread markers in a tiny circle (~3m radius)
+    const radius = 0.00003;
+    ids.forEach((id, i) => {
+      const angle = (2 * Math.PI * i) / ids.length;
+      offsets[id] = [Math.cos(angle) * radius, Math.sin(angle) * radius];
+    });
+  }
+  return offsets;
+}
 
 function FlyToSelected({
   truck,
   selectionKey,
   markerRefs,
+  offsets,
 }: {
   truck: TruckWithLocation | null | undefined;
   selectionKey: number;
   markerRefs: React.MutableRefObject<Record<string, L.Marker>>;
+  offsets: Record<string, [number, number]>;
 }) {
   const map = useMap();
 
@@ -68,34 +109,51 @@ function FlyToSelected({
     if (!truck?.id) return;
     if (!hasValidCoords(truck)) return;
 
-    const targetLat = Number(truck.locations.lat);
-    const targetLng = Number(truck.locations.lng);
+    const offset = offsets[truck.id] || [0, 0];
+    const targetLat = Number(truck.locations.lat) + offset[0];
+    const targetLng = Number(truck.locations.lng) + offset[1];
 
-    // Close any currently open popups first for clean transition
     map.closePopup();
-
-    // Fly to the marker — zoom past cluster threshold so marker is always individually visible
     map.flyTo([targetLat, targetLng], SELECTION_ZOOM, { duration: 0.7 });
 
-    // After fly completes, open popup for the selected marker
-    const timer = setTimeout(() => {
+    // Open popup reliably after moveend, not just a timer
+    const openPopup = () => {
       const marker = markerRefs.current[truck.id];
-      if (marker) {
-        marker.openPopup();
-      }
-    }, 800);
+      if (marker) marker.openPopup();
+    };
 
-    return () => clearTimeout(timer);
-    // selectionKey allows parents to force re-trigger even for the same truck
-  }, [truck?.id, selectionKey, map]);
+    // Use both: moveend for reliability + fallback timer for edge cases
+    const onMoveEnd = () => {
+      openPopup();
+      map.off("moveend", onMoveEnd);
+    };
+    map.on("moveend", onMoveEnd);
+    const fallback = setTimeout(() => {
+      map.off("moveend", onMoveEnd);
+      openPopup();
+    }, 1200);
+
+    return () => {
+      clearTimeout(fallback);
+      map.off("moveend", onMoveEnd);
+    };
+  }, [truck?.id, selectionKey, map, offsets]);
 
   return null;
 }
 
-export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selectionKey = 0 }: TruckMapProps) {
+export default function TruckMap({
+  trucks,
+  selectedTruckId,
+  onSelectTruck,
+  selectionKey = 0,
+}: TruckMapProps) {
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
   const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
   const markerRefs = useRef<Record<string, L.Marker>>({});
+
+  // Compute stable offsets for overlapping coordinates
+  const offsets = useMemo(() => computeOffsets(trucksWithCoords), [trucksWithCoords]);
 
   const setMarkerRef = useCallback((id: string, ref: L.Marker | null) => {
     if (ref) {
@@ -104,6 +162,17 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selec
       delete markerRefs.current[id];
     }
   }, []);
+
+  // Non-selected trucks go in cluster; selected truck rendered separately on top
+  const nonSelectedTrucks = trucksWithCoords.filter((t) => t.id !== selectedTruckId);
+
+  const getPosition = useCallback(
+    (truck: TruckWithLocation): [number, number] => {
+      const offset = offsets[truck.id] || [0, 0];
+      return [Number(truck.locations!.lat) + offset[0], Number(truck.locations!.lng) + offset[1]];
+    },
+    [offsets]
+  );
 
   return (
     <MapContainer
@@ -116,7 +185,14 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selec
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FlyToSelected truck={selectedTruck} selectionKey={selectionKey} markerRefs={markerRefs} />
+      <FlyToSelected
+        truck={selectedTruck}
+        selectionKey={selectionKey}
+        markerRefs={markerRefs}
+        offsets={offsets}
+      />
+
+      {/* Non-selected markers in cluster group */}
       <MarkerClusterGroup
         chunkedLoading
         maxClusterRadius={40}
@@ -124,21 +200,16 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selec
         showCoverageOnHover={false}
         disableClusteringAtZoom={CLUSTER_DISABLE_ZOOM}
       >
-        {trucksWithCoords.map((truck) => (
+        {nonSelectedTrucks.map((truck) => (
           <Marker
             key={truck.id}
-            position={[Number(truck.locations!.lat), Number(truck.locations!.lng)]}
-            icon={truck.id === selectedTruckId ? selectedIcon : defaultIcon}
+            position={getPosition(truck)}
+            icon={defaultIcon}
             ref={(ref) => setMarkerRef(truck.id, ref as unknown as L.Marker | null)}
             eventHandlers={{
               click: () => onSelectTruck(truck),
               mouseover: (e) => e.target.openPopup(),
-              mouseout: (e) => {
-                // Don't close popup if this is the selected marker
-                if (truck.id !== selectedTruckId) {
-                  e.target.closePopup();
-                }
-              },
+              mouseout: (e) => e.target.closePopup(),
             }}
           >
             <Popup>
@@ -160,6 +231,40 @@ export default function TruckMap({ trucks, selectedTruckId, onSelectTruck, selec
           </Marker>
         ))}
       </MarkerClusterGroup>
+
+      {/* Selected marker rendered OUTSIDE cluster group — always visible on top */}
+      {selectedTruck && hasValidCoords(selectedTruck) && (
+        <Marker
+          position={getPosition(selectedTruck)}
+          icon={selectedIcon}
+          zIndexOffset={1000}
+          ref={(ref) => setMarkerRef(selectedTruck.id, ref as unknown as L.Marker | null)}
+          eventHandlers={{
+            click: () => onSelectTruck(selectedTruck),
+            mouseover: (e) => e.target.openPopup(),
+            mouseout: () => {
+              /* keep popup open for selected */
+            },
+          }}
+        >
+          <Popup>
+            <div className="text-right font-sans min-w-[160px]" dir="rtl">
+              <p className="font-bold text-sm text-foreground">{selectedTruck.truck_name}</p>
+              {selectedTruck.food_category && (
+                <p className="text-xs text-muted-foreground mt-0.5">{selectedTruck.food_category}</p>
+              )}
+              {selectedTruck.locations?.name && (
+                <p className="text-xs text-muted-foreground/70 mt-0.5">{selectedTruck.locations.name}</p>
+              )}
+              {selectedTruck.hours_from && selectedTruck.hours_to && (
+                <p className="text-[11px] text-muted-foreground/50 mt-1">
+                  {selectedTruck.hours_from} – {selectedTruck.hours_to}
+                </p>
+              )}
+            </div>
+          </Popup>
+        </Marker>
+      )}
     </MapContainer>
   );
 }
