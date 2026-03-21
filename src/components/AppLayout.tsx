@@ -30,7 +30,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
     navLinks.push({ to: "/directory", label: "מאגר עמדות" });
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
-  navLinks.push({ to: "/advertisement", label: "גלו עמדות" });
+  navLinks.push({ to: "/advertisement", label: "כל העמדות" });
 
   return (
     <div className="min-h-screen flex flex-col">
