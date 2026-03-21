@@ -40,6 +40,10 @@ interface TruckMapProps {
   onSelectTruck: (truck: TruckWithLocation) => void;
   /** Increment to force re-emphasis (flyTo + popup) even if selectedTruckId hasn't changed */
   selectionKey?: number;
+  /** Override the zoom level used when flying to a selected marker */
+  selectionZoom?: number;
+  /** Override the max zoom when fitting all markers on first load */
+  initialZoom?: number;
 }
 
 export function hasValidCoords(
@@ -99,11 +103,13 @@ function FlyToSelected({
   selectionKey,
   markerRefs,
   offsets,
+  selectionZoom,
 }: {
   truck: TruckWithLocation | null | undefined;
   selectionKey: number;
   markerRefs: React.MutableRefObject<Record<string, L.Marker>>;
   offsets: Record<string, [number, number]>;
+  selectionZoom: number;
 }) {
   const map = useMap();
 
@@ -124,11 +130,11 @@ function FlyToSelected({
     map.closePopup();
 
     // Fly to point, then pan to compensate for sidebar
-    const targetPoint = map.project([targetLat, targetLng], SELECTION_ZOOM);
+    const targetPoint = map.project([targetLat, targetLng], selectionZoom);
     const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
-    const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
+    const adjustedLatLng = map.unproject(adjustedPoint, selectionZoom);
 
-    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.5 });
+    map.flyTo(adjustedLatLng, selectionZoom, { duration: 0.5 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
@@ -156,7 +162,7 @@ function FlyToSelected({
 }
 
 /** On first mount, fit bounds to all markers so the initial view is meaningful */
-function FitBoundsOnMount({ trucks, offsets }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]> }) {
+function FitBoundsOnMount({ trucks, offsets, initialZoom }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]>; initialZoom: number }) {
   const map = useMap();
   const [fitted, setFitted] = useState(false);
 
@@ -175,7 +181,7 @@ function FitBoundsOnMount({ trucks, offsets }: { trucks: TruckWithLocation[]; of
     map.fitBounds(bounds, {
       paddingTopLeft: [20, 20],
       paddingBottomRight: [300, 20],
-      maxZoom: INITIAL_ZOOM,
+      maxZoom: initialZoom,
     });
     setFitted(true);
   }, [trucks, fitted, map, offsets]);
@@ -188,7 +194,11 @@ export default function TruckMap({
   selectedTruckId,
   onSelectTruck,
   selectionKey = 0,
+  selectionZoom: selectionZoomProp,
+  initialZoom: initialZoomProp,
 }: TruckMapProps) {
+  const effectiveSelectionZoom = selectionZoomProp ?? SELECTION_ZOOM;
+  const effectiveInitialZoom = initialZoomProp ?? INITIAL_ZOOM;
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
   const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
   const markerRefs = useRef<Record<string, L.Marker>>({});
@@ -226,12 +236,13 @@ export default function TruckMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} />
+      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} initialZoom={effectiveInitialZoom} />
       <FlyToSelected
         truck={selectedTruck}
         selectionKey={selectionKey}
         markerRefs={markerRefs}
         offsets={offsets}
+        selectionZoom={effectiveSelectionZoom}
       />
 
       {/* Non-selected markers in cluster group */}
