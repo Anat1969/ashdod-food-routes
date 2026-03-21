@@ -14,7 +14,6 @@ export default function HeroSection() {
           className="absolute bottom-0 right-0 w-[300px] h-[300px] rounded-full opacity-[0.03]"
           style={{ background: "radial-gradient(circle, hsl(216 59% 60%) 0%, transparent 70%)" }}
         />
-        {/* Fine grain texture */}
         <div
           className="absolute inset-0 opacity-[0.018]"
           style={{
@@ -24,9 +23,9 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-10 pb-6 md:pt-14 md:pb-8 text-center max-w-3xl">
+      <div className="relative container mx-auto px-4 pt-14 pb-8 md:pt-20 md:pb-10 text-center max-w-3xl">
         {/* Kicker */}
-        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-4 uppercase font-medium">
+        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-5 uppercase font-medium">
           עיריית אשדוד · הנדסה ותכנון עירוני
         </p>
 
@@ -34,12 +33,12 @@ export default function HeroSection() {
         <h1 className="text-[1.75rem] md:text-[2.75rem] font-extrabold mb-1.5 leading-[1.1] tracking-tight">
           מערכת חכמה לניהול עמדות מזון
         </h1>
-        <p className="text-[1.25rem] md:text-[1.75rem] font-bold text-primary-foreground/60 mb-4 leading-tight">
+        <p className="text-[1.25rem] md:text-[1.75rem] font-bold text-primary-foreground/60 mb-5 leading-tight">
           במרחב הציבורי של אשדוד
         </p>
 
         {/* Gold accent divider */}
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-5">
           <div className="h-[2px] w-12 rounded-full" style={{ background: "hsl(39 75% 55% / 0.45)" }} />
         </div>
 
@@ -50,18 +49,21 @@ export default function HeroSection() {
       </div>
 
       {/* ── Floating Screens Composition ── */}
-      <div className="relative container mx-auto px-4 pb-4 max-w-4xl">
-        <div className="relative mx-auto" style={{ height: "clamp(220px, 38vw, 380px)" }}>
-          {/* Secondary screen — left/back: Municipal Dashboard */}
+      <div className="relative container mx-auto px-4 pb-6 max-w-5xl">
+        <div className="relative mx-auto" style={{ height: "clamp(260px, 42vw, 440px)" }}>
+
+          {/* Secondary screen — RIGHT/back: Municipal Dashboard */}
           <div
-            className="absolute rounded-xl border border-primary-foreground/[0.08] overflow-hidden municipal-shadow-lg"
+            className="absolute rounded-xl overflow-hidden transition-transform duration-500"
             style={{
-              width: "42%",
-              height: "78%",
-              top: "12%",
-              right: "2%",
-              transform: "perspective(1200px) rotateY(-3deg)",
+              width: "38%",
+              height: "72%",
+              top: "16%",
+              right: "0%",
+              transform: "perspective(1400px) rotateY(-4deg) scale(0.92)",
               zIndex: 1,
+              boxShadow: "0 12px 50px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2)",
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
             <ScreenMockup
@@ -75,17 +77,17 @@ export default function HeroSection() {
             />
           </div>
 
-          {/* Main screen — center/front: All Food Trucks Map */}
+          {/* Main screen — CENTER/front: All Food Trucks Map */}
           <div
-            className="absolute rounded-xl border border-primary-foreground/[0.1] overflow-hidden"
+            className="absolute rounded-xl overflow-hidden"
             style={{
-              width: "54%",
+              width: "58%",
               height: "100%",
               top: "0",
               left: "50%",
               transform: "translateX(-50%)",
-              zIndex: 3,
-              boxShadow: "0 8px 40px rgba(0,0,0,0.25), 0 2px 12px rgba(0,0,0,0.15)",
+              zIndex: 10,
+              boxShadow: "0 20px 70px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1)",
             }}
           >
             <ScreenMockup
@@ -95,16 +97,18 @@ export default function HeroSection() {
             />
           </div>
 
-          {/* Secondary screen — right/back: Approved Locations Map */}
+          {/* Secondary screen — LEFT/back: Approved Locations Map */}
           <div
-            className="absolute rounded-xl border border-primary-foreground/[0.08] overflow-hidden municipal-shadow-lg"
+            className="absolute rounded-xl overflow-hidden transition-transform duration-500"
             style={{
-              width: "42%",
-              height: "78%",
-              top: "12%",
-              left: "2%",
-              transform: "perspective(1200px) rotateY(3deg)",
+              width: "38%",
+              height: "72%",
+              top: "16%",
+              left: "0%",
+              transform: "perspective(1400px) rotateY(4deg) scale(0.92)",
               zIndex: 1,
+              boxShadow: "0 12px 50px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2)",
+              border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
             <ScreenMockup
@@ -120,7 +124,7 @@ export default function HeroSection() {
       </div>
 
       {/* Hero CTA */}
-      <div className="relative container mx-auto px-4 pt-4 pb-10 md:pb-14 text-center">
+      <div className="relative container mx-auto px-4 pt-6 pb-14 md:pb-20 text-center">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/journey"
@@ -143,7 +147,7 @@ export default function HeroSection() {
       </div>
 
       {/* Bottom fade */}
-      <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 }
@@ -159,65 +163,115 @@ function ScreenMockup({
   variant: "map" | "dashboard" | "approved";
 }) {
   return (
-    <div className="w-full h-full flex flex-col" style={{ background: "hsl(216 59% 18%)" }}>
+    <div className="w-full h-full flex flex-col" style={{ background: "hsl(216 59% 16%)" }}>
       {/* Title bar */}
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06]">
-        <div className="flex gap-1">
-          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
-          <div className="w-1.5 h-1.5 rounded-full bg-white/10" />
+      <div className="flex items-center gap-2 px-3 py-2 border-b border-white/[0.06]"
+        style={{ background: "hsl(216 59% 14%)" }}>
+        <div className="flex gap-1.5">
+          <div className="w-2 h-2 rounded-full" style={{ background: "hsl(0 70% 55% / 0.6)" }} />
+          <div className="w-2 h-2 rounded-full" style={{ background: "hsl(39 80% 52% / 0.6)" }} />
+          <div className="w-2 h-2 rounded-full" style={{ background: "hsl(142 70% 45% / 0.6)" }} />
         </div>
-        <span className="text-[9px] md:text-[10px] text-white/40 font-medium">{title}</span>
+        <span className="text-[9px] md:text-[10px] text-white/40 font-medium mr-1">{title}</span>
       </div>
 
       {/* Content area */}
       <div className="flex-1 p-2.5 md:p-3">
-        {variant === "map" && (
-          <div className="w-full h-full rounded-lg relative overflow-hidden" style={{ background: "hsl(216 30% 92%)" }}>
-            {/* Map-like grid lines */}
-            <div className="absolute inset-0 opacity-30">
-              {[20, 40, 60, 80].map((p) => (
-                <div key={`h-${p}`} className="absolute w-full border-t border-primary/10" style={{ top: `${p}%` }} />
-              ))}
-              {[25, 50, 75].map((p) => (
-                <div key={`v-${p}`} className="absolute h-full border-r border-primary/10" style={{ right: `${p}%` }} />
-              ))}
-            </div>
-            {/* Map pins */}
-            {[
-              { t: "25%", r: "30%", c: "hsl(39 80% 52%)" },
-              { t: "45%", r: "55%", c: "hsl(142 70% 40%)" },
-              { t: "60%", r: "25%", c: "hsl(216 59% 26%)" },
-              { t: "35%", r: "70%", c: "hsl(39 80% 52%)" },
-              { t: "70%", r: "50%", c: "hsl(142 70% 40%)" },
-            ].map((pin, i) => (
-              <div
-                key={i}
-                className="absolute w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-sm"
-                style={{ top: pin.t, right: pin.r, background: pin.c }}
-              />
-            ))}
-          </div>
-        )}
-
+        {variant === "map" && <MapContent />}
         {(variant === "dashboard" || variant === "approved") && (
-          <div className="space-y-2">
-            {items.map((item, i) => (
-              <div key={i} className="flex items-center justify-between bg-white/[0.04] rounded-lg px-2.5 py-1.5">
-                <span className="text-[8px] md:text-[9px] text-white/40">{item.label}</span>
-                <span className="text-[10px] md:text-[11px] font-bold" style={{ color: item.color }}>
-                  {item.value}
-                </span>
-              </div>
-            ))}
-            {variant === "dashboard" && (
-              <div className="mt-1 h-1 w-full rounded-full bg-white/[0.06] overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: "65%", background: "hsl(39 80% 52% / 0.5)" }} />
-              </div>
-            )}
-          </div>
+          <DashboardContent items={items} variant={variant} />
         )}
       </div>
+    </div>
+  );
+}
+
+function MapContent() {
+  return (
+    <div className="w-full h-full rounded-lg relative overflow-hidden" style={{ background: "hsl(216 30% 90%)" }}>
+      {/* Road-like lines */}
+      <div className="absolute inset-0">
+        {/* Horizontal roads */}
+        <div className="absolute w-full h-[2px]" style={{ top: "30%", background: "hsl(216 20% 82%)" }} />
+        <div className="absolute w-full h-[2px]" style={{ top: "55%", background: "hsl(216 20% 82%)" }} />
+        <div className="absolute w-full h-[2px]" style={{ top: "78%", background: "hsl(216 20% 84%)" }} />
+        {/* Vertical roads */}
+        <div className="absolute h-full w-[2px]" style={{ right: "25%", background: "hsl(216 20% 82%)" }} />
+        <div className="absolute h-full w-[2px]" style={{ right: "55%", background: "hsl(216 20% 82%)" }} />
+        <div className="absolute h-full w-[2px]" style={{ right: "80%", background: "hsl(216 20% 84%)" }} />
+        {/* Block fills */}
+        <div className="absolute rounded-sm" style={{ top: "8%", right: "28%", width: "22%", height: "18%", background: "hsl(216 25% 86%)" }} />
+        <div className="absolute rounded-sm" style={{ top: "34%", right: "58%", width: "18%", height: "17%", background: "hsl(216 25% 87%)" }} />
+        <div className="absolute rounded-sm" style={{ top: "60%", right: "10%", width: "12%", height: "14%", background: "hsl(216 25% 86%)" }} />
+      </div>
+      {/* Map pins with drop shadows */}
+      {[
+        { t: "22%", r: "32%", c: "hsl(39 80% 52%)", s: "12px" },
+        { t: "42%", r: "58%", c: "hsl(142 70% 40%)", s: "10px" },
+        { t: "65%", r: "22%", c: "hsl(216 59% 35%)", s: "10px" },
+        { t: "30%", r: "72%", c: "hsl(39 80% 52%)", s: "11px" },
+        { t: "72%", r: "48%", c: "hsl(142 70% 40%)", s: "9px" },
+        { t: "15%", r: "50%", c: "hsl(200 80% 50%)", s: "9px" },
+      ].map((pin, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            top: pin.t,
+            right: pin.r,
+            width: pin.s,
+            height: pin.s,
+            background: pin.c,
+            boxShadow: `0 2px 6px ${pin.c.replace(")", " / 0.4)")}`,
+          }}
+        />
+      ))}
+      {/* Zoom controls hint */}
+      <div className="absolute bottom-2 left-2 flex flex-col gap-0.5">
+        <div className="w-4 h-4 rounded bg-white/80 flex items-center justify-center text-[8px] text-primary/60 font-bold shadow-sm">+</div>
+        <div className="w-4 h-4 rounded bg-white/80 flex items-center justify-center text-[8px] text-primary/60 font-bold shadow-sm">−</div>
+      </div>
+    </div>
+  );
+}
+
+function DashboardContent({
+  items,
+  variant,
+}: {
+  items: { label: string; value: string; color: string }[];
+  variant: "dashboard" | "approved";
+}) {
+  return (
+    <div className="space-y-2">
+      {items.map((item, i) => (
+        <div key={i} className="flex items-center justify-between bg-white/[0.05] rounded-lg px-2.5 py-1.5">
+          <span className="text-[8px] md:text-[9px] text-white/40">{item.label}</span>
+          <span className="text-[10px] md:text-[12px] font-bold" style={{ color: item.color }}>
+            {item.value}
+          </span>
+        </div>
+      ))}
+      {variant === "dashboard" && (
+        <>
+          <div className="mt-1.5 h-1.5 w-full rounded-full bg-white/[0.06] overflow-hidden">
+            <div className="h-full rounded-full" style={{ width: "65%", background: "hsl(39 80% 52% / 0.5)" }} />
+          </div>
+          <div className="flex gap-1.5 mt-1.5">
+            <div className="flex-1 h-6 rounded bg-white/[0.04] border border-white/[0.06]" />
+            <div className="flex-1 h-6 rounded bg-white/[0.04] border border-white/[0.06]" />
+          </div>
+        </>
+      )}
+      {variant === "approved" && (
+        <div className="mt-1.5 rounded-lg bg-white/[0.03] border border-white/[0.05] p-1.5">
+          <div className="flex gap-1">
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="flex-1 h-4 rounded bg-white/[0.05]" />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
