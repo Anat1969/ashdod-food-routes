@@ -207,7 +207,7 @@ export default function Directory() {
     }
   };
 
-
+  const updateField = async (truckId: string, field: string, value: any) => {
     const { error } = await supabase
       .from("food_trucks")
       .update({ [field]: value } as any)
