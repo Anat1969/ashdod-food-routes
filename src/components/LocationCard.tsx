@@ -344,11 +344,11 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
         </Card>
 
         {/* מצב בשטח (center) */}
-        <Card className="border-sky-300 bg-white/80">
+        <Card className="border-sky-300 bg-white/80 flex flex-col">
           <CardHeader className="pb-2 pt-3">
             <CardTitle className="text-base">מצב בשטח</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm pb-3">
+          <CardContent className="space-y-3 text-sm pb-3 flex-1 flex flex-col">
             <BoolField
               label="מצב סביבה תקין"
               value={expertOpinion?.environment_ok ?? null}
@@ -362,7 +362,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
               onChange={(v) => setExpertBool("structure_ok", v)}
             />
             {isAdmin ? (
-              <div className="space-y-2 pt-2 border-t">
+              <div className="space-y-2 pt-2 border-t flex-1 flex flex-col">
                 <p className="text-xs text-muted-foreground">תשתיות:</p>
                 <div className="flex items-center gap-1">
                   <Checkbox checked={locElectricity} onCheckedChange={(v) => { setLocElectricity(!!v); saveLocationField({ infra_electricity: !!v }); }} />
@@ -387,7 +387,7 @@ export default function LocationCard({ truck, location, operator, expertOpinion,
                       await generateOpinion();
                     }
                   }}
-                  className={`w-full mt-2 py-3 rounded-lg text-sm font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"} ${generatingOpinion ? "opacity-60 cursor-wait" : ""}`}
+                  className={`w-full mt-auto py-2 rounded-md text-base font-bold border-2 transition-colors ${locDesired ? "bg-green-100 border-green-500 text-green-800" : "bg-muted/50 border-input text-muted-foreground"} ${generatingOpinion ? "opacity-60 cursor-wait" : ""}`}
                 >
                   {generatingOpinion ? "⏳ מייצר חוות דעת..." : locDesired ? "✅ יצירת חוות דעת והמלצה" : "יצירת חוות דעת והמלצה"}
                 </button>
