@@ -677,6 +677,23 @@ export default function Directory() {
                   {/* Conclusions-only columns */}
                   {viewMode === "conclusions" && (
                     <>
+                      {/* כפתור ניתוח */}
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 text-xs gap-1"
+                          disabled={generatingOpinion[truck.id]}
+                          onClick={() => generateOpinionForTruck(truck)}
+                        >
+                          {generatingOpinion[truck.id] ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="h-3.5 w-3.5" />
+                          )}
+                          {generatingOpinion[truck.id] ? "מנתח..." : "נתח"}
+                        </Button>
+                      </TableCell>
                       {/* ניתוח מצב קיים */}
                       <TableCell>
                         {opinions[truck.id]?.executive_summary || opinions[truck.id]?.location_analysis ? (
