@@ -49,77 +49,61 @@ export default function HeroSection() {
       </div>
 
       {/* ── Floating Screens Composition ── */}
-      <div className="relative container mx-auto px-4 pb-6 max-w-5xl">
-        <div className="relative mx-auto" style={{ height: "clamp(260px, 42vw, 440px)" }}>
+      <div className="relative container mx-auto px-4 pb-8 max-w-5xl">
+        <div className="relative mx-auto" style={{ height: "clamp(280px, 44vw, 460px)" }}>
+
+          {/* Secondary screen — LEFT/back: Approved Locations */}
+          <div
+            className="absolute rounded-xl overflow-hidden"
+            style={{
+              width: "42%",
+              height: "78%",
+              top: "12%",
+              left: "-4%",
+              transform: "perspective(1800px) rotateY(-6deg) scale(0.88)",
+              zIndex: 2,
+              boxShadow: "0 16px 60px rgba(0,0,0,0.25), 0 6px 20px rgba(0,0,0,0.15)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              filter: "brightness(0.92)",
+            }}
+          >
+            <ApprovedScreen />
+          </div>
 
           {/* Secondary screen — RIGHT/back: Municipal Dashboard */}
           <div
-            className="absolute rounded-xl overflow-hidden transition-transform duration-500"
+            className="absolute rounded-xl overflow-hidden"
             style={{
-              width: "38%",
-              height: "72%",
-              top: "16%",
-              right: "0%",
-              transform: "perspective(1400px) rotateY(-4deg) scale(0.92)",
-              zIndex: 1,
-              boxShadow: "0 12px 50px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              width: "42%",
+              height: "78%",
+              top: "12%",
+              right: "-4%",
+              transform: "perspective(1800px) rotateY(6deg) scale(0.88)",
+              zIndex: 2,
+              boxShadow: "0 16px 60px rgba(0,0,0,0.25), 0 6px 20px rgba(0,0,0,0.15)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              filter: "brightness(0.92)",
             }}
           >
-            <ScreenMockup
-              title="לוח בקרה עירוני"
-              items={[
-                { label: "בקשות ממתינות", value: "12", color: "hsl(39 80% 52%)" },
-                { label: "מאושרות", value: "34", color: "hsl(142 70% 40%)" },
-                { label: "בבדיקה", value: "8", color: "hsl(200 80% 50%)" },
-              ]}
-              variant="dashboard"
-            />
+            <DashboardScreen />
           </div>
 
           {/* Main screen — CENTER/front: All Food Trucks Map */}
           <div
-            className="absolute rounded-xl overflow-hidden"
+            className="absolute rounded-2xl overflow-hidden"
             style={{
-              width: "58%",
+              width: "52%",
               height: "100%",
               top: "0",
               left: "50%",
               transform: "translateX(-50%)",
               zIndex: 10,
-              boxShadow: "0 20px 70px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1)",
+              boxShadow: "0 25px 80px rgba(0,0,0,0.45), 0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1), 0 0 100px rgba(0,0,0,0.15)",
             }}
           >
-            <ScreenMockup
-              title="מפת כל הפודטראקים"
-              items={[]}
-              variant="map"
-            />
+            <MapScreen />
           </div>
 
-          {/* Secondary screen — LEFT/back: Approved Locations Map */}
-          <div
-            className="absolute rounded-xl overflow-hidden transition-transform duration-500"
-            style={{
-              width: "38%",
-              height: "72%",
-              top: "16%",
-              left: "0%",
-              transform: "perspective(1400px) rotateY(4deg) scale(0.92)",
-              zIndex: 1,
-              boxShadow: "0 12px 50px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <ScreenMockup
-              title="מפת עמדות מאושרות"
-              items={[
-                { label: "עמדות פעילות", value: "28", color: "hsl(142 70% 40%)" },
-                { label: "אזורים", value: "6", color: "hsl(216 59% 26%)" },
-              ]}
-              variant="approved"
-            />
-          </div>
         </div>
       </div>
 
