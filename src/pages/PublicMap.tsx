@@ -130,7 +130,8 @@ export default function PublicMap() {
             <TruckMap
               trucks={sortedFiltered}
               selectedTruckId={selectedId}
-              onSelectTruck={(t) => setSelectedId(t.id)}
+              onSelectTruck={(t) => selectTruck(t.id)}
+              selectionKey={selectionKey}
             />
           )}
         </div>
