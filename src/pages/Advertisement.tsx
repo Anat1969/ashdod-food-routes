@@ -69,7 +69,8 @@ export default function Advertisement() {
     const fetchTrucks = async () => {
       const { data } = await supabase
         .from("food_trucks")
-        .select("*, locations(*)");
+        .select("*, locations(*)")
+        .eq("status", "approved");
       const result = (data as TruckWithLocation[]) || [];
       result.sort((a, b) => {
         const streetA = a.locations?.street || a.locations?.name || "";

@@ -42,7 +42,6 @@ export default function PublicMap() {
       const { data } = await supabase
         .from("food_trucks")
         .select("*, locations(*)")
-        .eq("status", "approved")
         .order("truck_name");
       setTrucks((data as TruckWithLocation[]) || []);
       setLoading(false);
