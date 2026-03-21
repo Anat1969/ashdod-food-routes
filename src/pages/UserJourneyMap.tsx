@@ -58,7 +58,7 @@ const ROLES = {
   },
   resident: {
     label: "תושב",
-    sub: "גלו עמדות אוכל ברחבי העיר",
+    sub: "צפו בעמדות אוכל מאושרות ברחבי העיר",
     icon: UtensilsCrossed,
     iconBg: "bg-primary/6",
     iconColor: "text-primary",
