@@ -13,18 +13,11 @@ import AdminLayout from "@/components/AdminLayout";
 import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 export default function AdminDashboard() {
-  const { isAdmin, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [trucks, setTrucks] = useState<FoodTruck[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      navigate("/login");
-    }
-  }, [authLoading, isAdmin, navigate]);
 
   useEffect(() => {
     const fetch = async () => {
@@ -37,8 +30,6 @@ export default function AdminDashboard() {
     };
     if (isAdmin) fetch();
   }, [isAdmin]);
-
-  if (authLoading || !isAdmin) return null;
 
   const stats = {
     total: trucks.length,

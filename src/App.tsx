@@ -45,8 +45,8 @@ const App = () => (
               <Route path="/directory" element={<ProtectedRoute adminOnly><Directory /></ProtectedRoute>} />
               <Route path="/truck/:id" element={<TruckProfile />} />
               <Route path="/apply" element={<ApplicationForm />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/add" element={<AdminAddTrucks />} />
+              <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+              <Route path="/admin/add" element={<ProtectedRoute adminOnly><AdminAddTrucks /></ProtectedRoute>} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

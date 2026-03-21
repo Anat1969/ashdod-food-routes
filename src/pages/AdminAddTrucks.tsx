@@ -18,8 +18,6 @@ interface Location {
 }
 
 export default function AdminAddTrucks() {
-  const { isAdmin, loading: authLoading } = useAuth();
-  const navigate = useNavigate();
   const [locations, setLocations] = useState<Location[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -32,16 +30,10 @@ export default function AdminAddTrucks() {
   const [importing, setImporting] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) navigate("/login");
-  }, [authLoading, isAdmin, navigate]);
-
-  useEffect(() => {
     supabase.from("locations").select("id, name").then(({ data }) => {
       setLocations(data || []);
     });
   }, []);
-
-  if (authLoading || !isAdmin) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
