@@ -194,7 +194,11 @@ export default function TruckMap({
   selectedTruckId,
   onSelectTruck,
   selectionKey = 0,
+  selectionZoom: selectionZoomProp,
+  initialZoom: initialZoomProp,
 }: TruckMapProps) {
+  const effectiveSelectionZoom = selectionZoomProp ?? SELECTION_ZOOM;
+  const effectiveInitialZoom = initialZoomProp ?? INITIAL_ZOOM;
   const selectedTruck = trucks.find((t) => t.id === selectedTruckId);
   const trucksWithCoords = trucks.filter((t) => hasValidCoords(t));
   const markerRefs = useRef<Record<string, L.Marker>>({});
