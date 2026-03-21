@@ -186,8 +186,8 @@ export default function Directory() {
         await supabase
           .from("expert_opinions")
           .update({
-            executive_summary: field_notes,
-            recommendation: conditions,
+            field_notes: field_notes,
+            conditions: conditions,
           })
           .eq("id", existing.id);
       } else {
@@ -195,8 +195,8 @@ export default function Directory() {
           .from("expert_opinions")
           .insert({
             truck_id: truck.id,
-            executive_summary: field_notes,
-            recommendation: conditions,
+            field_notes: field_notes,
+            conditions: conditions,
           });
       }
 
