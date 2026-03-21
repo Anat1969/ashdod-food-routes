@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import TruckMap from "@/components/TruckMap";
-import { Search, Clock, UtensilsCrossed, MapPin } from "lucide-react";
+import { Search, Clock, UtensilsCrossed, MapPin, ChevronLeft } from "lucide-react";
 import PageNavigation from "@/components/PageNavigation";
 import { useRegisterList } from "@/hooks/useListNavigation";
 import type { FoodTruck, Location } from "@/lib/types";
@@ -30,6 +30,7 @@ export default function PublicMap() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectionKey, setSelectionKey] = useState(0);
+  const didAutoSelect = useRef(false);
 
   const selectTruck = useCallback((id: string) => {
     setSelectedId(id);
@@ -66,6 +67,36 @@ export default function PublicMap() {
     return streetA.localeCompare(streetB, "he");
   });
 
+  // Auto-select first truck on initial load
+  useEffect(() => {
+    if (didAutoSelect.current || loading || sortedFiltered.length === 0) return;
+    const firstWithCoords = sortedFiltered.find(
+      (t) => t.locations && Number.isFinite(Number(t.locations.lat)) && Number(t.locations.lat) !== 0
+    );
+    if (firstWithCoords) {
+      selectTruck(firstWithCoords.id);
+      didAutoSelect.current = true;
+    }
+  }, [loading, sortedFiltered, selectTruck]);
+
+  // When filter/search changes and selected truck is no longer visible, select the first available
+  useEffect(() => {
+    if (loading || sortedFiltered.length === 0) {
+      if (selectedId) setSelectedId(null);
+      return;
+    }
+    if (selectedId && !sortedFiltered.find((t) => t.id === selectedId)) {
+      const firstWithCoords = sortedFiltered.find(
+        (t) => t.locations && Number.isFinite(Number(t.locations.lat)) && Number(t.locations.lat) !== 0
+      );
+      if (firstWithCoords) {
+        selectTruck(firstWithCoords.id);
+      } else {
+        setSelectedId(null);
+      }
+    }
+  }, [sortedFiltered, selectedId, loading, selectTruck]);
+
   useRegisterList(
     sortedFiltered.map((t) => ({ id: t.id, label: t.truck_name })),
     "/map",
@@ -77,7 +108,7 @@ export default function PublicMap() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)]" dir="rtl">
-      {/* Compact toolbar — map-first orientation */}
+      {/* Compact toolbar */}
       <div className="bg-card border-b px-4 py-2.5 flex flex-col sm:flex-row items-center gap-2 z-10">
         <div className="flex items-center gap-2 flex-shrink-0">
           <MapPin className="h-4 w-4 text-primary" />
@@ -117,6 +148,40 @@ export default function PublicMap() {
         </div>
       </div>
 
+      {/* Desktop selected-truck detail strip */}
+      {selectedTruck && (
+        <div className="hidden md:flex bg-card/80 backdrop-blur border-b px-4 py-2 items-center gap-4 z-10 animate-in fade-in slide-in-from-top-1 duration-200">
+          <div className="w-1.5 h-8 rounded-full bg-primary flex-shrink-0" />
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <h3 className="font-bold text-sm text-foreground truncate">{selectedTruck.truck_name}</h3>
+            {selectedTruck.food_category && (
+              <Badge variant="secondary" className="text-[10px] font-medium flex-shrink-0">
+                {selectedTruck.food_category}
+              </Badge>
+            )}
+            {selectedTruck.locations?.name && (
+              <span className="text-xs text-muted-foreground flex items-center gap-1 flex-shrink-0">
+                <MapPin className="h-3 w-3" />
+                {selectedTruck.locations.name}
+              </span>
+            )}
+            {selectedTruck.hours_from && selectedTruck.hours_to && (
+              <span className="text-xs text-muted-foreground/70 flex items-center gap-1 flex-shrink-0">
+                <Clock className="h-3 w-3" />
+                {selectedTruck.hours_from} – {selectedTruck.hours_to}
+              </span>
+            )}
+          </div>
+          <Link
+            to={`/truck/${selectedTruck.id}`}
+            className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-semibold flex-shrink-0"
+          >
+            פרטים נוספים
+            <ChevronLeft className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
       {/* Main: map + list */}
       <div className="flex flex-1 overflow-hidden">
         {/* Map */}
@@ -136,7 +201,7 @@ export default function PublicMap() {
           )}
         </div>
 
-        {/* Narrow side list — secondary to the map */}
+        {/* Narrow side list */}
         <div className="w-72 hidden md:flex flex-col border-r bg-card overflow-y-auto">
           <div className="p-2.5 border-b">
             <h2 className="font-bold text-xs text-foreground">מה פתוח עכשיו?</h2>
@@ -223,12 +288,21 @@ function TruckSideCard({
   onClick: () => void;
 }) {
   const photoUrl = truck.street_photo_2_url || truck.street_photo_1_url || truck.vehicle_photo_url;
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Scroll selected card into view
+  useEffect(() => {
+    if (selected && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [selected]);
 
   return (
     <div
+      ref={cardRef}
       className={`p-3 cursor-pointer transition-all duration-200 ${
         selected
-          ? "bg-accent/[0.06] border-s-[3px] border-s-accent"
+          ? "bg-primary/[0.06] border-s-[3px] border-s-primary ring-1 ring-inset ring-primary/10"
           : "hover:bg-muted/30"
       }`}
       onClick={onClick}
@@ -237,7 +311,9 @@ function TruckSideCard({
         <img
           src={photoUrl}
           alt={truck.truck_name}
-          className="w-full h-28 object-cover rounded-lg mb-2.5"
+          className={`w-full h-28 object-cover rounded-lg mb-2.5 transition-shadow duration-200 ${
+            selected ? "ring-2 ring-primary/30" : ""
+          }`}
         />
       ) : (
         <div className="w-full h-24 bg-muted/40 rounded-lg mb-2.5 flex items-center justify-center">
