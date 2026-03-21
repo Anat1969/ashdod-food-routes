@@ -155,6 +155,34 @@ function FlyToSelected({
   return null;
 }
 
+/** On first mount, fit bounds to all markers so the initial view is meaningful */
+function FitBoundsOnMount({ trucks, offsets }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]> }) {
+  const map = useMap();
+  const [fitted, setFitted] = useState(false);
+
+  useEffect(() => {
+    if (fitted || trucks.length === 0) return;
+    const points = trucks
+      .filter(hasValidCoords)
+      .map((t) => {
+        const o = offsets[t.id] || [0, 0];
+        return L.latLng(Number(t.locations.lat) + o[0], Number(t.locations.lng) + o[1]);
+      });
+    if (points.length === 0) return;
+
+    const bounds = L.latLngBounds(points);
+    // Pad right side for the sidebar (288px)
+    map.fitBounds(bounds, {
+      paddingTopLeft: [20, 20],
+      paddingBottomRight: [300, 20],
+      maxZoom: INITIAL_ZOOM,
+    });
+    setFitted(true);
+  }, [trucks, fitted, map, offsets]);
+
+  return null;
+}
+
 export default function TruckMap({
   trucks,
   selectedTruckId,
