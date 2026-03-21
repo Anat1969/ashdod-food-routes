@@ -40,6 +40,10 @@ interface TruckMapProps {
   onSelectTruck: (truck: TruckWithLocation) => void;
   /** Increment to force re-emphasis (flyTo + popup) even if selectedTruckId hasn't changed */
   selectionKey?: number;
+  /** Override the zoom level used when flying to a selected marker */
+  selectionZoom?: number;
+  /** Override the max zoom when fitting all markers on first load */
+  initialZoom?: number;
 }
 
 export function hasValidCoords(
