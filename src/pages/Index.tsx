@@ -63,7 +63,7 @@ export default function Index() {
                 border border-primary-foreground/[0.1] text-sm font-medium
                 hover:bg-primary-foreground/[0.14] hover:text-primary-foreground transition-all duration-200"
             >
-              גלו את המפה
+              מפת כל הפודטראקים
             </Link>
           </div>
         </div>
@@ -112,13 +112,13 @@ export default function Index() {
 
           {/* Resident — soft cyan/teal */}
           <RoleCard
-            to="/map"
+            to="/advertisement"
             icon={UtensilsCrossed}
             accentHsl="195 60% 46%"
             title="תושב"
             subtitle="גילוי ומידע"
-            description="מפה אינטראקטיבית עם תפריטים, שעות פעילות ומיקומי עמדות"
-            ctaLabel="גלו עמדות במפה"
+            description="גלו עמדות אוכל, עיינו בתפריטים וצפו בתמונות — הכל במקום אחד"
+            ctaLabel="גלו עמדות"
           />
 
         </div>

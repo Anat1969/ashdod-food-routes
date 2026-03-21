@@ -112,9 +112,9 @@ export default function PublicMap() {
       <div className="bg-card border-b px-4 py-2.5 flex flex-col sm:flex-row items-center gap-2 z-10">
         <div className="flex items-center gap-2 flex-shrink-0">
           <MapPin className="h-4 w-4 text-primary" />
-          <span className="text-sm font-bold text-foreground">איתור מהיר</span>
+          <span className="text-sm font-bold text-foreground">מפת כל הפודטראקים</span>
           <span className="text-[11px] text-muted-foreground/60">·</span>
-          <span className="text-[11px] text-muted-foreground/60">{sortedFiltered.length} עמדות פעילות</span>
+          <span className="text-[11px] text-muted-foreground/60">{sortedFiltered.length} עמדות</span>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end">
           <div className="relative max-w-[220px]">
