@@ -130,11 +130,11 @@ function FlyToSelected({
     map.closePopup();
 
     // Fly to point, then pan to compensate for sidebar
-    const targetPoint = map.project([targetLat, targetLng], SELECTION_ZOOM);
+    const targetPoint = map.project([targetLat, targetLng], selectionZoom);
     const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
-    const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
+    const adjustedLatLng = map.unproject(adjustedPoint, selectionZoom);
 
-    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.5 });
+    map.flyTo(adjustedLatLng, selectionZoom, { duration: 0.5 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
