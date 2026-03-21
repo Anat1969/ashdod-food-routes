@@ -117,8 +117,8 @@ export default function Index() {
             accentHsl="195 60% 46%"
             title="תושב"
             subtitle="גילוי ומידע"
-            description="גלו עמדות אוכל, עיינו בתפריטים וצפו בתמונות — הכל במקום אחד"
-            ctaLabel="גלו עמדות"
+            description="צפו בעמדות אוכל מאושרות, עיינו בתפריטים וצפו בתמונות — הכל במקום אחד"
+            ctaLabel="מפת עמדות מאושרות"
           />
 
         </div>

@@ -108,7 +108,7 @@ const STEPS: Record<RoleKey, Step[]> = {
     { id: "r5", label: "תפריט ומחירים", icon: ClipboardList, desc: "תפריט מלא עם מחירים עדכניים", intersect: "מנוהל ע״י בעל העסק" },
     { id: "r6", label: "מיקום ושעות", icon: Map, desc: "כתובת, שכונה וימי פעילות" },
     { id: "r7", label: "אירועים מיוחדים", icon: Calendar, desc: "מבצעים ואירועים שמפרסם בעל העמדה", intersect: "פורסם ע״י בעל העסק", cta: { label: "לאירועים", to: "/map" } },
-    { id: "r8", label: "גלו עמדות", icon: Megaphone, desc: "תוכן שיווקי ומבצעים ממוקדים", cta: { label: "גלו עמדות", to: "/advertisement" } },
+    { id: "r8", label: "מפת עמדות מאושרות", icon: Megaphone, desc: "תוכן שיווקי ומבצעים ממוקדים", cta: { label: "מפת עמדות מאושרות", to: "/advertisement" } },
   ],
 };
 
