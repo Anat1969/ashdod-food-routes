@@ -229,6 +229,8 @@ export default function Advertisement() {
                 selectionKey={selectionKey}
                 selectionZoom={18}
                 initialZoom={17}
+                sidebarPosition="left"
+                sidebarWidth={400}
               />
             </div>
 

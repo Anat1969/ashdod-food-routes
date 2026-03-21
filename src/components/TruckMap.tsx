@@ -44,6 +44,10 @@ interface TruckMapProps {
   selectionZoom?: number;
   /** Override the max zoom when fitting all markers on first load */
   initialZoom?: number;
+  /** Which side the sidebar/list panel is on — controls offset direction. Default 'right' for /map layout. */
+  sidebarPosition?: "left" | "right";
+  /** Width of the sidebar in pixels — used for centering offset. Default 288. */
+  sidebarWidth?: number;
 }
 
 export function hasValidCoords(
@@ -77,7 +81,6 @@ const INITIAL_ZOOM = 16;
  * so they don't perfectly overlap and become indistinguishable.
  */
 function computeOffsets(trucks: TruckWithLocation[]): Record<string, [number, number]> {
-  // Group by coordinate key
   const groups: Record<string, string[]> = {};
   for (const t of trucks) {
     if (!hasValidCoords(t)) continue;
@@ -88,7 +91,6 @@ function computeOffsets(trucks: TruckWithLocation[]): Record<string, [number, nu
   const offsets: Record<string, [number, number]> = {};
   for (const ids of Object.values(groups)) {
     if (ids.length <= 1) continue;
-    // Spread markers in a tiny circle (~3m radius)
     const radius = 0.00003;
     ids.forEach((id, i) => {
       const angle = (2 * Math.PI * i) / ids.length;
@@ -104,12 +106,16 @@ function FlyToSelected({
   markerRefs,
   offsets,
   selectionZoom,
+  sidebarPosition,
+  sidebarWidth,
 }: {
   truck: TruckWithLocation | null | undefined;
   selectionKey: number;
   markerRefs: React.MutableRefObject<Record<string, L.Marker>>;
   offsets: Record<string, [number, number]>;
   selectionZoom: number;
+  sidebarPosition: "left" | "right";
+  sidebarWidth: number;
 }) {
   const map = useMap();
 
@@ -121,17 +127,20 @@ function FlyToSelected({
     const targetLat = Number(truck.locations.lat) + offset[0];
     const targetLng = Number(truck.locations.lng) + offset[1];
 
-    // Offset center slightly left (in screen space) to account for the right sidebar
-    // so the marker lands visually centered in the map area, not behind the list panel
+    // Offset center to account for sidebar so the marker lands visually centered
+    // in the available map area, not behind the list panel.
     const mapSize = map.getSize();
-    const sidebarPx = 288; // w-72 sidebar
-    const offsetX = mapSize.x > 800 ? sidebarPx / 2 : 0;
+    const halfSidebar = mapSize.x > 800 ? sidebarWidth / 2 : 0;
+    // Shift marker slightly below center so the popup (opens upward) stays in frame
+    const popupOffsetY = mapSize.y > 400 ? -40 : 0;
 
     map.closePopup();
 
-    // Fly to point, then pan to compensate for sidebar
     const targetPoint = map.project([targetLat, targetLng], selectionZoom);
-    const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
+    // 'right' sidebar → shift map center right so marker lands left of center (subtract X from marker perspective)
+    // 'left' sidebar → shift map center left so marker lands right of center (add X)
+    const offsetX = sidebarPosition === "right" ? -halfSidebar : halfSidebar;
+    const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y + popupOffsetY);
     const adjustedLatLng = map.unproject(adjustedPoint, selectionZoom);
 
     map.flyTo(adjustedLatLng, selectionZoom, { duration: 0.5 });
@@ -156,13 +165,25 @@ function FlyToSelected({
       clearTimeout(fallback);
       map.off("moveend", onMoveEnd);
     };
-  }, [truck?.id, selectionKey, map, offsets]);
+  }, [truck?.id, selectionKey, map, offsets, selectionZoom, sidebarPosition, sidebarWidth]);
 
   return null;
 }
 
 /** On first mount, fit bounds to all markers so the initial view is meaningful */
-function FitBoundsOnMount({ trucks, offsets, initialZoom }: { trucks: TruckWithLocation[]; offsets: Record<string, [number, number]>; initialZoom: number }) {
+function FitBoundsOnMount({
+  trucks,
+  offsets,
+  initialZoom,
+  sidebarPosition,
+  sidebarWidth,
+}: {
+  trucks: TruckWithLocation[];
+  offsets: Record<string, [number, number]>;
+  initialZoom: number;
+  sidebarPosition: "left" | "right";
+  sidebarWidth: number;
+}) {
   const map = useMap();
   const [fitted, setFitted] = useState(false);
 
@@ -177,14 +198,16 @@ function FitBoundsOnMount({ trucks, offsets, initialZoom }: { trucks: TruckWithL
     if (points.length === 0) return;
 
     const bounds = L.latLngBounds(points);
-    // Pad right side for the sidebar (288px)
+    const pad = sidebarWidth + 20;
+    const paddingLeft = sidebarPosition === "left" ? pad : 20;
+    const paddingRight = sidebarPosition === "right" ? pad : 20;
     map.fitBounds(bounds, {
-      paddingTopLeft: [20, 20],
-      paddingBottomRight: [300, 20],
+      paddingTopLeft: [paddingLeft, 20],
+      paddingBottomRight: [paddingRight, 20],
       maxZoom: initialZoom,
     });
     setFitted(true);
-  }, [trucks, fitted, map, offsets]);
+  }, [trucks, fitted, map, offsets, initialZoom, sidebarPosition, sidebarWidth]);
 
   return null;
 }
@@ -196,6 +219,8 @@ export default function TruckMap({
   selectionKey = 0,
   selectionZoom: selectionZoomProp,
   initialZoom: initialZoomProp,
+  sidebarPosition = "right",
+  sidebarWidth = 288,
 }: TruckMapProps) {
   const effectiveSelectionZoom = selectionZoomProp ?? SELECTION_ZOOM;
   const effectiveInitialZoom = initialZoomProp ?? INITIAL_ZOOM;
@@ -236,13 +261,21 @@ export default function TruckMap({
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <FitBoundsOnMount trucks={trucksWithCoords} offsets={offsets} initialZoom={effectiveInitialZoom} />
+      <FitBoundsOnMount
+        trucks={trucksWithCoords}
+        offsets={offsets}
+        initialZoom={effectiveInitialZoom}
+        sidebarPosition={sidebarPosition}
+        sidebarWidth={sidebarWidth}
+      />
       <FlyToSelected
         truck={selectedTruck}
         selectionKey={selectionKey}
         markerRefs={markerRefs}
         offsets={offsets}
         selectionZoom={effectiveSelectionZoom}
+        sidebarPosition={sidebarPosition}
+        sidebarWidth={sidebarWidth}
       />
 
       {/* Non-selected markers in cluster group */}
