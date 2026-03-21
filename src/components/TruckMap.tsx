@@ -128,7 +128,7 @@ function FlyToSelected({
     const adjustedPoint = L.point(targetPoint.x + offsetX, targetPoint.y);
     const adjustedLatLng = map.unproject(adjustedPoint, SELECTION_ZOOM);
 
-    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.6 });
+    map.flyTo(adjustedLatLng, SELECTION_ZOOM, { duration: 0.5 });
 
     // Open popup reliably after moveend, not just a timer
     const openPopup = () => {
