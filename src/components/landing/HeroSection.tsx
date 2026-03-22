@@ -49,56 +49,62 @@ export default function HeroSection() {
       </div>
 
       {/* ── Floating Screens Composition ── */}
-      <div className="relative container mx-auto px-4 pb-8 max-w-5xl">
-        <div className="relative mx-auto" style={{ height: "clamp(280px, 44vw, 460px)" }}>
+      <div className="relative mx-auto pb-6 md:pb-8" style={{ maxWidth: "1100px" }}>
+        <div
+          className="relative mx-auto"
+          style={{ height: "clamp(260px, 40vw, 420px)", perspective: "2200px" }}
+        >
 
-          {/* Secondary screen — LEFT/back: Approved Locations */}
+          {/* Secondary screen — LEFT/back: Approved Locations — cropped aggressively by left edge */}
           <div
             className="absolute rounded-xl overflow-hidden"
             style={{
-              width: "42%",
-              height: "78%",
-              top: "12%",
-              left: "-4%",
-              transform: "perspective(1800px) rotateY(-6deg) scale(0.88)",
-              zIndex: 2,
-              boxShadow: "0 16px 60px rgba(0,0,0,0.25), 0 6px 20px rgba(0,0,0,0.15)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              filter: "brightness(0.92)",
+              width: "38%",
+              height: "72%",
+              top: "18%",
+              left: "-8%",
+              transform: "rotateY(8deg) rotateZ(-1deg) scale(0.82)",
+              transformOrigin: "center center",
+              zIndex: 1,
+              boxShadow: "0 20px 50px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.12)",
+              border: "1px solid rgba(255,255,255,0.05)",
+              filter: "brightness(0.85) saturate(0.9)",
             }}
           >
             <ApprovedScreen />
           </div>
 
-          {/* Secondary screen — RIGHT/back: Municipal Dashboard */}
+          {/* Secondary screen — RIGHT/back: Municipal Dashboard — slightly less cropped for asymmetry */}
           <div
             className="absolute rounded-xl overflow-hidden"
             style={{
-              width: "42%",
-              height: "78%",
-              top: "12%",
-              right: "-4%",
-              transform: "perspective(1800px) rotateY(6deg) scale(0.88)",
+              width: "40%",
+              height: "76%",
+              top: "14%",
+              right: "-5%",
+              transform: "rotateY(-7deg) rotateZ(0.5deg) scale(0.84)",
+              transformOrigin: "center center",
               zIndex: 2,
-              boxShadow: "0 16px 60px rgba(0,0,0,0.25), 0 6px 20px rgba(0,0,0,0.15)",
+              boxShadow: "0 22px 55px rgba(0,0,0,0.22), 0 8px 22px rgba(0,0,0,0.14)",
               border: "1px solid rgba(255,255,255,0.06)",
-              filter: "brightness(0.92)",
+              filter: "brightness(0.88) saturate(0.92)",
             }}
           >
             <DashboardScreen />
           </div>
 
-          {/* Main screen — CENTER/front: All Food Trucks Map */}
+          {/* Main screen — CENTER/front: All Food Trucks Map — dominant but not oversized */}
           <div
             className="absolute rounded-2xl overflow-hidden"
             style={{
-              width: "52%",
+              width: "46%",
               height: "100%",
               top: "0",
               left: "50%",
-              transform: "translateX(-50%)",
+              transform: "translateX(-50%) translateZ(40px)",
               zIndex: 10,
-              boxShadow: "0 25px 80px rgba(0,0,0,0.45), 0 10px 30px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1), 0 0 100px rgba(0,0,0,0.15)",
+              boxShadow:
+                "0 30px 80px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
             }}
           >
             <MapScreen />
