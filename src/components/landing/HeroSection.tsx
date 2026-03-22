@@ -1,11 +1,28 @@
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 
 export default function HeroSection() {
   const compRef = useRef<HTMLDivElement>(null);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState<null | "center" | "left" | "right">(null);
+  const [idle, setIdle] = useState({ x: 0, y: 0 });
+
+  // Gentle idle breathing
+  useEffect(() => {
+    let frame: number;
+    let t = 0;
+    const tick = () => {
+      t += 0.008;
+      setIdle({
+        x: Math.sin(t * 0.7) * 0.06,
+        y: Math.cos(t * 0.5) * 0.04,
+      });
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, []);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     const rect = compRef.current?.getBoundingClientRect();
@@ -20,22 +37,28 @@ export default function HeroSection() {
     setHovered(null);
   }, []);
 
+  // Combined mouse + idle
+  const mx = mouse.x || idle.x;
+  const my = mouse.y || idle.y;
+
   // Parallax multipliers — rear screens move more
-  const centerTx = mouse.x * -4;
-  const centerTy = mouse.y * -2;
-  const leftTx = mouse.x * -10;
-  const leftTy = mouse.y * -5;
-  const rightTx = mouse.x * -8;
-  const rightTy = mouse.y * -4;
+  const centerTx = mx * -5;
+  const centerTy = my * -3;
+  const leftTx = mx * -12;
+  const leftTy = my * -6;
+  const rightTx = mx * -10;
+  const rightTy = my * -5;
 
-  // Hover lift
-  const liftCenter = hovered === "center" ? -4 : 0;
-  const liftLeft = hovered === "left" ? -5 : 0;
-  const liftRight = hovered === "right" ? -5 : 0;
+  // Hover lift & scale
+  const liftCenter = hovered === "center" ? -5 : 0;
+  const liftLeft = hovered === "left" ? -6 : 0;
+  const liftRight = hovered === "right" ? -6 : 0;
 
-  const scaleCenter = hovered === "center" ? 1.012 : 1;
-  const scaleLeft = hovered === "left" ? 1.018 : 1;
-  const scaleRight = hovered === "right" ? 1.018 : 1;
+  const scaleCenter = hovered === "center" ? 1.015 : 1;
+  const scaleLeft = hovered === "left" ? 1.02 : 1;
+  const scaleRight = hovered === "right" ? 1.02 : 1;
+
+  const transition = "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease";
 
   return (
     <section className="premium-hero-luxe text-primary-foreground relative overflow-hidden">
@@ -58,27 +81,27 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-14 pb-8 md:pt-20 md:pb-10 text-center max-w-3xl">
+      <div className="relative container mx-auto px-4 pt-16 pb-6 md:pt-24 md:pb-8 text-center max-w-3xl">
         {/* Kicker */}
-        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-5 uppercase font-medium">
+        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-6 uppercase font-medium">
           עיריית אשדוד · הנדסה ותכנון עירוני
         </p>
 
         {/* Main headline */}
-        <h1 className="text-[1.75rem] md:text-[2.75rem] font-extrabold mb-1.5 leading-[1.1] tracking-tight">
+        <h1 className="text-[1.75rem] md:text-[2.75rem] font-extrabold mb-2 leading-[1.1] tracking-tight">
           מערכת חכמה לניהול עמדות מזון
         </h1>
-        <p className="text-[1.25rem] md:text-[1.75rem] font-bold text-primary-foreground/60 mb-5 leading-tight">
+        <p className="text-[1.25rem] md:text-[1.75rem] font-bold text-primary-foreground/60 mb-6 leading-tight">
           במרחב הציבורי של אשדוד
         </p>
 
         {/* Gold accent divider */}
-        <div className="flex justify-center mb-5">
+        <div className="flex justify-center mb-6">
           <div className="h-[2px] w-12 rounded-full" style={{ background: "hsl(39 75% 55% / 0.45)" }} />
         </div>
 
         {/* Supporting line */}
-        <p className="text-[13px] md:text-[15px] text-primary-foreground/35 leading-relaxed max-w-lg mx-auto">
+        <p className="text-[13px] md:text-[15px] text-primary-foreground/35 leading-relaxed max-w-lg mx-auto mb-2">
           הגשה, בחינה, אישור, מיפוי וגילוי מיקומים — במערכת אחת ברורה, שקופה ומתקדמת
         </p>
       </div>
@@ -86,14 +109,14 @@ export default function HeroSection() {
       {/* ── Floating Screens Composition ── */}
       <div
         ref={compRef}
-        className="relative mx-auto pb-6 md:pb-8"
+        className="relative mx-auto pb-4 md:pb-6"
         style={{ maxWidth: "1100px" }}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
       >
         <div
           className="relative mx-auto"
-          style={{ height: "clamp(260px, 40vw, 420px)", perspective: "2200px" }}
+          style={{ height: "clamp(260px, 40vw, 420px)", perspective: "2400px" }}
         >
 
           {/* Secondary screen — LEFT/back: Approved Locations */}
@@ -102,19 +125,19 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("left")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "38%",
-              height: "72%",
-              top: "18%",
-              left: "-8%",
-              transform: `rotateY(8deg) rotateZ(-1deg) scale(${0.82 * scaleLeft}) translate(${leftTx}px, ${leftTy + liftLeft}px)`,
+              width: "36%",
+              height: "70%",
+              top: "20%",
+              left: "-9%",
+              transform: `rotateY(8deg) rotateZ(-1.2deg) scale(${0.8 * scaleLeft}) translate(${leftTx}px, ${leftTy + liftLeft}px)`,
               transformOrigin: "center center",
               zIndex: 1,
               boxShadow: hovered === "left"
-                ? "0 28px 65px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.18)"
-                : "0 20px 50px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.12)",
+                ? "0 30px 70px rgba(0,0,0,0.32), 0 14px 30px rgba(0,0,0,0.2)"
+                : "0 20px 50px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.12)",
               border: "1px solid rgba(255,255,255,0.05)",
-              filter: "brightness(0.85) saturate(0.9)",
-              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+              filter: hovered === "left" ? "brightness(0.9) saturate(0.95)" : "brightness(0.83) saturate(0.88)",
+              transition,
               willChange: "transform",
             }}
           >
@@ -127,19 +150,19 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("right")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "40%",
-              height: "76%",
-              top: "14%",
-              right: "-5%",
-              transform: `rotateY(-7deg) rotateZ(0.5deg) scale(${0.84 * scaleRight}) translate(${rightTx}px, ${rightTy + liftRight}px)`,
+              width: "38%",
+              height: "74%",
+              top: "16%",
+              right: "-6%",
+              transform: `rotateY(-7deg) rotateZ(0.8deg) scale(${0.82 * scaleRight}) translate(${rightTx}px, ${rightTy + liftRight}px)`,
               transformOrigin: "center center",
               zIndex: 2,
               boxShadow: hovered === "right"
-                ? "0 30px 68px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.18)"
-                : "0 22px 55px rgba(0,0,0,0.22), 0 8px 22px rgba(0,0,0,0.14)",
+                ? "0 32px 72px rgba(0,0,0,0.3), 0 14px 30px rgba(0,0,0,0.2)"
+                : "0 22px 55px rgba(0,0,0,0.24), 0 8px 22px rgba(0,0,0,0.14)",
               border: "1px solid rgba(255,255,255,0.06)",
-              filter: "brightness(0.88) saturate(0.92)",
-              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+              filter: hovered === "right" ? "brightness(0.92) saturate(0.96)" : "brightness(0.86) saturate(0.9)",
+              transition,
               willChange: "transform",
             }}
           >
@@ -152,16 +175,16 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("center")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "46%",
+              width: "44%",
               height: "100%",
               top: "0",
               left: "50%",
-              transform: `translateX(-50%) translateZ(40px) scale(${scaleCenter}) translate(${centerTx}px, ${centerTy + liftCenter}px)`,
+              transform: `translateX(-50%) translateZ(50px) scale(${scaleCenter}) translate(${centerTx}px, ${centerTy + liftCenter}px)`,
               zIndex: 10,
               boxShadow: hovered === "center"
-                ? "0 35px 90px rgba(0,0,0,0.55), 0 15px 38px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
-                : "0 30px 80px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
-              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+                ? "0 40px 100px rgba(0,0,0,0.55), 0 18px 42px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.14), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 32px 85px rgba(0,0,0,0.5), 0 14px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
+              transition,
               willChange: "transform",
             }}
           >
@@ -172,7 +195,7 @@ export default function HeroSection() {
       </div>
 
       {/* Hero CTA */}
-      <div className="relative container mx-auto px-4 pt-6 pb-14 md:pb-20 text-center">
+      <div className="relative container mx-auto px-4 pt-8 pb-16 md:pt-10 md:pb-24 text-center">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/journey"
@@ -194,8 +217,12 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Bottom fade */}
-      <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-background to-transparent" />
+      {/* Bottom fade — refined transition */}
+      <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none"
+        style={{
+          background: "linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.7) 40%, transparent 100%)"
+        }}
+      />
     </section>
   );
 }
@@ -244,7 +271,6 @@ function MapScreen() {
         </div>
         {/* Map area */}
         <div className="flex-1 relative overflow-hidden" style={{ background: "hsl(216 28% 91%)" }}>
-          {/* Roads grid */}
           <div className="absolute inset-0">
             {["28%","48%","70%"].map((t,i) => (
               <div key={`h${i}`} className="absolute w-full h-[1.5px]" style={{ top: t, background: "hsl(216 18% 83%)" }} />
@@ -252,13 +278,11 @@ function MapScreen() {
             {["22%","50%","75%"].map((r,i) => (
               <div key={`v${i}`} className="absolute h-full w-[1.5px]" style={{ right: r, background: "hsl(216 18% 83%)" }} />
             ))}
-            {/* Building blocks */}
             <div className="absolute rounded-[2px]" style={{ top: "6%", right: "25%", width: "20%", height: "18%", background: "hsl(216 22% 87%)" }} />
             <div className="absolute rounded-[2px]" style={{ top: "32%", right: "54%", width: "16%", height: "13%", background: "hsl(216 22% 87%)" }} />
             <div className="absolute rounded-[2px]" style={{ top: "52%", right: "8%", width: "11%", height: "14%", background: "hsl(216 22% 86%)" }} />
             <div className="absolute rounded-[2px]" style={{ top: "74%", right: "30%", width: "18%", height: "10%", background: "hsl(216 22% 88%)" }} />
           </div>
-          {/* Pins */}
           {[
             { t: "20%", r: "30%", c: "hsl(39 80% 52%)", s: 11, selected: true },
             { t: "40%", r: "60%", c: "hsl(142 70% 40%)", s: 9, selected: false },
@@ -279,7 +303,6 @@ function MapScreen() {
                     : `0 2px 5px ${pin.c.replace(")", " / 0.35)")}`,
                 }}
               />
-              {/* Popup on selected */}
               {pin.selected && (
                 <div className="absolute -top-[28px] left-1/2 -translate-x-1/2 rounded bg-white shadow-lg px-2 py-1 whitespace-nowrap"
                   style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
@@ -290,12 +313,10 @@ function MapScreen() {
               )}
             </div>
           ))}
-          {/* Zoom controls */}
           <div className="absolute bottom-2 left-2 flex flex-col gap-0.5">
             <div className="w-[14px] h-[14px] rounded bg-white/90 flex items-center justify-center text-[7px] font-bold shadow-sm" style={{ color: "hsl(216 59% 26%)" }}>+</div>
             <div className="w-[14px] h-[14px] rounded bg-white/90 flex items-center justify-center text-[7px] font-bold shadow-sm" style={{ color: "hsl(216 59% 26%)" }}>−</div>
           </div>
-          {/* Attribution bar */}
           <div className="absolute bottom-0 inset-x-0 h-3 bg-white/60 flex items-center px-1.5">
             <div className="h-[3px] w-8 rounded bg-black/10" />
           </div>
@@ -311,7 +332,6 @@ function DashboardScreen() {
     <div className="w-full h-full flex flex-col" style={{ background: "hsl(216 59% 15%)" }}>
       <TitleBar title="לוח בקרה עירוני" />
       <div className="flex-1 p-2 md:p-2.5 space-y-1.5 overflow-hidden">
-        {/* KPI row */}
         <div className="flex gap-1.5">
           {[
             { label: "ממתינות", value: "12", clr: "hsl(39 80% 52%)" },
@@ -324,7 +344,6 @@ function DashboardScreen() {
             </div>
           ))}
         </div>
-        {/* Progress bar */}
         <div className="space-y-0.5">
           <div className="flex justify-between">
             <span className="text-[6px] text-white/25">אחוז אישור</span>
@@ -334,7 +353,6 @@ function DashboardScreen() {
             <div className="h-full rounded-full" style={{ width: "65%", background: "linear-gradient(90deg, hsl(39 80% 52% / 0.6), hsl(39 80% 52% / 0.3))" }} />
           </div>
         </div>
-        {/* Table rows */}
         <div className="rounded-lg border border-white/[0.06] overflow-hidden">
           <div className="flex items-center px-2 py-1 bg-white/[0.04] border-b border-white/[0.04]">
             <span className="text-[6px] text-white/25 flex-1">שם</span>
@@ -353,7 +371,6 @@ function DashboardScreen() {
             </div>
           ))}
         </div>
-        {/* Action buttons */}
         <div className="flex gap-1">
           <div className="flex-1 h-4 rounded bg-white/[0.05] border border-white/[0.06] flex items-center justify-center">
             <span className="text-[5px] text-white/30">סינון</span>
@@ -373,7 +390,6 @@ function ApprovedScreen() {
     <div className="w-full h-full flex flex-col" style={{ background: "hsl(216 59% 15%)" }}>
       <TitleBar title="מפת עמדות מאושרות" />
       <div className="flex-1 p-2 md:p-2.5 space-y-1.5 overflow-hidden">
-        {/* Stats bar */}
         <div className="flex gap-1.5">
           <div className="flex-1 rounded bg-white/[0.05] border border-white/[0.06] px-2 py-1 text-center">
             <div className="text-[9px] md:text-[11px] font-bold" style={{ color: "hsl(142 70% 40%)" }}>28</div>
@@ -384,14 +400,12 @@ function ApprovedScreen() {
             <div className="text-[5px] md:text-[6px] text-white/25">אזורים</div>
           </div>
         </div>
-        {/* Location cards */}
         {[
           { name: "חוף לידו", zone: "אזור החוף", active: true },
           { name: "פארק אשדוד ים", zone: "פארקים", active: true },
           { name: "שד׳ בן גוריון", zone: "מרכז העיר", active: false },
         ].map((loc, i) => (
           <div key={i} className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-1.5 flex gap-1.5">
-            {/* Thumbnail */}
             <div className="w-8 h-6 rounded flex-shrink-0 overflow-hidden" style={{ background: "hsl(216 20% 80%)" }}>
               <div className="w-full h-full" style={{
                 background: i === 0
