@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import { useRef, useState, useCallback, useEffect } from "react";
+import heroMapAshdod from "@/assets/hero-map-ashdod.png";
 
 export default function HeroSection() {
   const compRef = useRef<HTMLDivElement>(null);
