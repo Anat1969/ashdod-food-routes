@@ -271,26 +271,19 @@ function MapScreen() {
           ))}
         </div>
         {/* Map area */}
-        <div className="flex-1 relative overflow-hidden" style={{ background: "hsl(216 28% 91%)" }}>
-          <div className="absolute inset-0">
-            {["28%","48%","70%"].map((t,i) => (
-              <div key={`h${i}`} className="absolute w-full h-[1.5px]" style={{ top: t, background: "hsl(216 18% 83%)" }} />
-            ))}
-            {["22%","50%","75%"].map((r,i) => (
-              <div key={`v${i}`} className="absolute h-full w-[1.5px]" style={{ right: r, background: "hsl(216 18% 83%)" }} />
-            ))}
-            <div className="absolute rounded-[2px]" style={{ top: "6%", right: "25%", width: "20%", height: "18%", background: "hsl(216 22% 87%)" }} />
-            <div className="absolute rounded-[2px]" style={{ top: "32%", right: "54%", width: "16%", height: "13%", background: "hsl(216 22% 87%)" }} />
-            <div className="absolute rounded-[2px]" style={{ top: "52%", right: "8%", width: "11%", height: "14%", background: "hsl(216 22% 86%)" }} />
-            <div className="absolute rounded-[2px]" style={{ top: "74%", right: "30%", width: "18%", height: "10%", background: "hsl(216 22% 88%)" }} />
-          </div>
+        <div className="flex-1 relative overflow-hidden">
+          <img
+            src={heroMapAshdod}
+            alt="מפת אשדוד"
+            className="absolute inset-0 w-full h-full object-cover"
+            draggable={false}
+          />
+          {/* Overlay pins */}
           {[
-            { t: "20%", r: "30%", c: "hsl(39 80% 52%)", s: 11, selected: true },
-            { t: "40%", r: "60%", c: "hsl(142 70% 40%)", s: 9, selected: false },
-            { t: "62%", r: "18%", c: "hsl(200 80% 50%)", s: 9, selected: false },
-            { t: "28%", r: "74%", c: "hsl(39 80% 52%)", s: 10, selected: false },
-            { t: "70%", r: "50%", c: "hsl(142 70% 40%)", s: 8, selected: false },
-            { t: "48%", r: "38%", c: "hsl(216 59% 35%)", s: 8, selected: false },
+            { t: "32%", r: "42%", c: "hsl(0 70% 50%)", s: 11, selected: true },
+            { t: "55%", r: "25%", c: "hsl(39 80% 52%)", s: 9, selected: false },
+            { t: "22%", r: "60%", c: "hsl(142 70% 40%)", s: 9, selected: false },
+            { t: "68%", r: "55%", c: "hsl(200 80% 50%)", s: 8, selected: false },
           ].map((pin, i) => (
             <div key={i} className="absolute" style={{ top: pin.t, right: pin.r }}>
               <div
@@ -317,9 +310,6 @@ function MapScreen() {
           <div className="absolute bottom-2 left-2 flex flex-col gap-0.5">
             <div className="w-[14px] h-[14px] rounded bg-white/90 flex items-center justify-center text-[7px] font-bold shadow-sm" style={{ color: "hsl(216 59% 26%)" }}>+</div>
             <div className="w-[14px] h-[14px] rounded bg-white/90 flex items-center justify-center text-[7px] font-bold shadow-sm" style={{ color: "hsl(216 59% 26%)" }}>−</div>
-          </div>
-          <div className="absolute bottom-0 inset-x-0 h-3 bg-white/60 flex items-center px-1.5">
-            <div className="h-[3px] w-8 rounded bg-black/10" />
           </div>
         </div>
       </div>
