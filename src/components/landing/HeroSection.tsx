@@ -1,7 +1,42 @@
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
+import { useRef, useState, useCallback } from "react";
 
 export default function HeroSection() {
+  const compRef = useRef<HTMLDivElement>(null);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const [hovered, setHovered] = useState<null | "center" | "left" | "right">(null);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    const rect = compRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    setMouse({ x, y });
+  }, []);
+
+  const handlePointerLeave = useCallback(() => {
+    setMouse({ x: 0, y: 0 });
+    setHovered(null);
+  }, []);
+
+  // Parallax multipliers — rear screens move more
+  const centerTx = mouse.x * -4;
+  const centerTy = mouse.y * -2;
+  const leftTx = mouse.x * -10;
+  const leftTy = mouse.y * -5;
+  const rightTx = mouse.x * -8;
+  const rightTy = mouse.y * -4;
+
+  // Hover lift
+  const liftCenter = hovered === "center" ? -4 : 0;
+  const liftLeft = hovered === "left" ? -5 : 0;
+  const liftRight = hovered === "right" ? -5 : 0;
+
+  const scaleCenter = hovered === "center" ? 1.012 : 1;
+  const scaleLeft = hovered === "left" ? 1.018 : 1;
+  const scaleRight = hovered === "right" ? 1.018 : 1;
+
   return (
     <section className="premium-hero-luxe text-primary-foreground relative overflow-hidden">
       {/* Ambient light layers */}
@@ -49,62 +84,85 @@ export default function HeroSection() {
       </div>
 
       {/* ── Floating Screens Composition ── */}
-      <div className="relative mx-auto pb-6 md:pb-8" style={{ maxWidth: "1100px" }}>
+      <div
+        ref={compRef}
+        className="relative mx-auto pb-6 md:pb-8"
+        style={{ maxWidth: "1100px" }}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
+      >
         <div
           className="relative mx-auto"
           style={{ height: "clamp(260px, 40vw, 420px)", perspective: "2200px" }}
         >
 
-          {/* Secondary screen — LEFT/back: Approved Locations — cropped aggressively by left edge */}
+          {/* Secondary screen — LEFT/back: Approved Locations */}
           <div
             className="absolute rounded-xl overflow-hidden"
+            onPointerEnter={() => setHovered("left")}
+            onPointerLeave={() => setHovered(null)}
             style={{
               width: "38%",
               height: "72%",
               top: "18%",
               left: "-8%",
-              transform: "rotateY(8deg) rotateZ(-1deg) scale(0.82)",
+              transform: `rotateY(8deg) rotateZ(-1deg) scale(${0.82 * scaleLeft}) translate(${leftTx}px, ${leftTy + liftLeft}px)`,
               transformOrigin: "center center",
               zIndex: 1,
-              boxShadow: "0 20px 50px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.12)",
+              boxShadow: hovered === "left"
+                ? "0 28px 65px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.18)"
+                : "0 20px 50px rgba(0,0,0,0.2), 0 8px 20px rgba(0,0,0,0.12)",
               border: "1px solid rgba(255,255,255,0.05)",
               filter: "brightness(0.85) saturate(0.9)",
+              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+              willChange: "transform",
             }}
           >
             <ApprovedScreen />
           </div>
 
-          {/* Secondary screen — RIGHT/back: Municipal Dashboard — slightly less cropped for asymmetry */}
+          {/* Secondary screen — RIGHT/back: Municipal Dashboard */}
           <div
             className="absolute rounded-xl overflow-hidden"
+            onPointerEnter={() => setHovered("right")}
+            onPointerLeave={() => setHovered(null)}
             style={{
               width: "40%",
               height: "76%",
               top: "14%",
               right: "-5%",
-              transform: "rotateY(-7deg) rotateZ(0.5deg) scale(0.84)",
+              transform: `rotateY(-7deg) rotateZ(0.5deg) scale(${0.84 * scaleRight}) translate(${rightTx}px, ${rightTy + liftRight}px)`,
               transformOrigin: "center center",
               zIndex: 2,
-              boxShadow: "0 22px 55px rgba(0,0,0,0.22), 0 8px 22px rgba(0,0,0,0.14)",
+              boxShadow: hovered === "right"
+                ? "0 30px 68px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.18)"
+                : "0 22px 55px rgba(0,0,0,0.22), 0 8px 22px rgba(0,0,0,0.14)",
               border: "1px solid rgba(255,255,255,0.06)",
               filter: "brightness(0.88) saturate(0.92)",
+              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+              willChange: "transform",
             }}
           >
             <DashboardScreen />
           </div>
 
-          {/* Main screen — CENTER/front: All Food Trucks Map — dominant but not oversized */}
+          {/* Main screen — CENTER/front: All Food Trucks Map */}
           <div
             className="absolute rounded-2xl overflow-hidden"
+            onPointerEnter={() => setHovered("center")}
+            onPointerLeave={() => setHovered(null)}
             style={{
               width: "46%",
               height: "100%",
               top: "0",
               left: "50%",
-              transform: "translateX(-50%) translateZ(40px)",
+              transform: `translateX(-50%) translateZ(40px) scale(${scaleCenter}) translate(${centerTx}px, ${centerTy + liftCenter}px)`,
               zIndex: 10,
-              boxShadow:
-                "0 30px 80px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
+              boxShadow: hovered === "center"
+                ? "0 35px 90px rgba(0,0,0,0.55), 0 15px 38px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.08)"
+                : "0 30px 80px rgba(0,0,0,0.5), 0 12px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
+              transition: "transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease",
+              willChange: "transform",
             }}
           >
             <MapScreen />
