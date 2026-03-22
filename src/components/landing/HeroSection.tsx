@@ -14,10 +14,10 @@ export default function HeroSection() {
     let frame: number;
     let t = 0;
     const tick = () => {
-      t += 0.008;
+      t += 0.006;
       setIdle({
-        x: Math.sin(t * 0.7) * 0.06,
-        y: Math.cos(t * 0.5) * 0.04,
+        x: Math.sin(t * 0.7) * 0.08,
+        y: Math.cos(t * 0.5) * 0.05,
       });
       frame = requestAnimationFrame(tick);
     };
@@ -38,28 +38,27 @@ export default function HeroSection() {
     setHovered(null);
   }, []);
 
-  // Combined mouse + idle
   const mx = mouse.x || idle.x;
   const my = mouse.y || idle.y;
 
-  // Parallax multipliers — rear screens move more
-  const centerTx = mx * -5;
-  const centerTy = my * -3;
-  const leftTx = mx * -12;
-  const leftTy = my * -6;
-  const rightTx = mx * -10;
-  const rightTy = my * -5;
+  // Stronger parallax — rear screens move significantly more
+  const centerTx = mx * -6;
+  const centerTy = my * -3.5;
+  const leftTx = mx * -16;
+  const leftTy = my * -8;
+  const rightTx = mx * -14;
+  const rightTy = my * -7;
 
-  // Hover lift & scale
-  const liftCenter = hovered === "center" ? -5 : 0;
-  const liftLeft = hovered === "left" ? -6 : 0;
-  const liftRight = hovered === "right" ? -6 : 0;
+  // Stronger hover lift & scale
+  const liftCenter = hovered === "center" ? -7 : 0;
+  const liftLeft = hovered === "left" ? -9 : 0;
+  const liftRight = hovered === "right" ? -9 : 0;
 
-  const scaleCenter = hovered === "center" ? 1.015 : 1;
-  const scaleLeft = hovered === "left" ? 1.02 : 1;
-  const scaleRight = hovered === "right" ? 1.02 : 1;
+  const scaleCenter = hovered === "center" ? 1.018 : 1;
+  const scaleLeft = hovered === "left" ? 1.03 : 1;
+  const scaleRight = hovered === "right" ? 1.03 : 1;
 
-  const transition = "transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease";
+  const transition = "transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1), filter 0.55s ease";
 
   return (
     <section className="premium-hero-luxe text-primary-foreground relative overflow-hidden">
@@ -74,7 +73,7 @@ export default function HeroSection() {
           style={{ background: "radial-gradient(circle, hsl(216 59% 60%) 0%, transparent 70%)" }}
         />
         <div
-          className="absolute inset-0 opacity-[0.018]"
+          className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
@@ -82,27 +81,27 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative container mx-auto px-4 pt-16 pb-6 md:pt-24 md:pb-8 text-center max-w-3xl">
+      <div className="relative container mx-auto px-4 pt-16 pb-4 md:pt-24 md:pb-6 text-center max-w-3xl">
         {/* Kicker */}
-        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/30 mb-6 uppercase font-medium">
+        <p className="text-[10px] tracking-[0.35em] text-primary-foreground/25 mb-7 uppercase font-medium">
           עיריית אשדוד · הנדסה ותכנון עירוני
         </p>
 
         {/* Main headline */}
-        <h1 className="text-[1.75rem] md:text-[2.75rem] font-extrabold mb-2 leading-[1.1] tracking-tight">
+        <h1 className="text-[1.75rem] md:text-[2.75rem] font-extrabold mb-2.5 leading-[1.08] tracking-tight">
           מערכת חכמה לניהול עמדות מזון
         </h1>
-        <p className="text-[1.25rem] md:text-[1.75rem] font-bold text-primary-foreground/60 mb-6 leading-tight">
+        <p className="text-[1.2rem] md:text-[1.65rem] font-bold text-primary-foreground/55 mb-7 leading-tight">
           במרחב הציבורי של אשדוד
         </p>
 
         {/* Gold accent divider */}
-        <div className="flex justify-center mb-6">
-          <div className="h-[2px] w-12 rounded-full" style={{ background: "hsl(39 75% 55% / 0.45)" }} />
+        <div className="flex justify-center mb-7">
+          <div className="h-[2px] w-10 rounded-full" style={{ background: "hsl(39 75% 55% / 0.4)" }} />
         </div>
 
         {/* Supporting line */}
-        <p className="text-[13px] md:text-[15px] text-primary-foreground/35 leading-relaxed max-w-lg mx-auto mb-2">
+        <p className="text-[13px] md:text-[14px] text-primary-foreground/30 leading-[1.8] max-w-md mx-auto mb-2">
           הגשה, בחינה, אישור, מיפוי וגילוי מיקומים — במערכת אחת ברורה, שקופה ומתקדמת
         </p>
       </div>
@@ -110,14 +109,14 @@ export default function HeroSection() {
       {/* ── Floating Screens Composition ── */}
       <div
         ref={compRef}
-        className="relative mx-auto pb-4 md:pb-6"
-        style={{ maxWidth: "1100px" }}
+        className="relative mx-auto pb-2 md:pb-4"
+        style={{ maxWidth: "1060px" }}
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
       >
         <div
           className="relative mx-auto"
-          style={{ height: "clamp(260px, 40vw, 420px)", perspective: "2400px" }}
+          style={{ height: "clamp(240px, 38vw, 400px)", perspective: "2200px" }}
         >
 
           {/* Secondary screen — LEFT/back: Approved Locations */}
@@ -126,18 +125,19 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("left")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "36%",
-              height: "70%",
-              top: "20%",
-              left: "-9%",
-              transform: `rotateY(8deg) rotateZ(-1.2deg) scale(${0.8 * scaleLeft}) translate(${leftTx}px, ${leftTy + liftLeft}px)`,
+              width: "34%",
+              height: "65%",
+              top: "24%",
+              left: "-6%",
+              clipPath: "inset(0 0 0 8% round 12px)",
+              transform: `rotateY(10deg) rotateZ(-1.5deg) scale(${0.78 * scaleLeft}) translate(${leftTx}px, ${leftTy + liftLeft}px)`,
               transformOrigin: "center center",
               zIndex: 1,
               boxShadow: hovered === "left"
-                ? "0 30px 70px rgba(0,0,0,0.32), 0 14px 30px rgba(0,0,0,0.2)"
-                : "0 20px 50px rgba(0,0,0,0.22), 0 8px 20px rgba(0,0,0,0.12)",
-              border: "1px solid rgba(255,255,255,0.05)",
-              filter: hovered === "left" ? "brightness(0.9) saturate(0.95)" : "brightness(0.83) saturate(0.88)",
+                ? "0 35px 80px rgba(0,0,0,0.38), 0 16px 35px rgba(0,0,0,0.22)"
+                : "0 22px 55px rgba(0,0,0,0.26), 0 10px 24px rgba(0,0,0,0.14)",
+              border: "1px solid rgba(255,255,255,0.04)",
+              filter: hovered === "left" ? "brightness(0.88) saturate(0.94)" : "brightness(0.78) saturate(0.85)",
               transition,
               willChange: "transform",
             }}
@@ -151,18 +151,19 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("right")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "38%",
-              height: "74%",
-              top: "16%",
-              right: "-6%",
-              transform: `rotateY(-7deg) rotateZ(0.8deg) scale(${0.82 * scaleRight}) translate(${rightTx}px, ${rightTy + liftRight}px)`,
+              width: "36%",
+              height: "68%",
+              top: "20%",
+              right: "-4%",
+              clipPath: "inset(0 8% 0 0 round 12px)",
+              transform: `rotateY(-9deg) rotateZ(1deg) scale(${0.8 * scaleRight}) translate(${rightTx}px, ${rightTy + liftRight}px)`,
               transformOrigin: "center center",
               zIndex: 2,
               boxShadow: hovered === "right"
-                ? "0 32px 72px rgba(0,0,0,0.3), 0 14px 30px rgba(0,0,0,0.2)"
-                : "0 22px 55px rgba(0,0,0,0.24), 0 8px 22px rgba(0,0,0,0.14)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              filter: hovered === "right" ? "brightness(0.92) saturate(0.96)" : "brightness(0.86) saturate(0.9)",
+                ? "0 36px 82px rgba(0,0,0,0.35), 0 16px 34px rgba(0,0,0,0.22)"
+                : "0 24px 60px rgba(0,0,0,0.28), 0 10px 26px rgba(0,0,0,0.16)",
+              border: "1px solid rgba(255,255,255,0.05)",
+              filter: hovered === "right" ? "brightness(0.9) saturate(0.95)" : "brightness(0.8) saturate(0.87)",
               transition,
               willChange: "transform",
             }}
@@ -176,15 +177,15 @@ export default function HeroSection() {
             onPointerEnter={() => setHovered("center")}
             onPointerLeave={() => setHovered(null)}
             style={{
-              width: "44%",
-              height: "100%",
-              top: "0",
+              width: "40%",
+              height: "95%",
+              top: "2%",
               left: "50%",
-              transform: `translateX(-50%) translateZ(50px) scale(${scaleCenter}) translate(${centerTx}px, ${centerTy + liftCenter}px)`,
+              transform: `translateX(-50%) translateZ(60px) scale(${scaleCenter}) translate(${centerTx}px, ${centerTy + liftCenter}px)`,
               zIndex: 10,
               boxShadow: hovered === "center"
-                ? "0 40px 100px rgba(0,0,0,0.55), 0 18px 42px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.14), inset 0 1px 0 rgba(255,255,255,0.08)"
-                : "0 32px 85px rgba(0,0,0,0.5), 0 14px 35px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.06)",
+                ? "0 44px 110px rgba(0,0,0,0.58), 0 20px 48px rgba(0,0,0,0.38), 0 0 0 1px rgba(255,255,255,0.16), inset 0 1px 0 rgba(255,255,255,0.1)"
+                : "0 36px 90px rgba(0,0,0,0.52), 0 16px 40px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.07)",
               transition,
               willChange: "transform",
             }}
@@ -196,12 +197,12 @@ export default function HeroSection() {
       </div>
 
       {/* Hero CTA */}
-      <div className="relative container mx-auto px-4 pt-8 pb-16 md:pt-10 md:pb-24 text-center">
+      <div className="relative container mx-auto px-4 pt-10 pb-16 md:pt-12 md:pb-24 text-center">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/journey"
             className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-accent text-accent-foreground text-sm font-bold
-              shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 hover:scale-[1.02]
+              shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/35 hover:scale-[1.03]
               transition-all duration-200"
           >
             צפו במסלולים
@@ -209,21 +210,21 @@ export default function HeroSection() {
           </Link>
           <Link
             to="/advertisement"
-            className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-primary-foreground/[0.08] text-primary-foreground/75
-              border border-primary-foreground/[0.1] text-sm font-medium
-              hover:bg-primary-foreground/[0.14] hover:text-primary-foreground transition-all duration-200"
+            className="inline-flex items-center gap-2 px-7 py-2.5 rounded-xl bg-primary-foreground/[0.07] text-primary-foreground/70
+              border border-primary-foreground/[0.08] text-sm font-medium
+              hover:bg-primary-foreground/[0.13] hover:text-primary-foreground/90 transition-all duration-200"
           >
             מפת עמדות מאושרות
           </Link>
         </div>
       </div>
 
-      {/* Bottom fade — refined transition */}
-      <div className="absolute bottom-0 inset-x-0 h-24 pointer-events-none"
-        style={{
-          background: "linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.7) 40%, transparent 100%)"
-        }}
-      />
+      {/* Bottom fade — ultra-clean transition */}
+      <div className="absolute bottom-0 inset-x-0 pointer-events-none">
+        <div className="h-16" style={{
+          background: "linear-gradient(to top, hsl(var(--background)) 0%, hsl(var(--background) / 0.6) 50%, transparent 100%)"
+        }} />
+      </div>
     </section>
   );
 }
