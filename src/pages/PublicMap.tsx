@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import TruckMap from "@/components/TruckMap";
 import { Search, Clock, UtensilsCrossed, MapPin, ChevronLeft } from "lucide-react";
-import PageNavigation from "@/components/PageNavigation";
 import { useRegisterList } from "@/hooks/useListNavigation";
 import type { FoodTruck, Location } from "@/lib/types";
 
@@ -143,7 +142,6 @@ export default function PublicMap() {
             <Heart className="h-3.5 w-3.5" />
             חוויה מקומית...
           </Link>
-          <PageNavigation />
         </div>
       </div>
 
