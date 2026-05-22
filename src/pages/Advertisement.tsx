@@ -10,7 +10,6 @@ import TruckMap from "@/components/TruckMap";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import type { FoodTruck, Location } from "@/lib/types";
-import PageNavigation from "@/components/PageNavigation";
 import { useRegisterList } from "@/hooks/useListNavigation";
 
 type TruckWithLocation = FoodTruck & { locations: Location | null };
@@ -176,7 +175,6 @@ export default function Advertisement() {
                 עיינו בתפריטים, צפו בתמונות ובחרו את העמדה שמתאימה לכם — הכל במקום אחד
               </p>
             </div>
-            <PageNavigation />
           </div>
         </div>
       </section>

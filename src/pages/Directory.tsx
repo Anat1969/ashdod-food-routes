@@ -11,7 +11,6 @@ import type { FoodTruck, TruckStatus } from "@/lib/types";
 import { STATUS_LABELS } from "@/lib/types";
 import { toast } from "sonner";
 import ashdodMap from "@/assets/ashdod-map.jpeg";
-import PageNavigation from "@/components/PageNavigation";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -406,7 +405,6 @@ export default function Directory() {
 
   return (
     <div className="container mx-auto px-4 py-8" dir="rtl">
-      <PageNavigation />
       <h1 className="text-2xl md:text-3xl font-bold mb-2">מאגר פודטראקים</h1>
       <p className="text-muted-foreground mb-6">רשימת הפודטראקים הרשומים בעיר אשדוד</p>
 

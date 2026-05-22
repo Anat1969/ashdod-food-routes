@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Send, ExternalLink, CheckCircle2, FileText, ClipboardList, SendHorizonal } from "lucide-react";
-import PageNavigation from "@/components/PageNavigation";
 import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 
 interface FormData {
@@ -83,7 +82,6 @@ export default function ApplicationForm() {
 
   return (
     <div className="container mx-auto px-4 py-10 max-w-2xl" dir="rtl">
-      <PageNavigation />
 
       {/* Premium header — original logo */}
       <div className="mb-10 text-center">
