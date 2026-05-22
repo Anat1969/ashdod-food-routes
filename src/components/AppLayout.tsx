@@ -20,6 +20,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   { to: "/", label: "ראשי" },
   { to: "/journey", label: "מסלולים" },
   { to: "/policy", label: "מדיניות" },
+  { to: "/zones", label: "אפיון אזורים" },
   { to: "/apply", label: "הגשת בקשה" }];
 
   if (user && !isAdmin) {
@@ -31,6 +32,9 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
   navLinks.push({ to: "/map", label: "מפת כל הפודטראקים" });
   navLinks.push({ to: "/advertisement", label: "מפת עמדות מאושרות" });
   navLinks.push({ to: "/experience", label: "חוויה מקומית..." });
+  if (isAdmin) {
+    navLinks.push({ to: "/location-card", label: "כרטיס מיקום" });
+  }
   if (isAdmin) {
     navLinks.push({ to: "/admin", label: "לוח בקרה" });
   }
