@@ -5,6 +5,7 @@ import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
 import ashdodLogo from "@/assets/ashdod-logo.jpeg";
 import PageNavigation from "@/components/PageNavigation";
+import AIMenu from "@/components/AIMenu";
 
 export default function AppLayout({ children }: {children: React.ReactNode;}) {
   const { user, isAdmin, signOut } = useAuth();
@@ -96,6 +97,7 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
             }
           </nav>
 
+          <div className="flex items-center gap-2">
           {/* Mobile Menu Button */}
           <button
             className="md:hidden p-2"
@@ -103,6 +105,9 @@ export default function AppLayout({ children }: {children: React.ReactNode;}) {
 
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
+
+            <AIMenu />
+          </div>
         </div>
 
         {/* Mobile Nav */}
